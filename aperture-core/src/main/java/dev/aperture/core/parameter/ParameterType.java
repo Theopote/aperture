@@ -8,6 +8,7 @@ public enum ParameterType {
 	LENGTH,
 	ANGLE,
 	COUNT,
+	NUMBER,
 	ENUM,
 	BOOL,
 	MATERIAL_REF

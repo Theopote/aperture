@@ -4,6 +4,8 @@ import dev.aperture.core.opening.GeneratorId;
 import dev.aperture.core.opening.OpeningCategory;
 import dev.aperture.core.opening.OpeningId;
 import dev.aperture.core.parameter.ParameterDefinition;
+import dev.aperture.core.parametric.ParametricSchema;
+import dev.aperture.core.parametric.Parameter;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,7 +19,7 @@ public record OpeningTypeDefinition(
 	int schemaVersion,
 	OpeningId id,
 	OpeningCategory category,
-	Map<String, ParameterDefinition> parameters,
+	ParametricSchema parametricSchema,
 	List<ConstraintRule> constraints,
 	GeneratorId generator,
 	Map<String, Object> components,
@@ -29,11 +31,15 @@ public record OpeningTypeDefinition(
 		}
 		Objects.requireNonNull(id, "id");
 		Objects.requireNonNull(category, "category");
+		Objects.requireNonNull(parametricSchema, "parametricSchema");
 		Objects.requireNonNull(generator, "generator");
-		parameters = Map.copyOf(parameters);
 		constraints = List.copyOf(constraints);
 		components = Map.copyOf(components);
 		materialSlots = List.copyOf(materialSlots);
+	}
+
+	public Map<String, ParameterDefinition> parameters() {
+		return parametricSchema.toLegacyMap();
 	}
 
 	public static Builder builder(OpeningId id, OpeningCategory category, GeneratorId generator) {
@@ -45,7 +51,7 @@ public record OpeningTypeDefinition(
 		private final OpeningCategory category;
 		private final GeneratorId generator;
 		private int schemaVersion = 1;
-		private final Map<String, ParameterDefinition> parameters = new LinkedHashMap<>();
+		private final ParametricSchema.Builder parametricSchema = ParametricSchema.builder();
 		private final List<ConstraintRule> constraints = new java.util.ArrayList<>();
 		private final Map<String, Object> components = new LinkedHashMap<>();
 		private final List<String> materialSlots = new java.util.ArrayList<>();
@@ -56,8 +62,13 @@ public record OpeningTypeDefinition(
 			this.generator = generator;
 		}
 
+		public Builder parameter(String name, Parameter parameter) {
+			parametricSchema.put(name, parameter);
+			return this;
+		}
+
 		public Builder parameter(String name, ParameterDefinition definition) {
-			parameters.put(name, definition);
+			parametricSchema.put(name, dev.aperture.core.parametric.ParameterBridge.fromDefinition(definition));
 			return this;
 		}
 
@@ -81,7 +92,7 @@ public record OpeningTypeDefinition(
 				schemaVersion,
 				id,
 				category,
-				parameters,
+				parametricSchema.build(),
 				constraints,
 				generator,
 				components,

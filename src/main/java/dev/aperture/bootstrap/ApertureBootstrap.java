@@ -68,9 +68,9 @@ public final class ApertureBootstrap {
 	}
 
 	private void loadOpeningTypes() {
-		OpeningTypeDefinition fromData = catalogLoader.loadClasspathResource("aperture/opening_types/fixed_window.json");
-		openingTypes.register(fromData);
-		LOGGER.info("Loaded opening type from data pack: {}", fromData.id());
+		openingTypes.register(catalogLoader.loadClasspathResource("aperture/opening_types/fixed_window.json"));
+		openingTypes.register(catalogLoader.loadClasspathResource("aperture/opening_types/door.json"));
+		LOGGER.info("Loaded {} opening types from data pack", openingTypes.all().size());
 	}
 
 	private void loadProfileCatalog() {

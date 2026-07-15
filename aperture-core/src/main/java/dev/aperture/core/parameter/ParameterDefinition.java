@@ -14,6 +14,7 @@ public record ParameterDefinition(
 	ParameterValue defaultValue,
 	OptionalDouble min,
 	OptionalDouble max,
+	OptionalDouble step,
 	List<String> enumValues
 ) {
 	public ParameterDefinition {
@@ -21,12 +22,23 @@ public record ParameterDefinition(
 		Objects.requireNonNull(defaultValue, "defaultValue");
 		Objects.requireNonNull(min, "min");
 		Objects.requireNonNull(max, "max");
+		Objects.requireNonNull(step, "step");
 		enumValues = List.copyOf(enumValues);
 		defaultValue.validateType(type);
 
 		if (type == ParameterType.ENUM && enumValues.isEmpty()) {
 			throw new IllegalArgumentException("Enum parameter requires values");
 		}
+	}
+
+	public ParameterDefinition(
+		ParameterType type,
+		ParameterValue defaultValue,
+		OptionalDouble min,
+		OptionalDouble max,
+		List<String> enumValues
+	) {
+		this(type, defaultValue, min, max, OptionalDouble.empty(), enumValues);
 	}
 
 	public static Builder builder(ParameterType type) {
@@ -46,6 +58,7 @@ public record ParameterDefinition(
 		private ParameterValue defaultValue;
 		private OptionalDouble min = OptionalDouble.empty();
 		private OptionalDouble max = OptionalDouble.empty();
+		private OptionalDouble step = OptionalDouble.empty();
 		private List<String> enumValues = List.of();
 
 		private Builder(ParameterType type) {
@@ -67,6 +80,11 @@ public record ParameterDefinition(
 			return this;
 		}
 
+		public Builder step(double value) {
+			this.step = OptionalDouble.of(value);
+			return this;
+		}
+
 		public Builder enumValues(String... values) {
 			this.enumValues = List.of(values);
 			return this;
@@ -78,12 +96,13 @@ public record ParameterDefinition(
 					case LENGTH -> ParameterValue.length(0);
 					case ANGLE -> ParameterValue.angle(0);
 					case COUNT -> ParameterValue.count(0);
+					case NUMBER -> ParameterValue.number(0);
 					case BOOL -> ParameterValue.bool(false);
 					case ENUM -> ParameterValue.enumValue(enumValues.isEmpty() ? "" : enumValues.getFirst());
 					case MATERIAL_REF -> ParameterValue.materialRef("");
 				};
 			}
-			return new ParameterDefinition(type, defaultValue, min, max, enumValues);
+			return new ParameterDefinition(type, defaultValue, min, max, step, enumValues);
 		}
 	}
 }

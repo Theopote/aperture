@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "id": "aperture:door",
+  "category": "door",
+  "generator": "aperture:rectangular_window_v1",
+  "parameters": {
+    "width": {
+      "kind": "range",
+      "type": "length",
+      "label": "Width",
+      "group": "Dimensions",
+      "default": 1200,
+      "min": 600,
+      "max": 2400,
+      "step": 10
+    },
+    "height": {
+      "kind": "range",
+      "type": "length",
+      "label": "Height",
+      "group": "Dimensions",
+      "default": 2300,
+      "min": 1800,
+      "max": 3000,
+      "step": 10
+    },
+    "thickness": {
+      "kind": "range",
+      "type": "length",
+      "label": "Thickness",
+      "group": "Dimensions",
+      "default": 60,
+      "min": 35,
+      "max": 120
+    },
+    "panel_count": {
+      "kind": "range",
+      "type": "count",
+      "label": "Panel Count",
+      "group": "Layout",
+      "default": 2,
+      "min": 1,
+      "max": 6
+    },
+    "glass_ratio": {
+      "kind": "range",
+      "type": "number",
+      "label": "Glass Ratio",
+      "group": "Layout",
+      "default": 0.35,
+      "min": 0,
+      "max": 1,
+      "step": 0.05
+    },
+    "frame_width": {
+      "kind": "range",
+      "type": "length",
+      "label": "Frame Width",
+      "group": "Frame",
+      "default": 80,
+      "min": 40,
+      "max": 200
+    },
+    "hinge_side": {
+      "kind": "choice",
+      "label": "Hinge Side",
+      "default": "left",
+      "choices": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    "has_transom": {
+      "kind": "boolean",
+      "label": "Transom",
+      "default": false
+    },
+    "frame_material": {
+      "kind": "material",
+      "label": "Frame Material",
+      "group": "Materials",
+      "default": "minecraft:oak_planks"
+    }
+  },
+  "materialSlots": ["frame", "glazing"],
+  "components": {
+    "frame": { "profile": "aperture:frame_standard_50" },
+    "glazing": { "system": "aperture:single_glazed" }
+  }
+}

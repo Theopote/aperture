@@ -11,6 +11,7 @@ public sealed interface ParameterValue permits
 	ParameterValue.LengthValue,
 	ParameterValue.AngleValue,
 	ParameterValue.CountValue,
+	ParameterValue.NumberValue,
 	ParameterValue.EnumValue,
 	ParameterValue.BoolValue,
 	ParameterValue.MaterialRefValue {
@@ -25,6 +26,10 @@ public sealed interface ParameterValue permits
 
 	static CountValue count(int value) {
 		return new CountValue(value);
+	}
+
+	static NumberValue number(double value) {
+		return new NumberValue(value);
 	}
 
 	static EnumValue enumValue(String value) {
@@ -77,6 +82,13 @@ public sealed interface ParameterValue permits
 		@Override
 		public ParameterType type() {
 			return ParameterType.COUNT;
+		}
+	}
+
+	record NumberValue(double value) implements ParameterValue {
+		@Override
+		public ParameterType type() {
+			return ParameterType.NUMBER;
 		}
 	}
 

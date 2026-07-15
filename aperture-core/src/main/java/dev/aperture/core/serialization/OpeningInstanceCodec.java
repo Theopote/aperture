@@ -131,6 +131,7 @@ public final class OpeningInstanceCodec implements JsonCodec<OpeningInstance> {
 			case ParameterValue.LengthValue length -> gsonNumber(length.millimeters());
 			case ParameterValue.AngleValue angle -> gsonNumber(angle.degrees());
 			case ParameterValue.CountValue count -> gsonNumber(count.value());
+			case ParameterValue.NumberValue number -> gsonNumber(number.value());
 			case ParameterValue.EnumValue enumValue -> gsonString(enumValue.value());
 			case ParameterValue.BoolValue bool -> gsonBool(bool.value());
 			case ParameterValue.MaterialRefValue materialRef -> gsonString(materialRef.raw());
@@ -173,6 +174,7 @@ public final class OpeningInstanceCodec implements JsonCodec<OpeningInstance> {
 			case LENGTH -> ParameterValue.length(element.getAsDouble());
 			case ANGLE -> ParameterValue.angle(element.getAsDouble());
 			case COUNT -> ParameterValue.count(element.getAsInt());
+			case NUMBER -> ParameterValue.number(element.getAsDouble());
 			case ENUM -> ParameterValue.enumValue(element.getAsString());
 			case BOOL -> ParameterValue.bool(element.getAsBoolean());
 			case MATERIAL_REF -> ParameterValue.materialRef(element.getAsString());

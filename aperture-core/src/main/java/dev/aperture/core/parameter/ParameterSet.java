@@ -53,6 +53,26 @@ public final class ParameterSet {
 		return ((ParameterValue.CountValue) require(name, ParameterType.COUNT)).value();
 	}
 
+	public double requireAngle(String name) {
+		return ((ParameterValue.AngleValue) require(name, ParameterType.ANGLE)).degrees();
+	}
+
+	public double requireNumber(String name) {
+		return ((ParameterValue.NumberValue) require(name, ParameterType.NUMBER)).value();
+	}
+
+	public boolean requireBool(String name) {
+		return ((ParameterValue.BoolValue) require(name, ParameterType.BOOL)).value();
+	}
+
+	public String requireEnum(String name) {
+		return ((ParameterValue.EnumValue) require(name, ParameterType.ENUM)).value();
+	}
+
+	public String requireMaterialRef(String name) {
+		return ((ParameterValue.MaterialRefValue) require(name, ParameterType.MATERIAL_REF)).raw();
+	}
+
 	private ParameterValue require(String name, ParameterType type) {
 		ParameterValue value = values.get(name);
 		if (value == null) {
