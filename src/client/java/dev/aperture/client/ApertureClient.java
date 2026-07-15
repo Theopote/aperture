@@ -1,9 +1,11 @@
 package dev.aperture.client;
 
 import dev.aperture.Aperture;
+import dev.aperture.client.editor.GizmoDragController;
 import dev.aperture.client.placement.ClientPlacementPreview;
 import dev.aperture.client.render.ApertureRenderers;
 import dev.aperture.client.render.ClientMaterialPreview;
+import dev.aperture.client.render.editor.EditorGizmoRenderer;
 import dev.aperture.client.render.placement.GhostPreviewMeshRenderer;
 import dev.aperture.client.render.placement.PlacementPreviewRenderer;
 import net.fabricmc.api.ClientModInitializer;
@@ -43,13 +45,17 @@ public class ApertureClient implements ClientModInitializer {
 
 		ClientTickEvents.END_CLIENT_TICK.register(this::onClientTick);
 		LevelRenderEvents.COLLECT_SUBMITS.register(GhostPreviewMeshRenderer::emit);
-		LevelRenderEvents.BEFORE_GIZMOS.register(context -> PlacementPreviewRenderer.emit());
+		LevelRenderEvents.BEFORE_GIZMOS.register(context -> {
+			PlacementPreviewRenderer.emit();
+			EditorGizmoRenderer.emit();
+		});
 		ApertureRenderers.registerAll();
 		Aperture.LOGGER.info("Aperture client initialized — crosshair placement preview active");
 	}
 
 	private void onClientTick(Minecraft client) {
 		ClientPlacementPreview.tick(client);
+		GizmoDragController.tick(client);
 
 		while (commitPlacementKey.consumeClick()) {
 			if (ClientPlacementPreview.commitPreview()) {

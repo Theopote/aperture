@@ -1,8 +1,15 @@
 package dev.aperture.client.placement;
 
 import dev.aperture.api.ApertureApi;
+import dev.aperture.client.editor.ClientEditorBridge;
+import dev.aperture.client.editor.GizmoDragController;
 import dev.aperture.client.parameter.ParameterEditorScreen;
 import dev.aperture.client.render.placement.PlacementPreviewMeshService;
+import dev.aperture.core.definition.OpeningTypeDefinition;
+import dev.aperture.core.geometry.Transform3d;
+import dev.aperture.core.instance.OpeningInstance;
+import dev.aperture.core.parameter.ParameterDefinition;
+import dev.aperture.core.parameter.ParameterValue;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.opening.OpeningId;
 import dev.aperture.core.parameter.ParameterSet;
@@ -25,8 +32,11 @@ public final class ClientPlacementPreview {
 
 	private static FabricPlacementTarget currentTarget;
 	private static PlacementSession currentSession;
+	private static final ClientEditorBridge editorBridge = new ClientEditorBridge();
 	private static OpeningId selectedTypeId = BuiltinOpeningTypes.DOOR_ID;
 	private static ParameterSet parameterOverrides = ParameterSet.empty();
+	private static Transform3d transformOverride;
+	private static Object lastTargetKey;
 
 	private ClientPlacementPreview() {
 	}
@@ -52,6 +62,13 @@ public final class ClientPlacementPreview {
 			}
 
 			currentTarget = target.get();
+			Object targetKey = targetKey(currentTarget);
+			if (lastTargetKey == null || !targetKey.equals(lastTargetKey)) {
+				lastTargetKey = targetKey;
+				if (!GizmoDragController.isDragging()) {
+					transformOverride = null;
+				}
+			}
 			refreshSession(api);
 		} catch (IllegalStateException notInitialized) {
 			clear();
@@ -76,14 +93,57 @@ public final class ClientPlacementPreview {
 			return;
 		}
 
+		Transform3d transform = transformOverride != null
+			? transformOverride
+			: currentTarget.suggestedTransform();
 		currentSession = api.placement().preview(
 			selectedTypeId,
 			parameterOverrides,
-			currentTarget.suggestedTransform(),
+			transform,
 			currentTarget.host(),
 			currentTarget.placementContext()
 		);
+		editorBridge.syncFromPreview(api, currentSession);
 		PlacementPreviewMeshService.update(currentSession);
+	}
+
+	public static void applyEditorInstance(OpeningInstance instance) {
+		try {
+			ApertureApi api = ApertureApi.get();
+			OpeningTypeDefinition definition = api.openingTypes().require(instance.typeId());
+			transformOverride = instance.transform();
+			parameterOverrides = overridesFromInstance(definition, instance);
+			refreshSession(api);
+		} catch (IllegalStateException notInitialized) {
+			// Mod not bootstrapped yet on client.
+		}
+	}
+
+	private static Object targetKey(FabricPlacementTarget target) {
+		return target.host().anchor();
+	}
+
+	private static ParameterSet overridesFromInstance(OpeningTypeDefinition definition, OpeningInstance instance) {
+		ParameterSet.Builder builder = ParameterSet.builder();
+		for (var entry : instance.parameters().asMap().entrySet()) {
+			ParameterDefinition schema = definition.parameters().get(entry.getKey());
+			if (schema == null) {
+				builder.put(entry.getKey(), entry.getValue());
+				continue;
+			}
+			ParameterValue defaultValue = schema.defaultValue();
+			if (!defaultValue.equals(entry.getValue())) {
+				builder.put(entry.getKey(), entry.getValue());
+			}
+		}
+		return builder.build();
+	}
+
+	public static java.util.Optional<ClientEditorBridge> editorBridge() {
+		if (currentSession == null) {
+			return java.util.Optional.empty();
+		}
+		return java.util.Optional.of(editorBridge);
 	}
 
 	public static Optional<FabricPlacementTarget> target() {
@@ -121,6 +181,10 @@ public final class ClientPlacementPreview {
 	private static void clear() {
 		currentTarget = null;
 		currentSession = null;
+		lastTargetKey = null;
+		transformOverride = null;
+		editorBridge.clear();
+		GizmoDragController.reset();
 		PlacementPreviewMeshService.clear();
 	}
 }
