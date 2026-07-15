@@ -11,6 +11,7 @@ import dev.aperture.geometry.profile.ProfileDefinition;
 import dev.aperture.geometry.profile.ProfileScaler;
 
 import java.util.Optional;
+import java.util.OptionalDouble;
 
 /**
  * Inputs available to each generation stage in a pipeline run.
@@ -67,9 +68,8 @@ public final class GenerationContext {
 	}
 
 	public Optional<Double> optionalLength(String name) {
-		return parameters.get(name)
-			.filter(value -> value.type() == ParameterType.LENGTH)
-			.map(value -> ((ParameterValue.LengthValue) value).millimeters());
+		OptionalDouble length = parameters.optionalLength(name);
+		return length.isPresent() ? Optional.of(length.getAsDouble()) : Optional.empty();
 	}
 
 	public ProfileDefinition scaledFrameProfile() {

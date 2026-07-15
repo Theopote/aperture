@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalDouble;
 
 /**
  * Resolved parameter values for an opening instance or generation request.
@@ -103,6 +104,14 @@ public final class ParameterSet {
 			.filter(value -> value.type() == ParameterType.ENUM)
 			.map(value -> ((ParameterValue.EnumValue) value).value())
 			.orElse(defaultValue);
+	}
+
+	public OptionalDouble optionalLength(String name) {
+		return get(name)
+			.filter(value -> value.type() == ParameterType.LENGTH)
+			.map(value -> ((ParameterValue.LengthValue) value).millimeters())
+			.map(OptionalDouble::of)
+			.orElse(OptionalDouble.empty());
 	}
 
 	private ParameterValue require(String name, ParameterType type) {
