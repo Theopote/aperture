@@ -1,5 +1,7 @@
 # 08 — Expansion Plan
 
+> **Canonical product roadmap:** see [12-phase-roadmap.md](12-phase-roadmap.md) for the full twelve-phase breakdown (Architecture → AI + NodeCraft). This document retains the original time-horizon view (Phase 0–5).
+
 ## Phase 0 — Foundation (Months 1–3) ← **Current**
 
 - [x] Architecture documentation
