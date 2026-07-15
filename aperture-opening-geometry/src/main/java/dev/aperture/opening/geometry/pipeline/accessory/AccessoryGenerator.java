@@ -1,13 +1,13 @@
 package dev.aperture.opening.geometry.pipeline.accessory;
 
 import dev.aperture.math.Vec3d;
+import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
+import dev.aperture.geometry.profile.ProfileCurve;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.geometry.pipeline.OpeningParameters;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 import dev.aperture.opening.geometry.pipeline.PipelineStep;
-import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 import dev.aperture.opening.geometry.pipeline.frame.FrameRailBuilder;
-import dev.aperture.geometry.profile.ProfileCurve;
 
 /**
  * Generates mullions and curtain-wall grid dividers.
@@ -43,14 +43,15 @@ public final class AccessoryGenerator implements PipelineStep {
 			double t = (double) i / (count + 1);
 			double x = layout.frameFace() + layout.innerWidth() * t - layout.frameFace() / 2.0;
 			String path = parameters.cols() > 1 ? "divider.vertical." + i : "frame.mullion." + i;
-			target.addSolid(FrameRailBuilder.miteredRail(
+			FrameRailBuilder.emitMiteredRail(
+				target,
 				path,
 				profile,
 				new Vec3d(x, layout.frameFace(), 0),
 				new Vec3d(x, layout.height() - layout.frameFace(), 0),
 				FrameRailBuilder.axisX(),
 				FrameRailBuilder.axisZ()
-			));
+			);
 		}
 	}
 
@@ -67,14 +68,15 @@ public final class AccessoryGenerator implements PipelineStep {
 		for (int i = 1; i <= count; i++) {
 			double t = (double) i / (count + 1);
 			double y = layout.frameFace() + layout.innerHeight() * t - layout.frameFace() / 2.0;
-			target.addSolid(FrameRailBuilder.miteredRail(
+			FrameRailBuilder.emitMiteredRail(
+				target,
 				"divider.horizontal." + i,
 				profile,
 				new Vec3d(layout.frameFace(), y, 0),
 				new Vec3d(layout.width() - layout.frameFace(), y, 0),
 				FrameRailBuilder.axisY(),
 				FrameRailBuilder.axisZ()
-			));
+			);
 		}
 	}
 }

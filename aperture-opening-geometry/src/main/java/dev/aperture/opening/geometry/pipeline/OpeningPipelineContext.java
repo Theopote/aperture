@@ -1,86 +1,67 @@
 package dev.aperture.opening.geometry.pipeline;
 
 import dev.aperture.core.definition.OpeningTypeDefinition;
-import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
-import dev.aperture.geometry.profile.ProfileCatalogRegistry;
-import dev.aperture.geometry.profile.ProfileDefinition;
+import dev.aperture.opening.resolve.OpeningParameterResolver;
+import dev.aperture.opening.resolve.ResolvedOpening;
 
 import java.util.Objects;
 
 /**
- * Mutable pipeline context flowing through profile, frame, panel, glass, and accessory steps.
+ * Geometry-step context with pre-resolved parameters, profiles, and layout.
  */
 public final class OpeningPipelineContext {
-	private final GenerationContext source;
-	private OpeningParameters parameters;
-	private ResolvedProfiles profiles;
-	private OpeningLayout layout;
+	private final ResolvedOpening resolved;
 
-	public OpeningPipelineContext(GenerationContext source) {
-		this.source = Objects.requireNonNull(source, "source");
+	public OpeningPipelineContext(ResolvedOpening resolved) {
+		this.resolved = Objects.requireNonNull(resolved, "resolved");
 	}
 
 	public static OpeningPipelineContext from(GenerationContext source) {
-		return new OpeningPipelineContext(source);
+		return new OpeningPipelineContext(new OpeningParameterResolver().resolve(source));
 	}
 
-	public OpeningTypeDefinition definition() {
-		return source.definition();
-	}
-
-	public ParameterSet parameters() {
-		return source.parameters();
-	}
-
-	public ProfileCatalogRegistry profileCatalog() {
-		return source.profiles();
+	public static OpeningPipelineContext from(ResolvedOpening resolved) {
+		return new OpeningPipelineContext(resolved);
 	}
 
 	public GenerationContext source() {
-		return source;
+		return resolved.context();
+	}
+
+	public OpeningTypeDefinition definition() {
+		return resolved.context().definition();
+	}
+
+	public dev.aperture.core.parameter.ParameterSet parameters() {
+		return resolved.context().parameters();
+	}
+
+	public dev.aperture.geometry.profile.ProfileCatalogRegistry profileCatalog() {
+		return resolved.context().profiles();
 	}
 
 	public OpeningParameters openingParameters() {
-		if (parameters == null) {
-			parameters = OpeningParameters.from(source);
-		}
-		return parameters;
+		return resolved.parameters();
 	}
 
 	public ResolvedProfiles resolvedProfiles() {
-		requireProfilesResolved();
-		return profiles;
+		return resolved.profiles();
 	}
 
 	public OpeningLayout layout() {
-		requireProfilesResolved();
-		if (layout == null) {
-			layout = OpeningLayout.from(openingParameters(), profiles);
-		}
-		return layout;
+		return resolved.layout();
 	}
 
-	public void setResolvedProfiles(ResolvedProfiles profiles) {
-		this.profiles = Objects.requireNonNull(profiles, "profiles");
-		this.layout = null;
+	public dev.aperture.geometry.profile.ProfileDefinition scaledFrameProfile() {
+		return resolved.context().scaledFrameProfile();
 	}
 
-	public ProfileDefinition scaledFrameProfile() {
-		return source.scaledFrameProfile();
-	}
-
-	public ProfileDefinition scaledPanelProfile() {
-		return source.scaledPanelProfile();
+	public dev.aperture.geometry.profile.ProfileDefinition scaledPanelProfile() {
+		return resolved.context().scaledPanelProfile();
 	}
 
 	public boolean hasComponent(String componentName) {
-		return source.hasComponent(componentName);
-	}
-
-	private void requireProfilesResolved() {
-		if (profiles == null) {
-			throw new IllegalStateException("ProfileGenerator has not run yet");
-		}
+		return resolved.context().hasComponent(componentName);
 	}
 }

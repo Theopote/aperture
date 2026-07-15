@@ -1,89 +1,48 @@
 package dev.aperture.opening.geometry.pipeline;
 
-import dev.aperture.opening.geometry.pipeline.accessory.AccessoryGenerator;
-import dev.aperture.geometry.recipe.GeometryRecipe;
-import dev.aperture.geometry.recipe.GeometryRecipeBuilder;
-import dev.aperture.geometry.recipe.GeometryRecipeExecutor;
-import dev.aperture.opening.geometry.pipeline.frame.FrameGenerator;
-import dev.aperture.opening.geometry.pipeline.glass.GlassGenerator;
-import dev.aperture.geometry.pipeline.mesh.MeshAssembler;
-import dev.aperture.opening.geometry.pipeline.panel.PanelGenerator;
-import dev.aperture.opening.geometry.pipeline.profile.ProfileGenerator;
 import dev.aperture.geometry.pipeline.PipelineResult;
+import dev.aperture.geometry.recipe.GeometryRecipe;
+import dev.aperture.opening.component.ComponentPlan;
+import dev.aperture.opening.component.ComponentPlanBuilder;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
+import dev.aperture.opening.pipeline.OpeningGenerationPipeline;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * Opening assembly pipeline: component steps produce kernel solids, then mesh assembly.
+ * Legacy facade over {@link OpeningGenerationPipeline} geometry steps.
+ *
+ * @deprecated Prefer {@link OpeningGenerationPipeline} and explicit layer types.
  */
+@Deprecated
 public final class OpeningPipeline {
-	public static final List<String> STEP_ORDER = List.of(
-		ProfileGenerator.STEP_ID,
-		FrameGenerator.STEP_ID,
-		PanelGenerator.STEP_ID,
-		GlassGenerator.STEP_ID,
-		AccessoryGenerator.STEP_ID
-	);
+	private final ComponentPlan plan;
 
-	private final List<PipelineStep> steps;
-	private final MeshAssembler meshAssembler;
-
-	public OpeningPipeline(List<PipelineStep> steps, MeshAssembler meshAssembler) {
-		if (steps.isEmpty()) {
-			throw new IllegalArgumentException("pipeline requires at least one step");
-		}
-		this.steps = List.copyOf(steps);
-		this.meshAssembler = meshAssembler;
+	public OpeningPipeline(ComponentPlan plan) {
+		this.plan = plan;
 	}
 
-	public static OpeningPipeline standard() {
-		return new OpeningPipeline(
-			List.of(
-				new ProfileGenerator(),
-				new FrameGenerator(),
-				new PanelGenerator(),
-				new GlassGenerator(),
-				new AccessoryGenerator()
-			),
-			new MeshAssembler()
-		);
-	}
-
-	public static OpeningPipeline of(PipelineStep... steps) {
-		return new OpeningPipeline(Arrays.asList(steps), new MeshAssembler());
+	public static OpeningPipeline forAssembly(dev.aperture.core.component.ComponentAssembly assembly) {
+		return new OpeningPipeline(ComponentPlanBuilder.buildPlan(assembly));
 	}
 
 	public PipelineResult execute(GenerationContext input) {
-		return execute(OpeningPipelineContext.from(input));
-	}
-
-	public PipelineResult execute(OpeningPipelineContext context) {
-		CompiledPipeline compiled = compile(context);
-		return new PipelineResult(compiled.geometry(), compiled.meshes());
+		return OpeningGenerationPipeline.standard().generate(input);
 	}
 
 	public CompiledPipeline compile(OpeningPipelineContext context) {
-		GeometryRecipeBuilder recipe = new GeometryRecipeBuilder();
-		for (PipelineStep step : steps) {
-			step.execute(context, recipe);
-		}
-		GeometryRecipe compiledRecipe = recipe.build();
-		var geometry = GeometryRecipeExecutor.execute(compiledRecipe);
-		var meshes = meshAssembler.assemble(geometry);
-		return new CompiledPipeline(compiledRecipe, geometry, meshes);
+		return OpeningGenerationPipeline.standard().compile(context.source());
 	}
 
 	public GeometryRecipe compileRecipe(OpeningPipelineContext context) {
-		return compile(context).recipe();
+		return OpeningGenerationPipeline.standard().compileRecipe(context.source());
 	}
 
 	public List<PipelineStep> steps() {
-		return steps;
+		return plan.steps();
 	}
 
 	public List<String> stepIds() {
-		return steps.stream().map(PipelineStep::id).toList();
+		return plan.stepIds();
 	}
 }

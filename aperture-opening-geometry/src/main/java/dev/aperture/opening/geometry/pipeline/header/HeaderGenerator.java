@@ -1,12 +1,12 @@
 package dev.aperture.opening.geometry.pipeline.header;
 
 import dev.aperture.math.Vec3d;
+import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
+import dev.aperture.geometry.profile.ProfileCurve;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 import dev.aperture.opening.geometry.pipeline.PipelineStep;
-import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 import dev.aperture.opening.geometry.pipeline.frame.FrameRailBuilder;
-import dev.aperture.geometry.profile.ProfileCurve;
 
 /**
  * Generates the structural header / head member above the opening frame.
@@ -24,7 +24,8 @@ public final class HeaderGenerator implements PipelineStep {
 		OpeningLayout layout = context.layout();
 		ProfileCurve profile = context.resolvedProfiles().frame().curve();
 		double y = layout.height() - layout.frameFace();
-		target.addSolid(FrameRailBuilder.miteredRail(
+		FrameRailBuilder.emitMiteredRail(
+			target,
 			"header.main",
 			profile,
 			new Vec3d(0, y, 0),
@@ -33,6 +34,6 @@ public final class HeaderGenerator implements PipelineStep {
 			FrameRailBuilder.axisZ(),
 			FrameRailBuilder.corner(layout, FrameRailBuilder.Corner.TOP_LEFT),
 			FrameRailBuilder.corner(layout, FrameRailBuilder.Corner.TOP_RIGHT)
-		));
+		);
 	}
 }

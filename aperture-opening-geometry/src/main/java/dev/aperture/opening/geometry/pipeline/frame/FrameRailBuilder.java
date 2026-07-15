@@ -1,14 +1,11 @@
 package dev.aperture.opening.geometry.pipeline.frame;
 
-import dev.aperture.math.BoundingBox;
-import dev.aperture.math.Vec3d;
-import dev.aperture.geometry.kernel.ProfileExtruder;
 import dev.aperture.geometry.model.GeometryLayer;
-import dev.aperture.geometry.model.GeometrySolid;
+import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 import dev.aperture.geometry.profile.ProfileCurve;
 import dev.aperture.geometry.recipe.shape.ShapeRecipe;
-import dev.aperture.geometry.recipe.shape.ShapeRecipes;
-import dev.aperture.opening.geometry.pipeline.OpeningLayout;
+import dev.aperture.math.BoundingBox;
+import dev.aperture.math.Vec3d;
 
 /**
  * Opening-specific frame rail layout compiled into kernel {@link ShapeRecipe} ops.
@@ -25,10 +22,13 @@ public final class FrameRailBuilder {
 		Vec3d profileV,
 		BoundingBox... subtractBoxes
 	) {
-		return ShapeRecipes.extrudeLinear(profile, pathStart, pathEnd, profileU, profileV, subtractBoxes);
+		return dev.aperture.geometry.recipe.shape.ShapeRecipes.extrudeLinear(
+			profile, pathStart, pathEnd, profileU, profileV, subtractBoxes
+		);
 	}
 
-	public static GeometrySolid miteredRail(
+	public static void emitMiteredRail(
+		GeometryCompilationTarget target,
 		String componentPath,
 		ProfileCurve profile,
 		Vec3d pathStart,
@@ -37,20 +37,15 @@ public final class FrameRailBuilder {
 		Vec3d profileV,
 		BoundingBox... subtractBoxes
 	) {
-		return ProfileExtruder.linear(
+		target.emitSolid(
 			componentPath,
 			"frame",
 			GeometryLayer.OPAQUE,
-			profile,
-			pathStart,
-			pathEnd,
-			profileU,
-			profileV,
-			subtractBoxes
+			miteredRailShape(profile, pathStart, pathEnd, profileU, profileV, subtractBoxes)
 		);
 	}
 
-	public static BoundingBox corner(OpeningLayout layout, Corner corner) {
+	public static BoundingBox corner(dev.aperture.opening.geometry.pipeline.OpeningLayout layout, Corner corner) {
 		return switch (corner) {
 			case BOTTOM_LEFT -> new BoundingBox(Vec3d.ZERO, new Vec3d(layout.frameFace(), layout.frameFace(), layout.frameDepth()));
 			case BOTTOM_RIGHT -> new BoundingBox(
@@ -69,15 +64,15 @@ public final class FrameRailBuilder {
 	}
 
 	public static Vec3d axisX() {
-		return ProfileExtruder.AXIS_X;
+		return dev.aperture.geometry.kernel.ProfileExtruder.AXIS_X;
 	}
 
 	public static Vec3d axisY() {
-		return ProfileExtruder.AXIS_Y;
+		return dev.aperture.geometry.kernel.ProfileExtruder.AXIS_Y;
 	}
 
 	public static Vec3d axisZ() {
-		return ProfileExtruder.AXIS_Z;
+		return dev.aperture.geometry.kernel.ProfileExtruder.AXIS_Z;
 	}
 
 	public enum Corner {

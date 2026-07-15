@@ -36,8 +36,11 @@ public final class GeneratorRegistry {
 		ParameterSet parameters,
 		ProfileCatalogRegistry profiles
 	) {
-		GenerationContext context = new GenerationContext(definition, parameters, profiles);
-		return require(definition.generator()).generate(context);
+		return generatePipeline(new GenerationContext(definition, parameters, profiles));
+	}
+
+	public PipelineResult generatePipeline(GenerationContext context) {
+		return require(context.definition().generator()).generate(context);
 	}
 
 	public GeometryResult generate(

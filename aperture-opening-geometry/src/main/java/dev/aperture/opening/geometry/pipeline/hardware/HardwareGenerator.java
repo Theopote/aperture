@@ -4,12 +4,12 @@ import dev.aperture.core.component.ComponentKind;
 import dev.aperture.math.BoundingBox;
 import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.model.GeometryLayer;
-import dev.aperture.geometry.model.GeometrySolid;
+import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
+import dev.aperture.geometry.recipe.shape.ShapeRecipes;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.geometry.pipeline.OpeningParameters;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 import dev.aperture.opening.geometry.pipeline.PipelineStep;
-import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 import dev.aperture.opening.geometry.pipeline.panel.PanelCellLayout;
 import dev.aperture.opening.geometry.pipeline.panel.PanelLayoutPlanner;
 
@@ -50,14 +50,7 @@ public final class HardwareGenerator implements PipelineStep {
 		}
 
 		PanelCellLayout primary = PanelLayoutPlanner.primaryLeaf(cells, parameters.panelHinge());
-		String hardwareType = context.definition().components().hardware()
-			.map(component -> component.hardwareType())
-			.orElse("generic");
-
-		switch (hardwareType) {
-			case "hinge_set", "hinges" -> emitHingeSet(target, primary, layout);
-			default -> emitHingeSet(target, primary, layout);
-		}
+		emitHingeSet(target, primary, layout);
 		emitHandle(target, primary, layout);
 	}
 
@@ -76,15 +69,15 @@ public final class HardwareGenerator implements PipelineStep {
 			double centerY = leaf.originY() + leaf.height() * positions[i];
 			double minY = centerY - HINGE_HEIGHT / 2.0;
 			double maxY = centerY + HINGE_HEIGHT / 2.0;
-			target.addSolid(GeometrySolid.box(
+			target.emitSolid(
 				"hardware.hinge." + (i + 1),
 				"hardware",
 				GeometryLayer.CUTOUT,
-				new BoundingBox(
+				ShapeRecipes.box(new BoundingBox(
 					new Vec3d(hingeX + offsetX, minY, layout.frameDepth() * 0.15),
 					new Vec3d(hingeX + offsetX + HINGE_WIDTH, maxY, layout.frameDepth() * 0.15 + HINGE_DEPTH)
-				)
-			));
+				))
+			);
 		}
 	}
 
@@ -99,14 +92,14 @@ public final class HardwareGenerator implements PipelineStep {
 			case "right" -> layout.sashFace() * 0.2;
 			default -> -HANDLE_WIDTH - layout.sashFace() * 0.2;
 		};
-		target.addSolid(GeometrySolid.box(
+		target.emitSolid(
 			"hardware.handle",
 			"hardware",
 			GeometryLayer.CUTOUT,
-			new BoundingBox(
+			ShapeRecipes.box(new BoundingBox(
 				new Vec3d(latchX + offsetX, centerY - HANDLE_HEIGHT / 2.0, layout.frameDepth() * 0.35),
 				new Vec3d(latchX + offsetX + HANDLE_WIDTH, centerY + HANDLE_HEIGHT / 2.0, layout.frameDepth() * 0.35 + HANDLE_DEPTH)
-			)
-		));
+			))
+		);
 	}
 }
