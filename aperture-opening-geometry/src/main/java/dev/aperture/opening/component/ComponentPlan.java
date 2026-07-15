@@ -5,8 +5,8 @@ import dev.aperture.opening.geometry.pipeline.PipelineStep;
 import java.util.List;
 
 /**
- * Ordered geometry steps selected from a {@link dev.aperture.core.component.ComponentAssembly}.
- * Door, window, and curtain wall differ only by which steps appear here.
+ * Ordered geometry steps — one {@link dev.aperture.opening.geometry.pipeline.ComponentPipelineStep}
+ * per component instance in the assembly.
  */
 public record ComponentPlan(List<PipelineStep> steps) {
 	public ComponentPlan {

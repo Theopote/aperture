@@ -1,6 +1,8 @@
 package dev.aperture.opening.geometry.pipeline.panel;
 
 import dev.aperture.core.component.PanelComponent;
+import dev.aperture.core.parameter.ParameterType;
+import dev.aperture.core.parameter.ParameterValue;
 import dev.aperture.math.BoundingBox;
 import dev.aperture.math.Transform3d;
 import dev.aperture.math.Vec3d;
@@ -43,8 +45,8 @@ public final class PanelGenerator implements ComponentPipelineStep {
 		}
 
 		OpeningLayout layout = context.layout();
-		ProfileCurve sashProfile = context.resolvedProfiles().panelProfile().orElseThrow().curve();
-		List<PanelCellLayout> cells = PanelLayoutPlanner.plan(parameters, layout);
+		ProfileCurve sashProfile = context.profileCurveFor(component);
+		List<PanelCellLayout> cells = PanelLayoutPlanner.plan(parameters, layout, resolveHingeSide(context));
 		for (PanelCellLayout cell : cells) {
 			emitPanelCell(target, sashProfile, layout, cell);
 		}
@@ -121,6 +123,13 @@ public final class PanelGenerator implements ComponentPipelineStep {
 				panelTransform
 			);
 		}
+	}
+
+	private String resolveHingeSide(OpeningPipelineContext context) {
+		return context.parameters().get("hinge_side")
+			.filter(value -> value.type() == ParameterType.ENUM)
+			.map(value -> ((ParameterValue.EnumValue) value).value())
+			.orElse(component.hinge());
 	}
 
 	private String pathPrefix(PanelCellLayout cell) {

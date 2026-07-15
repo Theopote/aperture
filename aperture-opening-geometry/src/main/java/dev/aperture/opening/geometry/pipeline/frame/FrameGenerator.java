@@ -29,7 +29,7 @@ public final class FrameGenerator implements ComponentPipelineStep {
 	public void execute(OpeningPipelineContext context, GeometryCompilationTarget target) {
 		String root = component.ref().id();
 		OpeningLayout layout = context.layout();
-		ProfileCurve profile = context.resolvedProfiles().frame().curve();
+		ProfileCurve profile = context.profileCurveFor(component);
 
 		FrameRailBuilder.emitMiteredRail(
 			target,

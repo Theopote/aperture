@@ -66,9 +66,9 @@ class RenderDeltaEngineTest {
 
 		RenderDelta delta = RenderDeltaEngine.compute(before, after);
 
-		assertEquals(Set.of(PartId.of("frame.mullion.2")), delta.added());
+		assertEquals(Set.of(PartId.of("mullions.mullion.2")), delta.added());
 		assertTrue(delta.removed().isEmpty());
-		assertEquals(Set.of(PartId.of("frame.mullion.1")), delta.changed());
+		assertEquals(Set.of(PartId.of("mullions.mullion.1")), delta.changed());
 		assertTrue(delta.unchanged().contains(PartId.of("frame.bottom")));
 		assertTrue(delta.unchanged().contains(PartId.of("glazing")));
 	}

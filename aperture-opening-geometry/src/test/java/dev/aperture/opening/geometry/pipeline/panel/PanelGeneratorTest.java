@@ -51,8 +51,8 @@ class PanelGeneratorTest {
 			.put("glass_ratio", ParameterValue.number(0.35))
 			.build());
 
-		assertTrue(result.meshes().partsByPath().containsKey("panel.0.bottom"));
-		assertTrue(result.meshes().partsByPath().containsKey("panel.1.bottom"));
+		assertTrue(result.meshes().partsByPath().containsKey("door_leaf.0.bottom"));
+		assertTrue(result.meshes().partsByPath().containsKey("door_leaf.1.bottom"));
 	}
 
 	@Test
@@ -62,7 +62,7 @@ class PanelGeneratorTest {
 			.put("glass_ratio", ParameterValue.number(0.35))
 			.build());
 
-		assertTrue(result.meshes().partsByPath().containsKey("panel.glazing"));
-		assertTrue(result.meshes().partsByPath().containsKey("panel.infill"));
+		assertTrue(result.meshes().partsByPath().containsKey("door_leaf.glazing"));
+		assertTrue(result.meshes().partsByPath().containsKey("door_leaf.infill"));
 	}
 }

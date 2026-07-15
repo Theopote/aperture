@@ -30,7 +30,7 @@ public final class AccessoryGenerator implements ComponentPipelineStep {
 	public void execute(OpeningPipelineContext context, GeometryCompilationTarget target) {
 		OpeningLayout layout = context.layout();
 		OpeningParameters parameters = context.openingParameters();
-		ProfileCurve profile = context.resolvedProfiles().frame().curve();
+		ProfileCurve profile = context.profileCurveFor(component);
 		String root = component.ref().id();
 
 		switch (resolveSource(component.source())) {

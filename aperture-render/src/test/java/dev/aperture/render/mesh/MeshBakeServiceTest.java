@@ -89,7 +89,7 @@ class MeshBakeServiceTest {
 		assertEquals(7, patched.partIds().size());
 		assertTrue(delta2.unchanged().contains(PartId.of("glazing")));
 		assertEquals(glazingHandle, patched.section(PartId.of("glazing")).orElseThrow().handle());
-		assertTrue(patched.section(PartId.of("frame.mullion.2")).isPresent());
+		assertTrue(patched.section(PartId.of("mullions.mullion.2")).isPresent());
 	}
 
 	private static PipelineResult windowPipeline(double width, double height, int mullions) {

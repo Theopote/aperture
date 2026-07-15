@@ -16,6 +16,14 @@ public final class PanelLayoutPlanner {
 	}
 
 	public static List<PanelCellLayout> plan(OpeningParameters parameters, OpeningLayout layout) {
+		return plan(parameters, layout, parameters.panelHinge());
+	}
+
+	public static List<PanelCellLayout> plan(
+		OpeningParameters parameters,
+		OpeningLayout layout,
+		String hingeSide
+	) {
 		if (!parameters.hasPanel()) {
 			return List.of();
 		}
@@ -35,7 +43,7 @@ public final class PanelLayoutPlanner {
 		for (int index = 0; index < panelCount; index++) {
 			double originX = layout.frameFace() + index * (cellWidth + gap);
 			double originY = layout.frameFace();
-			boolean operable = isOperableLeaf(index, panelCount, parameters.panelHinge());
+			boolean operable = isOperableLeaf(index, panelCount, hingeSide);
 			cells.add(new PanelCellLayout(
 				index,
 				panelCount,
@@ -45,7 +53,7 @@ public final class PanelLayoutPlanner {
 				cellHeight,
 				solidHeight,
 				glassHeight,
-				parameters.panelHinge(),
+				hingeSide,
 				operable,
 				parameters.openAngleDegrees(),
 				layout

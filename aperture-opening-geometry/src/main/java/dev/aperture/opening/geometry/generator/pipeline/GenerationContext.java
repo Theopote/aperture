@@ -123,11 +123,19 @@ public final class GenerationContext {
 	}
 
 	public ProfileDefinition scaledFrameProfile() {
-		return scaleProfile(requireComponentProfile("frame"));
+		return scaledFrameProfile(requireComponentProfile("frame").id());
+	}
+
+	public ProfileDefinition scaledFrameProfile(String profileId) {
+		return scaleProfile(requireProfile(profileId));
 	}
 
 	public ProfileDefinition scaledPanelProfile() {
-		ProfileDefinition base = requireComponentProfile("panel");
+		return scaledPanelProfile(requireComponentProfile("panel").id());
+	}
+
+	public ProfileDefinition scaledPanelProfile(String profileId) {
+		ProfileDefinition base = requireProfile(profileId);
 		double sashWidth = optionalLength("panel_width")
 			.orElse(requireLength("frame_width") * 0.75);
 		return ProfileScaler.scaleToFrameWidth(base, sashWidth);

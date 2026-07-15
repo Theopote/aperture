@@ -30,7 +30,7 @@ class ComponentPipelinePlannerTest {
 	void doorPipelineUsesComponentIds() {
 		var steps = ComponentPipelinePlanner.plannedStepIds(BuiltinOpeningTypes.door().components());
 		assertEquals(
-			List.of("door_frame", "door_leaf", "door_glass", "threshold", "handle", "hinges", "_mullions"),
+			List.of("door_frame", "door_leaf", "door_glass", "threshold", "hinges", "handle", "_mullions"),
 			steps
 		);
 	}

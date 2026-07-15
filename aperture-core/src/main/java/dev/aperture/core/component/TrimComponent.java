@@ -12,6 +12,10 @@ public record TrimComponent(ComponentRef ref, Map<String, String> properties) im
 		return ComponentKind.TRIM;
 	}
 
+	public String profileId() {
+		return property("profile", "");
+	}
+
 	public static TrimComponent of(String id, String profileId) {
 		return new TrimComponent(ComponentRef.of(id), ComponentProperties.of("profile", profileId));
 	}

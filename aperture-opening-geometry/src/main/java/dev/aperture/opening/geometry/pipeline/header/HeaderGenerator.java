@@ -28,7 +28,7 @@ public final class HeaderGenerator implements ComponentPipelineStep {
 	@Override
 	public void execute(OpeningPipelineContext context, GeometryCompilationTarget target) {
 		OpeningLayout layout = context.layout();
-		ProfileCurve profile = context.resolvedProfiles().frame().curve();
+		ProfileCurve profile = context.profileCurveFor(component);
 		double y = layout.height() - layout.frameFace();
 		FrameRailBuilder.emitMiteredRail(
 			target,
