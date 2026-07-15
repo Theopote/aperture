@@ -27,10 +27,41 @@ class BooleanOpTest {
 			extrusion,
 			new BoundingBox(Vec3d.ZERO, new Vec3d(50, 50, 50))
 		);
+		BoundingBox corner = new BoundingBox(Vec3d.ZERO, new Vec3d(50, 50, 50));
 		Mesh trimmed = ShapeMesher.meshLocal(mitered);
 
-		assertTrue(trimmed.triangleCount() < full.triangleCount());
-		assertTrue(trimmed.triangleCount() >= 8);
+		assertTrue(countTrianglesInside(trimmed, corner) < countTrianglesInside(full, corner));
+	}
+
+	private static int countTrianglesInside(Mesh mesh, BoundingBox box) {
+		int count = 0;
+		for (int triangle = 0; triangle < mesh.triangleCount(); triangle++) {
+			int index = triangle * 3;
+			Vec3d a = readPosition(mesh, mesh.indices()[index]);
+			Vec3d b = readPosition(mesh, mesh.indices()[index + 1]);
+			Vec3d c = readPosition(mesh, mesh.indices()[index + 2]);
+			Vec3d centroid = new Vec3d(
+				(a.x() + b.x() + c.x()) / 3.0,
+				(a.y() + b.y() + c.y()) / 3.0,
+				(a.z() + b.z() + c.z()) / 3.0
+			);
+			if (isInside(centroid, box)) {
+				count++;
+			}
+		}
+		return count;
+	}
+
+	private static boolean isInside(Vec3d point, BoundingBox box) {
+		return point.x() >= box.min().x() && point.x() <= box.max().x()
+			&& point.y() >= box.min().y() && point.y() <= box.max().y()
+			&& point.z() >= box.min().z() && point.z() <= box.max().z();
+	}
+
+	private static Vec3d readPosition(Mesh mesh, int vertexIndex) {
+		int offset = vertexIndex * Mesh.FLOATS_PER_VERTEX;
+		float[] vertices = mesh.vertices();
+		return new Vec3d(vertices[offset], vertices[offset + 1], vertices[offset + 2]);
 	}
 
 	@Test

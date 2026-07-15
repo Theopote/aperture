@@ -2,6 +2,7 @@ package dev.aperture.geometry.generator;
 
 import dev.aperture.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.geometry.model.GeometryResult;
+import dev.aperture.geometry.pipeline.PipelineResult;
 
 /**
  * Procedural generator for an opening type. Implementations live in
@@ -10,5 +11,12 @@ import dev.aperture.geometry.model.GeometryResult;
 public interface OpeningGenerator {
 	String id();
 
-	GeometryResult generate(GenerationContext context);
+	/**
+	 * Runs the full opening generator pipeline including mesh assembly.
+	 */
+	PipelineResult generate(GenerationContext context);
+
+	default GeometryResult generateGeometry(GenerationContext context) {
+		return generate(context).geometry();
+	}
 }

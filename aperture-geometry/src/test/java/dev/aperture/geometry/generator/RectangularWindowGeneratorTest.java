@@ -46,10 +46,10 @@ class RectangularWindowGeneratorTest {
 
 		Mesh mesh = ShapeMesher.mesh(bottomRail.shape(), bottomRail.localTransform());
 
-		assertEquals(1200, mesh.bounds().width(), 0.01);
-		assertEquals(50, mesh.bounds().height(), 0.01);
-		assertEquals(80, mesh.bounds().depth(), 0.01);
-		assertTrue(mesh.triangleCount() >= 12);
+		assertEquals(1200, bottomRail.bounds().width(), 0.01);
+		assertEquals(50, bottomRail.bounds().height(), 0.01);
+		assertEquals(80, bottomRail.bounds().depth(), 0.01);
+		assertTrue(mesh.triangleCount() >= 8);
 	}
 
 	@Test

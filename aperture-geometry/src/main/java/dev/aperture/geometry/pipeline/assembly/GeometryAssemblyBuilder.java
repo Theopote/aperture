@@ -1,4 +1,4 @@
-package dev.aperture.geometry.generator.pipeline;
+package dev.aperture.geometry.pipeline.assembly;
 
 import dev.aperture.core.geometry.BoundingBox;
 import dev.aperture.geometry.model.GeometryResult;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Mutable builder for assembling {@link GeometryResult} from pipeline stages.
+ * Mutable builder for assembling {@link GeometryResult} from pipeline generators.
  */
 public final class GeometryAssemblyBuilder {
 	private final List<GeometrySolid> solids = new ArrayList<>();

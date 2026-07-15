@@ -1,23 +1,16 @@
 package dev.aperture.geometry.generator;
 
-import dev.aperture.geometry.generator.pipeline.FrameStage;
 import dev.aperture.geometry.generator.pipeline.GenerationContext;
-import dev.aperture.geometry.generator.pipeline.GenerationPipeline;
-import dev.aperture.geometry.generator.pipeline.GlassStage;
-import dev.aperture.geometry.generator.pipeline.PanelStage;
-import dev.aperture.geometry.model.GeometryResult;
+import dev.aperture.geometry.pipeline.OpeningPipeline;
+import dev.aperture.geometry.pipeline.PipelineResult;
 
 /**
- * Reference generator: rectangular window via frame, panel, and glass pipeline stages.
+ * Reference generator: rectangular window through the standard opening pipeline.
  */
 public final class RectangularWindowGenerator implements OpeningGenerator {
 	public static final String ID = "aperture:rectangular_window_v1";
 
-	private final GenerationPipeline pipeline = GenerationPipeline.of(
-		new FrameStage(),
-		new PanelStage(),
-		new GlassStage()
-	);
+	private final OpeningPipeline pipeline = OpeningPipeline.standard();
 
 	@Override
 	public String id() {
@@ -25,7 +18,11 @@ public final class RectangularWindowGenerator implements OpeningGenerator {
 	}
 
 	@Override
-	public GeometryResult generate(GenerationContext context) {
+	public PipelineResult generate(GenerationContext context) {
 		return pipeline.execute(context);
+	}
+
+	public OpeningPipeline pipeline() {
+		return pipeline;
 	}
 }

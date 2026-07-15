@@ -5,6 +5,7 @@ import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.geometry.model.GeometryResult;
+import dev.aperture.geometry.pipeline.PipelineResult;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 
@@ -29,15 +30,23 @@ public final class GenerationTestSupport {
 		);
 	}
 
-	public static GeometryResult generateFixedWindow(ParameterSet overrides) {
+	public static PipelineResult generateFixedWindowPipeline(ParameterSet overrides) {
 		return new RectangularWindowGenerator().generate(context(BuiltinOpeningTypes.fixedWindow(), overrides));
 	}
 
-	public static GeometryResult generateCasementWindow(ParameterSet overrides) {
-		return new RectangularWindowGenerator().generate(context(BuiltinOpeningTypes.casementWindow(), overrides));
+	public static GeometryResult generateFixedWindow(ParameterSet overrides) {
+		return generateFixedWindowPipeline(overrides).geometry();
 	}
 
 	public static GeometryResult generateFixedWindow() {
 		return generateFixedWindow(ParameterSet.empty());
+	}
+
+	public static PipelineResult generateCasementWindowPipeline(ParameterSet overrides) {
+		return new RectangularWindowGenerator().generate(context(BuiltinOpeningTypes.casementWindow(), overrides));
+	}
+
+	public static GeometryResult generateCasementWindow(ParameterSet overrides) {
+		return generateCasementWindowPipeline(overrides).geometry();
 	}
 }

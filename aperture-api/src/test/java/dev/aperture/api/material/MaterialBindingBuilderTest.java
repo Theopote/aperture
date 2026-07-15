@@ -25,7 +25,7 @@ class MaterialBindingBuilderTest {
 			definition,
 			ParameterSet.mergeDefaults(definition.parameters(), instance.parameters()),
 			new ProfileCatalogLoader().loadClasspathCatalog()
-		));
+		)).geometry();
 		var materials = new MaterialResolverRegistry(VanillaMaterialResolver.INSTANCE);
 
 		MaterialBindingSet bindings = MaterialBindingBuilder.build(definition, instance, geometry, materials);

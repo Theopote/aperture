@@ -84,6 +84,6 @@ class RenderDeltaEngineTest {
 				.build()),
 			PROFILE_LOADER.loadClasspathCatalog()
 		);
-		return GENERATOR.generate(context);
+		return GENERATOR.generate(context).geometry();
 	}
 }
