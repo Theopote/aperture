@@ -1,6 +1,5 @@
 package dev.aperture.client.placement;
 
-import dev.aperture.Aperture;
 import dev.aperture.api.ApertureApi;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.parameter.ParameterSet;

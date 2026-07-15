@@ -29,10 +29,14 @@ stateDiagram-v2
 
 ## Host Detection
 
-1. Raycast → block face.
-2. Classify host (full block wall, aperture wall block, custom host tag).
-3. Build `HostPlane`: derive width/height extents by scanning coplanar faces.
-4. Compute max opening bounds within host.
+1. Raycast → block face (`FabricPlacementRaycast` / crosshair `HitResult`).
+2. Classify host (`HostClassifier` — solid occluding blocks).
+3. Build host region by scanning coplanar faces (`HostPlaneScanner`).
+4. Convert to core `PlacementContext` via `FabricPlacementAdapter`.
+
+Fabric adapter package: `dev.aperture.placement.fabric` (root mod module).
+Client preview: `ClientPlacementPreview` updates each tick from crosshair; press **P** to commit a valid preview.
+Wireframe overlay: `PlacementPreviewRenderer` — see [10-fabric-placement-adapter.md](10-fabric-placement-adapter.md).
 
 ## Validation Rules (extensible chain)
 
