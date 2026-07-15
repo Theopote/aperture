@@ -1,22 +1,28 @@
 package dev.aperture.opening.geometry.pipeline.header;
 
+import dev.aperture.core.component.HeaderComponent;
 import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 import dev.aperture.geometry.profile.ProfileCurve;
+import dev.aperture.opening.geometry.pipeline.ComponentPaths;
+import dev.aperture.opening.geometry.pipeline.ComponentPipelineStep;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
-import dev.aperture.opening.geometry.pipeline.PipelineStep;
 import dev.aperture.opening.geometry.pipeline.frame.FrameRailBuilder;
 
 /**
- * Generates the structural header / head member above the opening frame.
+ * Generates the structural header / head member for one header component instance.
  */
-public final class HeaderGenerator implements PipelineStep {
-	public static final String STEP_ID = "header";
+public final class HeaderGenerator implements ComponentPipelineStep {
+	private final HeaderComponent component;
+
+	public HeaderGenerator(HeaderComponent component) {
+		this.component = component;
+	}
 
 	@Override
-	public String id() {
-		return STEP_ID;
+	public HeaderComponent component() {
+		return component;
 	}
 
 	@Override
@@ -26,7 +32,7 @@ public final class HeaderGenerator implements PipelineStep {
 		double y = layout.height() - layout.frameFace();
 		FrameRailBuilder.emitMiteredRail(
 			target,
-			"header.main",
+			ComponentPaths.join(component.ref().id(), "main"),
 			profile,
 			new Vec3d(0, y, 0),
 			new Vec3d(layout.width(), y, 0),

@@ -8,12 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HardwareGeneratorTest {
 	@Test
-	void doorGeneratesHingesAndHandle() {
+	void doorGeneratesHingesAndHandleFromSeparateComponents() {
 		var result = GenerationTestSupport.generateDoorPipeline(ParameterSet.empty());
 
-		assertTrue(result.meshes().partsByPath().containsKey("hardware.hinge.1"));
-		assertTrue(result.meshes().partsByPath().containsKey("hardware.hinge.2"));
-		assertTrue(result.meshes().partsByPath().containsKey("hardware.hinge.3"));
-		assertTrue(result.meshes().partsByPath().containsKey("hardware.handle"));
+		assertTrue(result.meshes().partsByPath().containsKey("hinges.hinge.1"));
+		assertTrue(result.meshes().partsByPath().containsKey("hinges.hinge.2"));
+		assertTrue(result.meshes().partsByPath().containsKey("hinges.hinge.3"));
+		assertTrue(result.meshes().partsByPath().containsKey("handle.main"));
 	}
 }

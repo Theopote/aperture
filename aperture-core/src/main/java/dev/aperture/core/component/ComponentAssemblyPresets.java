@@ -36,6 +36,7 @@ public final class ComponentAssemblyPresets {
 			PanelComponent.of("door_leaf", panelProfile, hingeSide),
 			GlassComponent.of("door_glass", glazingSystem),
 			HardwareComponent.of("hinges", "hinge_set"),
+			HardwareComponent.of("handle", "handle"),
 			SillComponent.of("threshold", frameProfile)
 		);
 	}
@@ -43,8 +44,8 @@ public final class ComponentAssemblyPresets {
 	public static ComponentAssembly curtainWall(String frameProfile, String glazingSystem) {
 		return ComponentAssembly.of(
 			FrameComponent.of("grid_frame", frameProfile),
-			DividerComponent.mullions("vertical_mullions"),
-			DividerComponent.mullions("horizontal_mullions"),
+			DividerComponent.fromSource("vertical_mullions", "parameter:cols"),
+			DividerComponent.fromSource("horizontal_mullions", "parameter:rows"),
 			GlassComponent.of("unit_glazing", glazingSystem),
 			HeaderComponent.of("head", frameProfile),
 			SillComponent.of("sill", frameProfile)

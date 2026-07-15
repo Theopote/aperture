@@ -1,18 +1,23 @@
 package dev.aperture.opening.geometry.pipeline.trim;
 
-import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
-import dev.aperture.opening.geometry.pipeline.PipelineStep;
+import dev.aperture.core.component.TrimComponent;
 import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
+import dev.aperture.opening.geometry.pipeline.ComponentPipelineStep;
+import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 
 /**
  * Reserved for interior/exterior trim and casing geometry.
  */
-public final class TrimGenerator implements PipelineStep {
-	public static final String STEP_ID = "trim";
+public final class TrimGenerator implements ComponentPipelineStep {
+	private final TrimComponent component;
+
+	public TrimGenerator(TrimComponent component) {
+		this.component = component;
+	}
 
 	@Override
-	public String id() {
-		return STEP_ID;
+	public TrimComponent component() {
+		return component;
 	}
 
 	@Override

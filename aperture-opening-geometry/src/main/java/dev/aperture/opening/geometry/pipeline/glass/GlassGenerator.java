@@ -1,25 +1,31 @@
 package dev.aperture.opening.geometry.pipeline.glass;
 
+import dev.aperture.core.component.GlassComponent;
 import dev.aperture.math.BoundingBox;
 import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 import dev.aperture.geometry.recipe.shape.ShapeRecipes;
+import dev.aperture.opening.geometry.pipeline.ComponentPaths;
+import dev.aperture.opening.geometry.pipeline.ComponentPipelineStep;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.geometry.pipeline.OpeningParameters;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
-import dev.aperture.opening.geometry.pipeline.PipelineStep;
 
 /**
- * Generates fixed glazing when no operable panel is present.
+ * Generates fixed glazing for one glass component instance when no operable panel is present.
  */
-public final class GlassGenerator implements PipelineStep {
-	public static final String STEP_ID = "glass";
+public final class GlassGenerator implements ComponentPipelineStep {
 	private static final double GLAZING_DEPTH = 10;
+	private final GlassComponent component;
+
+	public GlassGenerator(GlassComponent component) {
+		this.component = component;
+	}
 
 	@Override
-	public String id() {
-		return STEP_ID;
+	public GlassComponent component() {
+		return component;
 	}
 
 	@Override
@@ -34,13 +40,14 @@ public final class GlassGenerator implements PipelineStep {
 			return;
 		}
 
+		String root = component.ref().id();
 		if (parameters.cols() > 1 || parameters.rows() > 1) {
-			emitGridGlazing(target, layout, parameters);
+			emitGridGlazing(target, layout, parameters, root);
 			return;
 		}
 
 		target.emitSolid(
-			"glazing",
+			root,
 			"glazing",
 			GeometryLayer.TRANSLUCENT,
 			ShapeRecipes.box(new BoundingBox(
@@ -53,7 +60,8 @@ public final class GlassGenerator implements PipelineStep {
 	private static void emitGridGlazing(
 		GeometryCompilationTarget target,
 		OpeningLayout layout,
-		OpeningParameters parameters
+		OpeningParameters parameters,
+		String root
 	) {
 		double cellWidth = layout.innerWidth() / parameters.cols();
 		double cellHeight = layout.innerHeight() / parameters.rows();
@@ -67,7 +75,7 @@ public final class GlassGenerator implements PipelineStep {
 					continue;
 				}
 				target.emitSolid(
-					"glazing." + row + "." + col,
+					ComponentPaths.join(root, row + "." + col),
 					"glazing",
 					GeometryLayer.TRANSLUCENT,
 					ShapeRecipes.box(new BoundingBox(

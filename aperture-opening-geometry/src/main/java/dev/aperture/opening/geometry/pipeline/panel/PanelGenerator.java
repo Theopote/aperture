@@ -1,5 +1,6 @@
 package dev.aperture.opening.geometry.pipeline.panel;
 
+import dev.aperture.core.component.PanelComponent;
 import dev.aperture.math.BoundingBox;
 import dev.aperture.math.Transform3d;
 import dev.aperture.math.Vec3d;
@@ -8,25 +9,30 @@ import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 import dev.aperture.geometry.recipe.shape.ShapeRecipe;
 import dev.aperture.geometry.recipe.shape.ShapeRecipes;
+import dev.aperture.opening.geometry.pipeline.ComponentPaths;
+import dev.aperture.opening.geometry.pipeline.ComponentPipelineStep;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.geometry.pipeline.OpeningParameters;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
-import dev.aperture.opening.geometry.pipeline.PipelineStep;
 import dev.aperture.opening.geometry.pipeline.frame.FrameRailBuilder;
 import dev.aperture.geometry.profile.ProfileCurve;
 
 import java.util.List;
 
 /**
- * Generates operable panel sash geometry with multi-panel layout and glass ratio support.
+ * Generates operable panel sash geometry for one panel component instance.
  */
-public final class PanelGenerator implements PipelineStep {
-	public static final String STEP_ID = "panel";
+public final class PanelGenerator implements ComponentPipelineStep {
 	private static final double PANEL_GLAZING_DEPTH = 8;
+	private final PanelComponent component;
+
+	public PanelGenerator(PanelComponent component) {
+		this.component = component;
+	}
 
 	@Override
-	public String id() {
-		return STEP_ID;
+	public PanelComponent component() {
+		return component;
 	}
 
 	@Override
@@ -44,7 +50,7 @@ public final class PanelGenerator implements PipelineStep {
 		}
 	}
 
-	private static void emitPanelCell(
+	private void emitPanelCell(
 		GeometryCompilationTarget target,
 		ProfileCurve sashProfile,
 		OpeningLayout layout,
@@ -62,7 +68,7 @@ public final class PanelGenerator implements PipelineStep {
 			)
 			: Transform3d.identity();
 
-		String prefix = cell.pathPrefix();
+		String prefix = pathPrefix(cell);
 		double originX = cell.originX();
 		double originY = cell.originY();
 		double panelWidth = cell.width();
@@ -115,6 +121,11 @@ public final class PanelGenerator implements PipelineStep {
 				panelTransform
 			);
 		}
+	}
+
+	private String pathPrefix(PanelCellLayout cell) {
+		String root = component.ref().id();
+		return cell.panelCount() == 1 ? root : ComponentPaths.join(root, String.valueOf(cell.index()));
 	}
 
 	private static void emitExtrudedRail(

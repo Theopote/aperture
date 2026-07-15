@@ -57,10 +57,10 @@ class OpeningRecipeExportTest {
 		GeometryRecipe recipe = PIPELINE.compileRecipe(context);
 
 		assertTrue(recipe.ops().stream().anyMatch(op -> op instanceof EmitSolidOp emit
-			&& emit.componentPath().equals("sill.main")
+			&& emit.componentPath().equals("threshold.main")
 			&& emit.shape() instanceof BoxRecipe));
 		assertTrue(recipe.ops().stream().anyMatch(op -> op instanceof EmitSolidOp emit
-			&& emit.componentPath().equals("hardware.handle")
+			&& emit.componentPath().equals("handle.main")
 			&& emit.shape() instanceof BoxRecipe));
 	}
 

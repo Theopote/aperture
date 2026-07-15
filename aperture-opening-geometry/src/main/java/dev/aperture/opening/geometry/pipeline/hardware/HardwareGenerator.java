@@ -1,43 +1,44 @@
 package dev.aperture.opening.geometry.pipeline.hardware;
 
-import dev.aperture.core.component.ComponentKind;
+import dev.aperture.core.component.HardwareComponent;
 import dev.aperture.math.BoundingBox;
 import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 import dev.aperture.geometry.recipe.shape.ShapeRecipes;
+import dev.aperture.opening.geometry.pipeline.ComponentPaths;
+import dev.aperture.opening.geometry.pipeline.ComponentPipelineStep;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.geometry.pipeline.OpeningParameters;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
-import dev.aperture.opening.geometry.pipeline.PipelineStep;
 import dev.aperture.opening.geometry.pipeline.panel.PanelCellLayout;
 import dev.aperture.opening.geometry.pipeline.panel.PanelLayoutPlanner;
 
 import java.util.List;
 
 /**
- * Generates hinge plates, handles, and other mount hardware geometry.
+ * Generates hinge plates, handles, and other mount hardware for one hardware component instance.
  */
-public final class HardwareGenerator implements PipelineStep {
-	public static final String STEP_ID = "hardware";
+public final class HardwareGenerator implements ComponentPipelineStep {
 	private static final double HINGE_WIDTH = 18;
 	private static final double HINGE_HEIGHT = 90;
 	private static final double HINGE_DEPTH = 12;
 	private static final double HANDLE_WIDTH = 24;
 	private static final double HANDLE_HEIGHT = 120;
 	private static final double HANDLE_DEPTH = 16;
+	private final HardwareComponent component;
+
+	public HardwareGenerator(HardwareComponent component) {
+		this.component = component;
+	}
 
 	@Override
-	public String id() {
-		return STEP_ID;
+	public HardwareComponent component() {
+		return component;
 	}
 
 	@Override
 	public void execute(OpeningPipelineContext context, GeometryCompilationTarget target) {
-		if (!context.definition().components().has(ComponentKind.HARDWARE)) {
-			return;
-		}
-
 		OpeningParameters parameters = context.openingParameters();
 		if (!parameters.hasPanel()) {
 			return;
@@ -50,15 +51,22 @@ public final class HardwareGenerator implements PipelineStep {
 		}
 
 		PanelCellLayout primary = PanelLayoutPlanner.primaryLeaf(cells, parameters.panelHinge());
-		emitHingeSet(target, primary, layout);
-		emitHandle(target, primary, layout);
+		switch (component.hardwareType()) {
+			case "hinge_set" -> emitHingeSet(target, primary, layout);
+			case "handle" -> emitHandle(target, primary, layout);
+			default -> {
+				emitHingeSet(target, primary, layout);
+				emitHandle(target, primary, layout);
+			}
+		}
 	}
 
-	private static void emitHingeSet(
+	private void emitHingeSet(
 		GeometryCompilationTarget target,
 		PanelCellLayout leaf,
 		OpeningLayout layout
 	) {
+		String root = component.ref().id();
 		double hingeX = leaf.hingeX();
 		double offsetX = switch (leaf.hingeSide().toLowerCase()) {
 			case "right" -> -HINGE_DEPTH;
@@ -70,7 +78,7 @@ public final class HardwareGenerator implements PipelineStep {
 			double minY = centerY - HINGE_HEIGHT / 2.0;
 			double maxY = centerY + HINGE_HEIGHT / 2.0;
 			target.emitSolid(
-				"hardware.hinge." + (i + 1),
+				ComponentPaths.join(root, "hinge." + (i + 1)),
 				"hardware",
 				GeometryLayer.CUTOUT,
 				ShapeRecipes.box(new BoundingBox(
@@ -81,11 +89,12 @@ public final class HardwareGenerator implements PipelineStep {
 		}
 	}
 
-	private static void emitHandle(
+	private void emitHandle(
 		GeometryCompilationTarget target,
 		PanelCellLayout leaf,
 		OpeningLayout layout
 	) {
+		String root = component.ref().id();
 		double latchX = leaf.latchX();
 		double centerY = leaf.originY() + leaf.height() * 0.48;
 		double offsetX = switch (leaf.hingeSide().toLowerCase()) {
@@ -93,7 +102,7 @@ public final class HardwareGenerator implements PipelineStep {
 			default -> -HANDLE_WIDTH - layout.sashFace() * 0.2;
 		};
 		target.emitSolid(
-			"hardware.handle",
+			ComponentPaths.join(root, "main"),
 			"hardware",
 			GeometryLayer.CUTOUT,
 			ShapeRecipes.box(new BoundingBox(

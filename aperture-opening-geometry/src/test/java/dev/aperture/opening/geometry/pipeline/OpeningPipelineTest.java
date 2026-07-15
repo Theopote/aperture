@@ -48,11 +48,11 @@ class OpeningPipelineTest {
 	void doorPipelineBuildsMultiPanelAndSillGeometry() {
 		var result = GenerationTestSupport.generateDoorPipeline(ParameterSet.empty());
 
-		assertTrue(result.meshes().partsByPath().containsKey("panel.0.bottom"));
-		assertTrue(result.meshes().partsByPath().containsKey("panel.1.bottom"));
-		assertTrue(result.meshes().partsByPath().containsKey("panel.0.infill"));
-		assertTrue(result.meshes().partsByPath().containsKey("panel.0.glazing"));
-		assertTrue(result.meshes().partsByPath().containsKey("sill.main"));
-		assertTrue(result.meshes().partsByPath().containsKey("hardware.handle"));
+		assertTrue(result.meshes().partsByPath().containsKey("door_leaf.0.bottom"));
+		assertTrue(result.meshes().partsByPath().containsKey("door_leaf.1.bottom"));
+		assertTrue(result.meshes().partsByPath().containsKey("door_leaf.0.infill"));
+		assertTrue(result.meshes().partsByPath().containsKey("door_leaf.0.glazing"));
+		assertTrue(result.meshes().partsByPath().containsKey("threshold.main"));
+		assertTrue(result.meshes().partsByPath().containsKey("handle.main"));
 	}
 }

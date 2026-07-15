@@ -17,10 +17,10 @@ import dev.aperture.opening.resolve.ResolvedOpening;
 /**
  * Full opening generation stack:
  * <pre>
- * Definition (in GenerationContext)
+ * OpeningTypeDefinition (component recipe)
  *   → Parameter Resolver
- *   → Component Builder
- *   → Geometry Builder
+ *   → Component Plan (one step per component instance)
+ *   → Geometry Builder (ShapeRecipe IR)
  *   → Mesh Builder
  * </pre>
  * Renderer consumes {@link PipelineResult} on the client.

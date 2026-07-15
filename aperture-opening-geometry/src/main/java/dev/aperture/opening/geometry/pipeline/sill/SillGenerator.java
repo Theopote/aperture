@@ -1,24 +1,30 @@
 package dev.aperture.opening.geometry.pipeline.sill;
 
+import dev.aperture.core.component.SillComponent;
 import dev.aperture.math.BoundingBox;
 import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 import dev.aperture.geometry.recipe.shape.ShapeRecipes;
+import dev.aperture.opening.geometry.pipeline.ComponentPaths;
+import dev.aperture.opening.geometry.pipeline.ComponentPipelineStep;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
-import dev.aperture.opening.geometry.pipeline.PipelineStep;
 
 /**
- * Generates the sill / threshold at the bottom of the opening.
+ * Generates the sill / threshold for one sill component instance.
  */
-public final class SillGenerator implements PipelineStep {
-	public static final String STEP_ID = "sill";
+public final class SillGenerator implements ComponentPipelineStep {
 	private static final double SILL_DEPTH = 20;
+	private final SillComponent component;
+
+	public SillGenerator(SillComponent component) {
+		this.component = component;
+	}
 
 	@Override
-	public String id() {
-		return STEP_ID;
+	public SillComponent component() {
+		return component;
 	}
 
 	@Override
@@ -29,7 +35,7 @@ public final class SillGenerator implements PipelineStep {
 			return;
 		}
 		target.emitSolid(
-			"sill.main",
+			ComponentPaths.join(component.ref().id(), "main"),
 			"frame",
 			GeometryLayer.OPAQUE,
 			ShapeRecipes.box(new BoundingBox(

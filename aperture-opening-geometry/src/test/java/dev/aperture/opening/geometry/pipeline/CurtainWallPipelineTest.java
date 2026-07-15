@@ -13,11 +13,11 @@ class CurtainWallPipelineTest {
 	void generatesGridGlazingAndDividers() {
 		var result = GenerationTestSupport.generateCurtainWallPipeline(ParameterSet.empty());
 
-		assertTrue(result.meshes().partsByPath().containsKey("glazing.0.0"));
-		assertTrue(result.meshes().partsByPath().containsKey("glazing.2.3"));
-		assertTrue(result.meshes().partsByPath().containsKey("divider.vertical.1"));
-		assertTrue(result.meshes().partsByPath().containsKey("divider.horizontal.1"));
-		assertTrue(result.meshes().partsByPath().containsKey("header.main"));
+		assertTrue(result.meshes().partsByPath().containsKey("unit_glazing.0.0"));
+		assertTrue(result.meshes().partsByPath().containsKey("unit_glazing.2.3"));
+		assertTrue(result.meshes().partsByPath().containsKey("vertical_mullions.vertical.1"));
+		assertTrue(result.meshes().partsByPath().containsKey("horizontal_mullions.horizontal.1"));
+		assertTrue(result.meshes().partsByPath().containsKey("head.main"));
 		assertTrue(result.meshes().partsByPath().containsKey("sill.main"));
 	}
 
@@ -25,7 +25,7 @@ class CurtainWallPipelineTest {
 	void gridCellCountMatchesColsAndRows() {
 		var result = GenerationTestSupport.generateCurtainWallPipeline(ParameterSet.empty());
 		long glazingCells = result.geometry().solids().stream()
-			.filter(solid -> solid.componentPath().startsWith("glazing."))
+			.filter(solid -> solid.componentPath().startsWith("unit_glazing."))
 			.count();
 		assertEquals(12, glazingCells);
 	}

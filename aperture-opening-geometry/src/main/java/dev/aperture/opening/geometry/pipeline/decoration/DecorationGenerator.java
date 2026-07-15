@@ -1,18 +1,23 @@
 package dev.aperture.opening.geometry.pipeline.decoration;
 
-import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
-import dev.aperture.opening.geometry.pipeline.PipelineStep;
+import dev.aperture.core.component.DecorationComponent;
 import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
+import dev.aperture.opening.geometry.pipeline.ComponentPipelineStep;
+import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 
 /**
  * Reserved for decorative muntins, grilles, and applied ornament.
  */
-public final class DecorationGenerator implements PipelineStep {
-	public static final String STEP_ID = "decoration";
+public final class DecorationGenerator implements ComponentPipelineStep {
+	private final DecorationComponent component;
+
+	public DecorationGenerator(DecorationComponent component) {
+		this.component = component;
+	}
 
 	@Override
-	public String id() {
-		return STEP_ID;
+	public DecorationComponent component() {
+		return component;
 	}
 
 	@Override
