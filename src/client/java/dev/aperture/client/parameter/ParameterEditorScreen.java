@@ -6,7 +6,7 @@ import dev.aperture.core.parametric.ParametricEditResult;
 import dev.aperture.core.parametric.ParametricEditor;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.validation.ValidationResult;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -72,23 +72,23 @@ public final class ParameterEditorScreen extends Screen {
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-		renderBackground(graphics, mouseX, mouseY, partialTick);
-		graphics.drawCenteredString(font, title, width / 2, 12, 0xFFFFFF);
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+		extractBackground(graphics, mouseX, mouseY, partialTick);
+		graphics.text(font, title, width / 2 - font.width(title) / 2, 12, 0xFFFFFFFF, true);
 
 		for (ParameterWidgetFactory.ParameterField field : fields) {
 			if (field.isGroupHeader()) {
-				graphics.drawString(font, field.label(), 20, field.y(), 0xA0A0A0);
+				graphics.text(font, field.label(), 20, field.y(), 0xFFA0A0A0, false);
 			} else {
-				graphics.drawString(font, field.label(), 20, field.y() + 6, 0xFFFFFF);
+				graphics.text(font, field.label(), 20, field.y() + 6, 0xFFFFFFFF, false);
 			}
 		}
 
 		if (!statusMessage.isEmpty()) {
-			graphics.drawCenteredString(font, statusMessage, width / 2, height - 40, 0xFF5555);
+			graphics.text(font, statusMessage, width / 2 - font.width(statusMessage) / 2, height - 40, 0xFFFF5555, false);
 		}
 
-		super.render(graphics, mouseX, mouseY, partialTick);
+		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
 	}
 
 	@Override
