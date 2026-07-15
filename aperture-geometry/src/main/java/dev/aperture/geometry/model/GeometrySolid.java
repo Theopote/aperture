@@ -1,6 +1,10 @@
 package dev.aperture.geometry.model;
 
 import dev.aperture.core.geometry.BoundingBox;
+import dev.aperture.core.geometry.Facing;
+import dev.aperture.core.geometry.Transform3d;
+import dev.aperture.geometry.shape.BoxShape;
+import dev.aperture.geometry.shape.SolidShape;
 
 /**
  * A single generated solid belonging to a material slot and render layer.
@@ -9,6 +13,46 @@ public record GeometrySolid(
 	String componentPath,
 	String materialSlot,
 	GeometryLayer layer,
-	BoundingBox bounds
+	SolidShape shape,
+	Transform3d localTransform
 ) {
+	public GeometrySolid {
+		if (localTransform == null) {
+			localTransform = Transform3d.at(0, 0, 0, Facing.NORTH);
+		}
+	}
+
+	public BoundingBox bounds() {
+		return localTransform.applyTo(shape.bounds());
+	}
+
+	public static GeometrySolid box(
+		String componentPath,
+		String materialSlot,
+		GeometryLayer layer,
+		BoundingBox bounds
+	) {
+		return new GeometrySolid(
+			componentPath,
+			materialSlot,
+			layer,
+			new BoxShape(bounds),
+			Transform3d.at(0, 0, 0, Facing.NORTH)
+		);
+	}
+
+	public static GeometrySolid of(
+		String componentPath,
+		String materialSlot,
+		GeometryLayer layer,
+		SolidShape shape
+	) {
+		return new GeometrySolid(
+			componentPath,
+			materialSlot,
+			layer,
+			shape,
+			Transform3d.at(0, 0, 0, Facing.NORTH)
+		);
+	}
 }

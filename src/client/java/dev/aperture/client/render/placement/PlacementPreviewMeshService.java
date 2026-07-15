@@ -14,10 +14,10 @@ import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.render.data.PreviewRenderContext;
 import dev.aperture.render.data.RenderDelta;
 import dev.aperture.render.material.MaterialBindingSet;
-import dev.aperture.render.mesh.BoxMeshCompiler;
 import dev.aperture.render.mesh.LODLevel;
 import dev.aperture.render.mesh.MeshAsset;
 import dev.aperture.render.mesh.MeshBakeService;
+import dev.aperture.render.mesh.SolidShapeMeshCompiler;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -26,7 +26,7 @@ import java.util.UUID;
  * Client-side bridge from placement preview to the pure-Java render pipeline.
  */
 public final class PlacementPreviewMeshService {
-	private static final MeshBakeService BAKE_SERVICE = new MeshBakeService(new BoxMeshCompiler());
+	private static final MeshBakeService BAKE_SERVICE = new MeshBakeService(new SolidShapeMeshCompiler());
 
 	private static PreviewRenderContext context;
 	private static MeshAsset meshAsset = MeshAsset.empty(LODLevel.FULL);

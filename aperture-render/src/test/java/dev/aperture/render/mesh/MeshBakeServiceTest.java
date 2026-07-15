@@ -15,15 +15,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MeshBakeServiceTest {
-	private final MeshBakeService bakeService = new MeshBakeService(new BoxMeshCompiler());
+	private final MeshBakeService bakeService = new MeshBakeService(new SolidShapeMeshCompiler());
 
 	@Test
 	void incrementalBakeReusesUnchangedSections() {
 		RenderDocument document = RenderDocument.forPreview(UUID.randomUUID());
 		GeometryResult v1 = new GeometryResult(
 			java.util.List.of(
-				new GeometrySolid("frame", "frame", GeometryLayer.OPAQUE_FRAME, BoundingBox.fromSize(1000, 1200, 50)),
-				new GeometrySolid("glazing", "glazing", GeometryLayer.TRANSLUCENT_GLASS, BoundingBox.fromSize(900, 1100, 10))
+				GeometrySolid.box("frame", "frame", GeometryLayer.OPAQUE_FRAME, BoundingBox.fromSize(1000, 1200, 50)),
+				GeometrySolid.box("glazing", "glazing", GeometryLayer.TRANSLUCENT_GLASS, BoundingBox.fromSize(900, 1100, 10))
 			),
 			BoundingBox.fromSize(1000, 1200, 50),
 			BoundingBox.fromSize(1000, 1200, 200)
@@ -35,8 +35,8 @@ class MeshBakeServiceTest {
 
 		GeometryResult v2 = new GeometryResult(
 			java.util.List.of(
-				new GeometrySolid("frame", "frame", GeometryLayer.OPAQUE_FRAME, BoundingBox.fromSize(1200, 1200, 50)),
-				new GeometrySolid("glazing", "glazing", GeometryLayer.TRANSLUCENT_GLASS, BoundingBox.fromSize(900, 1100, 10))
+				GeometrySolid.box("frame", "frame", GeometryLayer.OPAQUE_FRAME, BoundingBox.fromSize(1200, 1200, 50)),
+				GeometrySolid.box("glazing", "glazing", GeometryLayer.TRANSLUCENT_GLASS, BoundingBox.fromSize(900, 1100, 10))
 			),
 			BoundingBox.fromSize(1200, 1200, 50),
 			BoundingBox.fromSize(1200, 1200, 200)
@@ -52,15 +52,15 @@ class MeshBakeServiceTest {
 	}
 
 	@Test
-	void boxCompilerProducesTwelveTriangles() {
-		GeometrySolid solid = new GeometrySolid(
+	void solidShapeCompilerProducesTwelveTrianglesForBox() {
+		GeometrySolid solid = GeometrySolid.box(
 			"frame",
 			"frame",
 			GeometryLayer.OPAQUE_FRAME,
 			BoundingBox.fromSize(100, 200, 30)
 		);
 
-		MeshSection section = new BoxMeshCompiler().compile(solid, LODLevel.FULL);
+		MeshSection section = new SolidShapeMeshCompiler().compile(solid, LODLevel.FULL);
 
 		assertEquals(12, section.triangleCount());
 		assertEquals(PartId.of("frame"), section.partId());

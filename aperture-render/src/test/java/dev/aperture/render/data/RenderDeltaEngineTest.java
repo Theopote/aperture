@@ -1,32 +1,42 @@
 package dev.aperture.render.data;
 
-import dev.aperture.core.geometry.BoundingBox;
-import dev.aperture.core.geometry.Vec3d;
-import dev.aperture.geometry.model.GeometryLayer;
+import dev.aperture.core.catalog.BuiltinOpeningTypes;
+import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.geometry.generator.RectangularWindowGenerator;
 import dev.aperture.geometry.model.GeometryResult;
-import dev.aperture.geometry.model.GeometrySolid;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RenderDeltaEngineTest {
+	private static final RectangularWindowGenerator GENERATOR = new RectangularWindowGenerator();
+
 	@Test
 	void firstSnapshotIsAllAdded() {
 		GeometryResult next = window(1200, 1500, 0);
 		RenderDelta delta = RenderDeltaEngine.compute(null, next);
 
-		assertEquals(Set.of(PartId.of("frame"), PartId.of("glazing")), delta.added());
+		assertEquals(
+			Set.of(
+				PartId.of("frame.bottom"),
+				PartId.of("frame.top"),
+				PartId.of("frame.left"),
+				PartId.of("frame.right"),
+				PartId.of("glazing")
+			),
+			delta.added()
+		);
 		assertTrue(delta.removed().isEmpty());
 		assertTrue(delta.changed().isEmpty());
 		assertTrue(delta.unchanged().isEmpty());
 	}
 
 	@Test
-	void widthChangeMarksFrameAndGlazingChanged() {
+	void widthChangeMarksAllPartsChanged() {
 		GeometryResult before = window(1200, 1500, 0);
 		GeometryResult after = window(1400, 1500, 0);
 
@@ -34,7 +44,7 @@ class RenderDeltaEngineTest {
 
 		assertTrue(delta.added().isEmpty());
 		assertTrue(delta.removed().isEmpty());
-		assertEquals(Set.of(PartId.of("frame"), PartId.of("glazing")), delta.changed());
+		assertEquals(5, delta.changed().size());
 		assertTrue(delta.unchanged().isEmpty());
 	}
 
@@ -47,39 +57,18 @@ class RenderDeltaEngineTest {
 
 		assertEquals(Set.of(PartId.of("frame.mullion.2")), delta.added());
 		assertTrue(delta.removed().isEmpty());
-		assertTrue(delta.changed().contains(PartId.of("frame.mullion.1")));
-		assertTrue(delta.unchanged().contains(PartId.of("frame")));
+		assertTrue(delta.unchanged().contains(PartId.of("frame.mullion.1")));
+		assertTrue(delta.unchanged().contains(PartId.of("frame.bottom")));
 		assertTrue(delta.unchanged().contains(PartId.of("glazing")));
 	}
 
 	private static GeometryResult window(double width, double height, int mullions) {
-		double frameWidth = 50;
-		List<GeometrySolid> solids = new java.util.ArrayList<>();
-		solids.add(new GeometrySolid("frame", "frame", GeometryLayer.OPAQUE_FRAME, BoundingBox.fromSize(width, height, frameWidth)));
-
-		double innerWidth = width - frameWidth * 2;
-		double innerHeight = height - frameWidth * 2;
-		solids.add(new GeometrySolid(
-			"glazing",
-			"glazing",
-			GeometryLayer.TRANSLUCENT_GLASS,
-			new BoundingBox(new Vec3d(frameWidth, frameWidth, 0), new Vec3d(frameWidth + innerWidth, frameWidth + innerHeight, 10))
-		));
-
-		for (int i = 1; i <= mullions; i++) {
-			double t = (double) i / (mullions + 1);
-			double x = frameWidth + innerWidth * t;
-			solids.add(new GeometrySolid(
-				"frame.mullion." + i,
-				"frame",
-				GeometryLayer.OPAQUE_FRAME,
-				new BoundingBox(
-					new Vec3d(x - frameWidth / 2.0, frameWidth, 0),
-					new Vec3d(x + frameWidth / 2.0, frameWidth + innerHeight, frameWidth)
-				)
-			));
-		}
-
-		return new GeometryResult(solids, BoundingBox.fromSize(width, height, frameWidth), BoundingBox.fromSize(width, height, 200));
+		var definition = BuiltinOpeningTypes.fixedWindow();
+		ParameterSet parameters = ParameterSet.mergeDefaults(definition.parameters(), ParameterSet.builder()
+			.put("width", ParameterValue.length(width))
+			.put("height", ParameterValue.length(height))
+			.put("mullions", ParameterValue.count(mullions))
+			.build());
+		return GENERATOR.generate(definition, parameters);
 	}
 }

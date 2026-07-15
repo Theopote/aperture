@@ -9,10 +9,10 @@ import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.render.data.RenderDelta;
 import dev.aperture.render.data.RenderDocument;
 import dev.aperture.render.material.MaterialBindingSet;
-import dev.aperture.render.mesh.BoxMeshCompiler;
 import dev.aperture.render.mesh.LODLevel;
 import dev.aperture.render.mesh.MeshAsset;
 import dev.aperture.render.mesh.MeshBakeService;
+import dev.aperture.render.mesh.SolidShapeMeshCompiler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +23,7 @@ import java.util.UUID;
  */
 public final class InstanceRenderCache {
 	private static final InstanceRenderCache INSTANCE = new InstanceRenderCache();
-	private static final MeshBakeService BAKE_SERVICE = new MeshBakeService(new BoxMeshCompiler());
+	private static final MeshBakeService BAKE_SERVICE = new MeshBakeService(new SolidShapeMeshCompiler());
 
 	private final Map<UUID, CachedInstanceRender> cache = new HashMap<>();
 
