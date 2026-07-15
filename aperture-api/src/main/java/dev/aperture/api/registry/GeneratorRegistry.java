@@ -1,10 +1,12 @@
 package dev.aperture.api.registry;
 
-import dev.aperture.geometry.generator.OpeningGenerator;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.opening.GeneratorId;
 import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.geometry.generator.OpeningGenerator;
+import dev.aperture.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.geometry.model.GeometryResult;
+import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 
 import java.util.Map;
 import java.util.Optional;
@@ -28,7 +30,12 @@ public final class GeneratorRegistry {
 		return get(id).orElseThrow(() -> new IllegalArgumentException("Unknown generator: " + id));
 	}
 
-	public GeometryResult generate(OpeningTypeDefinition definition, ParameterSet parameters) {
-		return require(definition.generator()).generate(definition, parameters);
+	public GeometryResult generate(
+		OpeningTypeDefinition definition,
+		ParameterSet parameters,
+		ProfileCatalogRegistry profiles
+	) {
+		GenerationContext context = new GenerationContext(definition, parameters, profiles);
+		return require(definition.generator()).generate(context);
 	}
 }

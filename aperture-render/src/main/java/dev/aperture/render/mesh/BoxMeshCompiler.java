@@ -1,7 +1,6 @@
 package dev.aperture.render.mesh;
 
 import dev.aperture.core.geometry.BoundingBox;
-import dev.aperture.core.geometry.Vec3d;
 import dev.aperture.geometry.model.GeometrySolid;
 import dev.aperture.render.data.PartId;
 

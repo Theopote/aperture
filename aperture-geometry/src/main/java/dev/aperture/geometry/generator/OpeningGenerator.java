@@ -1,7 +1,6 @@
 package dev.aperture.geometry.generator;
 
-import dev.aperture.core.definition.OpeningTypeDefinition;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.geometry.model.GeometryResult;
 
 /**
@@ -11,5 +10,5 @@ import dev.aperture.geometry.model.GeometryResult;
 public interface OpeningGenerator {
 	String id();
 
-	GeometryResult generate(OpeningTypeDefinition definition, ParameterSet parameters);
+	GeometryResult generate(GenerationContext context);
 }

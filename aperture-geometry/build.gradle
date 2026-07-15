@@ -1,5 +1,12 @@
 dependencies {
 	api project(':aperture-core')
+	implementation 'com.google.code.gson:gson:2.11.0'
+}
+
+processTestResources {
+	from("${rootProject.projectDir}/aperture-data/aperture") {
+		into "aperture"
+	}
 }
 
 tasks.named('test') {

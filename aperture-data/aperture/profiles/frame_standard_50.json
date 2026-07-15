@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "aperture:frame_standard_50",
+  "name": "Standard 50×50 Frame",
+  "points": [
+    { "u": 0, "v": 0 },
+    { "u": 50, "v": 0 },
+    { "u": 50, "v": 50 },
+    { "u": 0, "v": 50 }
+  ]
+}

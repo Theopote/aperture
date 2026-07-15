@@ -20,6 +20,9 @@ import dev.aperture.core.placement.PlacementService;
 import dev.aperture.fabric.placement.FabricPlacementAdapter;
 import dev.aperture.geometry.generator.RectangularWindowGenerator;
 import dev.aperture.geometry.model.GeometryResult;
+import dev.aperture.geometry.profile.ProfileCatalogLoader;
+import dev.aperture.geometry.profile.ProfileCatalogRegistry;
+import dev.aperture.geometry.profile.ProfileDefinition;
 import dev.aperture.registry.ApertureBlockEntities;
 import dev.aperture.registry.ApertureBlocks;
 import org.slf4j.Logger;
@@ -33,11 +36,12 @@ public final class ApertureBootstrap {
 
 	private final OpeningTypeRegistry openingTypes = new OpeningTypeRegistry();
 	private final GeneratorRegistry generators = new GeneratorRegistry();
+	private final ProfileCatalogRegistry profileCatalog = new ProfileCatalogRegistry();
 	private final MaterialCatalogRegistry materialCatalog = new MaterialCatalogRegistry();
 	private final MaterialResolverRegistry materials = new MaterialResolverRegistry(VanillaMaterialResolver.INSTANCE);
 	private final OpeningInstanceStore instances = new InMemoryOpeningInstanceStore();
 	private final OpeningTypeCatalogLoader catalogLoader = new OpeningTypeCatalogLoader();
-	private final OpeningGenerationService generation = new OpeningGenerationService(openingTypes, generators);
+	private final OpeningGenerationService generation = new OpeningGenerationService(openingTypes, generators, profileCatalog);
 	private final PlacementService placement = new PlacementService(openingTypes, instances);
 	private final FabricPlacementAdapter fabricPlacement = new FabricPlacementAdapter();
 
@@ -45,8 +49,9 @@ public final class ApertureBootstrap {
 		registerBlocks();
 		registerGenerators();
 		loadOpeningTypes();
+		loadProfileCatalog();
 		loadMaterialCatalog();
-		ApertureApi.init(new ApertureApi(openingTypes, generators, materialCatalog, materials, instances, generation, placement));
+		ApertureApi.init(new ApertureApi(openingTypes, generators, profileCatalog, materialCatalog, materials, instances, generation, placement));
 		verifyReferencePipeline();
 		LOGGER.info("Aperture bootstrap complete — {} opening types, {} generators",
 			openingTypes.all().size(), 1);
@@ -66,6 +71,14 @@ public final class ApertureBootstrap {
 		OpeningTypeDefinition fromData = catalogLoader.loadClasspathResource("aperture/opening_types/fixed_window.json");
 		openingTypes.register(fromData);
 		LOGGER.info("Loaded opening type from data pack: {}", fromData.id());
+	}
+
+	private void loadProfileCatalog() {
+		ProfileCatalogRegistry loaded = new ProfileCatalogLoader().loadClasspathCatalog();
+		for (ProfileDefinition definition : loaded.all().values()) {
+			profileCatalog.register(definition);
+		}
+		LOGGER.info("Loaded {} catalog profiles", profileCatalog.all().size());
 	}
 
 	private void loadMaterialCatalog() {
@@ -103,6 +116,10 @@ public final class ApertureBootstrap {
 
 	public GeneratorRegistry generators() {
 		return generators;
+	}
+
+	public ProfileCatalogRegistry profileCatalog() {
+		return profileCatalog;
 	}
 
 	public MaterialCatalogRegistry materialCatalog() {

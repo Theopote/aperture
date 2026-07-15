@@ -25,6 +25,24 @@ public record ProfileCurve(List<Vec2d> points) {
 		));
 	}
 
+	public static ProfileCurve fromPoints(List<Vec2d> points) {
+		return new ProfileCurve(points);
+	}
+
+	public ProfileBounds bounds() {
+		double minU = Double.POSITIVE_INFINITY;
+		double minV = Double.POSITIVE_INFINITY;
+		double maxU = Double.NEGATIVE_INFINITY;
+		double maxV = Double.NEGATIVE_INFINITY;
+		for (Vec2d point : points) {
+			minU = Math.min(minU, point.u());
+			minV = Math.min(minV, point.v());
+			maxU = Math.max(maxU, point.u());
+			maxV = Math.max(maxV, point.v());
+		}
+		return new ProfileBounds(minU, minV, maxU, maxV);
+	}
+
 	public int segmentCount() {
 		return points.size();
 	}

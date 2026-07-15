@@ -10,7 +10,7 @@
   },
   "generator": "aperture:rectangular_window_v1",
   "components": {
-    "frame": { "profile": "aperture:frame_standard_50" },
+    "frame": { "profile": "aperture:frame_l_50x80" },
     "glazing": { "system": "aperture:single_glazed" }
   },
   "materialSlots": ["frame", "glazing"]

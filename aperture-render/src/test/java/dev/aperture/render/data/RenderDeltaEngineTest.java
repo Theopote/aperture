@@ -4,7 +4,9 @@ import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.parameter.ParameterValue;
 import dev.aperture.geometry.generator.RectangularWindowGenerator;
+import dev.aperture.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.geometry.model.GeometryResult;
+import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -14,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RenderDeltaEngineTest {
 	private static final RectangularWindowGenerator GENERATOR = new RectangularWindowGenerator();
+	private static final ProfileCatalogLoader PROFILE_LOADER = new ProfileCatalogLoader();
 
 	@Test
 	void firstSnapshotIsAllAdded() {
@@ -36,7 +39,7 @@ class RenderDeltaEngineTest {
 	}
 
 	@Test
-	void widthChangeMarksAllPartsChanged() {
+	void widthChangeMarksWidthDependentPartsChanged() {
 		GeometryResult before = window(1200, 1500, 0);
 		GeometryResult after = window(1400, 1500, 0);
 
@@ -44,12 +47,20 @@ class RenderDeltaEngineTest {
 
 		assertTrue(delta.added().isEmpty());
 		assertTrue(delta.removed().isEmpty());
-		assertEquals(5, delta.changed().size());
-		assertTrue(delta.unchanged().isEmpty());
+		assertEquals(
+			Set.of(
+				PartId.of("frame.bottom"),
+				PartId.of("frame.top"),
+				PartId.of("frame.right"),
+				PartId.of("glazing")
+			),
+			delta.changed()
+		);
+		assertEquals(Set.of(PartId.of("frame.left")), delta.unchanged());
 	}
 
 	@Test
-	void mullionCountChangeAddsAndRemovesMullions() {
+	void mullionCountChangeAddsMullionsAndUpdatesExistingPositions() {
 		GeometryResult before = window(1200, 1500, 1);
 		GeometryResult after = window(1200, 1500, 2);
 
@@ -57,18 +68,22 @@ class RenderDeltaEngineTest {
 
 		assertEquals(Set.of(PartId.of("frame.mullion.2")), delta.added());
 		assertTrue(delta.removed().isEmpty());
-		assertTrue(delta.unchanged().contains(PartId.of("frame.mullion.1")));
+		assertEquals(Set.of(PartId.of("frame.mullion.1")), delta.changed());
 		assertTrue(delta.unchanged().contains(PartId.of("frame.bottom")));
 		assertTrue(delta.unchanged().contains(PartId.of("glazing")));
 	}
 
 	private static GeometryResult window(double width, double height, int mullions) {
 		var definition = BuiltinOpeningTypes.fixedWindow();
-		ParameterSet parameters = ParameterSet.mergeDefaults(definition.parameters(), ParameterSet.builder()
-			.put("width", ParameterValue.length(width))
-			.put("height", ParameterValue.length(height))
-			.put("mullions", ParameterValue.count(mullions))
-			.build());
-		return GENERATOR.generate(definition, parameters);
+		GenerationContext context = new GenerationContext(
+			definition,
+			ParameterSet.mergeDefaults(definition.parameters(), ParameterSet.builder()
+				.put("width", ParameterValue.length(width))
+				.put("height", ParameterValue.length(height))
+				.put("mullions", ParameterValue.count(mullions))
+				.build()),
+			PROFILE_LOADER.loadClasspathCatalog()
+		);
+		return GENERATOR.generate(context);
 	}
 }

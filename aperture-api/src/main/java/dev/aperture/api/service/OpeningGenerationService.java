@@ -9,6 +9,7 @@ import dev.aperture.core.validation.OpeningValidator;
 import dev.aperture.core.validation.ParameterConstraintValidator;
 import dev.aperture.core.validation.ValidationResult;
 import dev.aperture.geometry.model.GeometryResult;
+import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 
 /**
  * Orchestrates validation and procedural generation for a placed opening instance.
@@ -16,19 +17,26 @@ import dev.aperture.geometry.model.GeometryResult;
 public final class OpeningGenerationService {
 	private final OpeningTypeRegistry openingTypes;
 	private final GeneratorRegistry generators;
+	private final ProfileCatalogRegistry profiles;
 	private final OpeningValidator parameterValidator;
 
-	public OpeningGenerationService(OpeningTypeRegistry openingTypes, GeneratorRegistry generators) {
-		this(openingTypes, generators, new ParameterConstraintValidator());
+	public OpeningGenerationService(
+		OpeningTypeRegistry openingTypes,
+		GeneratorRegistry generators,
+		ProfileCatalogRegistry profiles
+	) {
+		this(openingTypes, generators, profiles, new ParameterConstraintValidator());
 	}
 
 	public OpeningGenerationService(
 		OpeningTypeRegistry openingTypes,
 		GeneratorRegistry generators,
+		ProfileCatalogRegistry profiles,
 		OpeningValidator parameterValidator
 	) {
 		this.openingTypes = openingTypes;
 		this.generators = generators;
+		this.profiles = profiles;
 		this.parameterValidator = parameterValidator;
 	}
 
@@ -44,6 +52,6 @@ public final class OpeningGenerationService {
 			throw new IllegalStateException("Opening instance failed validation: " + validation.issues());
 		}
 
-		return generators.generate(definition, resolved);
+		return generators.generate(definition, resolved, profiles);
 	}
 }

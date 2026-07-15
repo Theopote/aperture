@@ -7,6 +7,8 @@ import dev.aperture.core.geometry.Vec3d;
 import dev.aperture.geometry.shape.BoxShape;
 import dev.aperture.geometry.shape.ExtrusionShape;
 import dev.aperture.geometry.shape.SolidShape;
+import dev.aperture.geometry.shape.SubtractShape;
+import dev.aperture.geometry.shape.UnionShape;
 
 /**
  * Triangulates {@link SolidShape} instances into {@link Mesh} data.
@@ -27,6 +29,8 @@ public final class ShapeMesher {
 		return switch (shape) {
 			case BoxShape box -> meshBox(box.bounds());
 			case ExtrusionShape extrusion -> meshExtrusion(extrusion);
+			case UnionShape union -> MeshOps.unionAll(union.operands().stream().map(ShapeMesher::meshLocal).toList());
+			case SubtractShape subtract -> MeshOps.subtractByBounds(meshLocal(subtract.base()), subtract.tool().bounds());
 		};
 	}
 

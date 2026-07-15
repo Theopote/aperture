@@ -7,6 +7,7 @@ import dev.aperture.api.service.OpeningGenerationService;
 import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.core.instance.OpeningInstanceStore;
 import dev.aperture.core.placement.PlacementService;
+import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 
 /**
  * Public API surface for Aperture addon mods.
@@ -16,6 +17,7 @@ public final class ApertureApi {
 
 	private final OpeningTypeRegistry openingTypes;
 	private final GeneratorRegistry generators;
+	private final ProfileCatalogRegistry profiles;
 	private final MaterialCatalogRegistry materialCatalog;
 	private final MaterialResolverRegistry materials;
 	private final OpeningInstanceStore instances;
@@ -25,6 +27,7 @@ public final class ApertureApi {
 	public ApertureApi(
 		OpeningTypeRegistry openingTypes,
 		GeneratorRegistry generators,
+		ProfileCatalogRegistry profiles,
 		MaterialCatalogRegistry materialCatalog,
 		MaterialResolverRegistry materials,
 		OpeningInstanceStore instances,
@@ -33,6 +36,7 @@ public final class ApertureApi {
 	) {
 		this.openingTypes = openingTypes;
 		this.generators = generators;
+		this.profiles = profiles;
 		this.materialCatalog = materialCatalog;
 		this.materials = materials;
 		this.instances = instances;
@@ -57,6 +61,10 @@ public final class ApertureApi {
 
 	public GeneratorRegistry generators() {
 		return generators;
+	}
+
+	public ProfileCatalogRegistry profiles() {
+		return profiles;
 	}
 
 	public MaterialCatalogRegistry materialCatalog() {

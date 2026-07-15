@@ -41,7 +41,7 @@ public final class BuiltinOpeningTypes {
 				.build())
 			.materialSlot("frame")
 			.materialSlot("glazing")
-			.component("frame", Map.of("profile", "aperture:frame_standard_50"))
+			.component("frame", Map.of("profile", "aperture:frame_l_50x80"))
 			.component("glazing", Map.of("system", "aperture:single_glazed"))
 			.build();
 	}

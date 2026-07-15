@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "profiles": [
+    "frame_standard_50",
+    "frame_l_50x80"
+  ]
+}
