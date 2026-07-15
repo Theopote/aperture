@@ -77,6 +77,34 @@ public final class ParameterSet {
 		return ((ParameterValue.MaterialRefValue) require(name, ParameterType.MATERIAL_REF)).raw();
 	}
 
+	public int countOrDefault(String name, int defaultValue) {
+		return get(name)
+			.filter(value -> value.type() == ParameterType.COUNT)
+			.map(value -> ((ParameterValue.CountValue) value).value())
+			.orElse(defaultValue);
+	}
+
+	public double numberOrDefault(String name, double defaultValue) {
+		return get(name)
+			.filter(value -> value.type() == ParameterType.NUMBER)
+			.map(value -> ((ParameterValue.NumberValue) value).value())
+			.orElse(defaultValue);
+	}
+
+	public double angleOrDefault(String name, double defaultDegrees) {
+		return get(name)
+			.filter(value -> value.type() == ParameterType.ANGLE)
+			.map(value -> ((ParameterValue.AngleValue) value).degrees())
+			.orElse(defaultDegrees);
+	}
+
+	public String enumOrDefault(String name, String defaultValue) {
+		return get(name)
+			.filter(value -> value.type() == ParameterType.ENUM)
+			.map(value -> ((ParameterValue.EnumValue) value).value())
+			.orElse(defaultValue);
+	}
+
 	private ParameterValue require(String name, ParameterType type) {
 		ParameterValue value = values.get(name);
 		if (value == null) {

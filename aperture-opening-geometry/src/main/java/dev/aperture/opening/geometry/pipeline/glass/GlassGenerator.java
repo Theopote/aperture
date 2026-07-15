@@ -1,6 +1,8 @@
 package dev.aperture.opening.geometry.pipeline.glass;
 
+import dev.aperture.core.component.ComponentKind;
 import dev.aperture.core.component.GlassComponent;
+import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.math.BoundingBox;
 import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.model.GeometryLayer;
@@ -9,7 +11,6 @@ import dev.aperture.geometry.recipe.shape.ShapeRecipes;
 import dev.aperture.opening.geometry.pipeline.ComponentPaths;
 import dev.aperture.opening.geometry.pipeline.ComponentPipelineStep;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
-import dev.aperture.opening.geometry.pipeline.OpeningParameters;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 
 /**
@@ -30,8 +31,7 @@ public final class GlassGenerator implements ComponentPipelineStep {
 
 	@Override
 	public void execute(OpeningPipelineContext context, GeometryCompilationTarget target) {
-		OpeningParameters parameters = context.openingParameters();
-		if (parameters.hasPanel()) {
+		if (context.hasComponent(ComponentKind.PANEL)) {
 			return;
 		}
 
@@ -40,9 +40,12 @@ public final class GlassGenerator implements ComponentPipelineStep {
 			return;
 		}
 
+		ParameterSet parameters = context.parameters();
+		int cols = Math.max(1, parameters.countOrDefault("cols", 1));
+		int rows = Math.max(1, parameters.countOrDefault("rows", 1));
 		String root = component.ref().id();
-		if (parameters.cols() > 1 || parameters.rows() > 1) {
-			emitGridGlazing(target, layout, parameters, root);
+		if (cols > 1 || rows > 1) {
+			emitGridGlazing(target, layout, cols, rows, root);
 			return;
 		}
 
@@ -60,13 +63,14 @@ public final class GlassGenerator implements ComponentPipelineStep {
 	private static void emitGridGlazing(
 		GeometryCompilationTarget target,
 		OpeningLayout layout,
-		OpeningParameters parameters,
+		int cols,
+		int rows,
 		String root
 	) {
-		double cellWidth = layout.innerWidth() / parameters.cols();
-		double cellHeight = layout.innerHeight() / parameters.rows();
-		for (int row = 0; row < parameters.rows(); row++) {
-			for (int col = 0; col < parameters.cols(); col++) {
+		double cellWidth = layout.innerWidth() / cols;
+		double cellHeight = layout.innerHeight() / rows;
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
 				double minX = layout.frameFace() + col * cellWidth + layout.frameFace() * 0.25;
 				double maxX = layout.frameFace() + (col + 1) * cellWidth - layout.frameFace() * 0.25;
 				double minY = layout.frameFace() + row * cellHeight + layout.frameFace() * 0.25;

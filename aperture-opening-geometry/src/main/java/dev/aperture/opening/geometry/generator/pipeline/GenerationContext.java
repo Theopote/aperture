@@ -6,8 +6,6 @@ import dev.aperture.core.component.FrameComponent;
 import dev.aperture.core.component.PanelComponent;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterType;
-import dev.aperture.core.parameter.ParameterValue;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 import dev.aperture.geometry.profile.ProfileDefinition;
 import dev.aperture.geometry.profile.ProfileScaler;
@@ -57,10 +55,7 @@ public final class GenerationContext {
 	}
 
 	public double angleDegrees(String name, double defaultDegrees) {
-		return parameters.get(name)
-			.filter(value -> value.type() == ParameterType.ANGLE)
-			.map(value -> ((ParameterValue.AngleValue) value).degrees())
-			.orElse(defaultDegrees);
+		return parameters.angleOrDefault(name, defaultDegrees);
 	}
 
 	public boolean hasComponent(ComponentKind kind) {

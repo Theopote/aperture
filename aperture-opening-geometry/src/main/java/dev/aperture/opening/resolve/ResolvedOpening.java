@@ -2,7 +2,6 @@ package dev.aperture.opening.resolve;
 
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
-import dev.aperture.opening.geometry.pipeline.OpeningParameters;
 import dev.aperture.opening.geometry.pipeline.ResolvedProfiles;
 
 /**
@@ -10,7 +9,6 @@ import dev.aperture.opening.geometry.pipeline.ResolvedProfiles;
  */
 public record ResolvedOpening(
 	GenerationContext context,
-	OpeningParameters parameters,
 	ResolvedProfiles profiles,
 	OpeningLayout layout
 ) {

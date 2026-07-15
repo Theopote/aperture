@@ -1,13 +1,16 @@
 package dev.aperture.opening.geometry.pipeline.panel;
 
+import dev.aperture.core.component.ComponentKind;
+import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
-import dev.aperture.opening.geometry.pipeline.OpeningParameters;
+import dev.aperture.opening.resolve.ComponentPropertyResolver;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Computes per-panel cell layout from {@code panel_count} and {@code glass_ratio}.
+ * Computes per-panel cell layout from {@code panel_count} and {@code glass_ratio} parameters.
  */
 public final class PanelLayoutPlanner {
 	private static final double INTER_PANEL_GAP_RATIO = 0.25;
@@ -15,20 +18,26 @@ public final class PanelLayoutPlanner {
 	private PanelLayoutPlanner() {
 	}
 
-	public static List<PanelCellLayout> plan(OpeningParameters parameters, OpeningLayout layout) {
-		return plan(parameters, layout, parameters.panelHinge());
+	public static List<PanelCellLayout> plan(GenerationContext context, OpeningLayout layout) {
+		ParameterSet parameters = context.parameters();
+		String hingeSide = ComponentPropertyResolver.panelHinge(context, "left");
+		return plan(context, layout, hingeSide);
 	}
 
 	public static List<PanelCellLayout> plan(
-		OpeningParameters parameters,
+		GenerationContext context,
 		OpeningLayout layout,
 		String hingeSide
 	) {
-		if (!parameters.hasPanel()) {
+		if (!context.hasComponent(ComponentKind.PANEL)) {
 			return List.of();
 		}
 
-		int panelCount = parameters.panelCount();
+		ParameterSet parameters = context.parameters();
+		int panelCount = Math.max(1, parameters.countOrDefault("panel_count", 1));
+		double glassRatio = clampRatio(parameters.numberOrDefault("glass_ratio", 1.0));
+		double openAngleDegrees = parameters.angleOrDefault("open_angle", 0.0);
+
 		double gap = panelCount > 1 ? layout.sashFace() * INTER_PANEL_GAP_RATIO : 0.0;
 		double totalGap = gap * (panelCount - 1);
 		double cellWidth = (layout.innerWidth() - totalGap) / panelCount;
@@ -37,7 +46,7 @@ public final class PanelLayoutPlanner {
 			return List.of();
 		}
 
-		double glassHeight = cellHeight * parameters.glassRatio();
+		double glassHeight = cellHeight * glassRatio;
 		double solidHeight = cellHeight - glassHeight;
 		List<PanelCellLayout> cells = new ArrayList<>(panelCount);
 		for (int index = 0; index < panelCount; index++) {
@@ -55,7 +64,7 @@ public final class PanelLayoutPlanner {
 				glassHeight,
 				hingeSide,
 				operable,
-				parameters.openAngleDegrees(),
+				openAngleDegrees,
 				layout
 			));
 		}
@@ -80,5 +89,9 @@ public final class PanelLayoutPlanner {
 			case "right" -> index == panelCount - 1;
 			default -> index == 0;
 		};
+	}
+
+	private static double clampRatio(double value) {
+		return Math.max(0.0, Math.min(1.0, value));
 	}
 }

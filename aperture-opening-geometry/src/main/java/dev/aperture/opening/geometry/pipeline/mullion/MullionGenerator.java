@@ -1,6 +1,7 @@
 package dev.aperture.opening.geometry.pipeline.mullion;
 
 import dev.aperture.core.component.MullionComponent;
+import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.parametric.ParameterRef;
 import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
@@ -8,7 +9,6 @@ import dev.aperture.geometry.profile.ProfileCurve;
 import dev.aperture.opening.geometry.pipeline.ComponentPaths;
 import dev.aperture.opening.geometry.pipeline.ComponentPipelineStep;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
-import dev.aperture.opening.geometry.pipeline.OpeningParameters;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 import dev.aperture.opening.geometry.pipeline.frame.FrameRailBuilder;
 
@@ -30,23 +30,27 @@ public final class MullionGenerator implements ComponentPipelineStep {
 	@Override
 	public void execute(OpeningPipelineContext context, GeometryCompilationTarget target) {
 		OpeningLayout layout = context.layout();
-		OpeningParameters parameters = context.openingParameters();
+		ParameterSet parameters = context.parameters();
 		ProfileCurve profile = context.profileCurveFor(component);
 		String root = component.ref().id();
 
+		int cols = Math.max(1, parameters.countOrDefault("cols", 1));
+		int rows = Math.max(1, parameters.countOrDefault("rows", 1));
+		int mullions = parameters.countOrDefault("mullions", 0);
+
 		switch (resolveSource(component.source())) {
-			case COLS -> emitVerticalMullions(target, layout, profile, parameters, root, parameters.cols() - 1);
-			case ROWS -> emitHorizontalMullions(target, layout, profile, parameters, root, parameters.rows() - 1);
-			case MULLIONS -> emitVerticalMullions(target, layout, profile, parameters, root, parameters.mullions());
+			case COLS -> emitVerticalMullions(target, layout, profile, cols, root, cols - 1);
+			case ROWS -> emitHorizontalMullions(target, layout, profile, root, rows - 1);
+			case MULLIONS -> emitVerticalMullions(target, layout, profile, cols, root, mullions);
 			case ALL -> {
-				emitVerticalMullions(target, layout, profile, parameters, root, verticalCount(parameters));
-				emitHorizontalMullions(target, layout, profile, parameters, root, parameters.rows() - 1);
+				emitVerticalMullions(target, layout, profile, cols, root, verticalCount(cols, mullions));
+				emitHorizontalMullions(target, layout, profile, root, rows - 1);
 			}
 		}
 	}
 
-	private static int verticalCount(OpeningParameters parameters) {
-		return parameters.cols() > 1 ? parameters.cols() - 1 : parameters.mullions();
+	private static int verticalCount(int cols, int mullions) {
+		return cols > 1 ? cols - 1 : mullions;
 	}
 
 	private static MullionSource resolveSource(String source) {
@@ -73,7 +77,7 @@ public final class MullionGenerator implements ComponentPipelineStep {
 		GeometryCompilationTarget target,
 		OpeningLayout layout,
 		ProfileCurve profile,
-		OpeningParameters parameters,
+		int cols,
 		String root,
 		int count
 	) {
@@ -83,7 +87,7 @@ public final class MullionGenerator implements ComponentPipelineStep {
 		for (int i = 1; i <= count; i++) {
 			double t = (double) i / (count + 1);
 			double x = layout.frameFace() + layout.innerWidth() * t - layout.frameFace() / 2.0;
-			String path = parameters.cols() > 1
+			String path = cols > 1
 				? ComponentPaths.join(root, "vertical." + i)
 				: ComponentPaths.join(root, "mullion." + i);
 			FrameRailBuilder.emitMiteredRail(
@@ -102,7 +106,6 @@ public final class MullionGenerator implements ComponentPipelineStep {
 		GeometryCompilationTarget target,
 		OpeningLayout layout,
 		ProfileCurve profile,
-		OpeningParameters parameters,
 		String root,
 		int count
 	) {

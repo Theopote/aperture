@@ -1,5 +1,6 @@
 package dev.aperture.opening.geometry.pipeline.handle;
 
+import dev.aperture.core.component.ComponentKind;
 import dev.aperture.core.component.HandleComponent;
 import dev.aperture.math.BoundingBox;
 import dev.aperture.math.Vec3d;
@@ -9,10 +10,10 @@ import dev.aperture.geometry.recipe.shape.ShapeRecipes;
 import dev.aperture.opening.geometry.pipeline.ComponentPaths;
 import dev.aperture.opening.geometry.pipeline.ComponentPipelineStep;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
-import dev.aperture.opening.geometry.pipeline.OpeningParameters;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 import dev.aperture.opening.geometry.pipeline.panel.PanelCellLayout;
 import dev.aperture.opening.geometry.pipeline.panel.PanelLayoutPlanner;
+import dev.aperture.opening.resolve.ComponentPropertyResolver;
 
 import java.util.List;
 
@@ -36,18 +37,19 @@ public final class HandleGenerator implements ComponentPipelineStep {
 
 	@Override
 	public void execute(OpeningPipelineContext context, GeometryCompilationTarget target) {
-		OpeningParameters parameters = context.openingParameters();
-		if (!parameters.hasPanel()) {
+		if (!context.hasComponent(ComponentKind.PANEL)) {
 			return;
 		}
 
 		OpeningLayout layout = context.layout();
-		List<PanelCellLayout> cells = PanelLayoutPlanner.plan(parameters, layout);
+		var generationContext = context.generationContext();
+		List<PanelCellLayout> cells = PanelLayoutPlanner.plan(generationContext, layout);
 		if (cells.isEmpty()) {
 			return;
 		}
 
-		PanelCellLayout primary = PanelLayoutPlanner.primaryLeaf(cells, parameters.panelHinge());
+		String hingeSide = ComponentPropertyResolver.panelHinge(generationContext, "left");
+		PanelCellLayout primary = PanelLayoutPlanner.primaryLeaf(cells, hingeSide);
 		emitHandle(target, primary, layout);
 	}
 

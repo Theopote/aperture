@@ -1,5 +1,6 @@
 package dev.aperture.opening.geometry.pipeline.panel;
 
+import dev.aperture.core.component.ComponentKind;
 import dev.aperture.core.component.PanelComponent;
 import dev.aperture.opening.resolve.ComponentPropertyResolver;
 import dev.aperture.math.BoundingBox;
@@ -13,7 +14,6 @@ import dev.aperture.geometry.recipe.shape.ShapeRecipes;
 import dev.aperture.opening.geometry.pipeline.ComponentPaths;
 import dev.aperture.opening.geometry.pipeline.ComponentPipelineStep;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
-import dev.aperture.opening.geometry.pipeline.OpeningParameters;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 import dev.aperture.opening.geometry.pipeline.frame.FrameRailBuilder;
 import dev.aperture.geometry.profile.ProfileCurve;
@@ -38,14 +38,17 @@ public final class PanelGenerator implements ComponentPipelineStep {
 
 	@Override
 	public void execute(OpeningPipelineContext context, GeometryCompilationTarget target) {
-		OpeningParameters parameters = context.openingParameters();
-		if (!parameters.hasPanel()) {
+		if (!context.hasComponent(ComponentKind.PANEL)) {
 			return;
 		}
 
 		OpeningLayout layout = context.layout();
 		ProfileCurve sashProfile = context.profileCurveFor(component);
-		List<PanelCellLayout> cells = PanelLayoutPlanner.plan(parameters, layout, resolveHingeSide(context));
+		List<PanelCellLayout> cells = PanelLayoutPlanner.plan(
+			context.generationContext(),
+			layout,
+			resolveHingeSide(context)
+		);
 		for (PanelCellLayout cell : cells) {
 			emitPanelCell(target, sashProfile, layout, cell);
 		}
@@ -125,7 +128,7 @@ public final class PanelGenerator implements ComponentPipelineStep {
 	}
 
 	private String resolveHingeSide(OpeningPipelineContext context) {
-		return ComponentPropertyResolver.panelHinge(context.source(), component.hinge());
+		return ComponentPropertyResolver.panelHinge(context.generationContext(), "left");
 	}
 
 	private String pathPrefix(PanelCellLayout cell) {

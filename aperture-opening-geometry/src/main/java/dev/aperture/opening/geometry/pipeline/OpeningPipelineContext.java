@@ -13,7 +13,8 @@ import dev.aperture.opening.resolve.ResolvedOpening;
 import java.util.Objects;
 
 /**
- * Geometry-step context with pre-resolved parameters, profiles, and layout.
+ * Geometry-step context with pre-resolved profiles and layout.
+ * Parameter values are read from {@link #parameters()} / {@link #generationContext()}.
  */
 public final class OpeningPipelineContext {
 	private final ResolvedOpening resolved;
@@ -42,12 +43,12 @@ public final class OpeningPipelineContext {
 		return resolved.context().parameters();
 	}
 
-	public dev.aperture.geometry.profile.ProfileCatalogRegistry profileCatalog() {
-		return resolved.context().profiles();
+	public GenerationContext generationContext() {
+		return resolved.context();
 	}
 
-	public OpeningParameters openingParameters() {
-		return resolved.parameters();
+	public dev.aperture.geometry.profile.ProfileCatalogRegistry profileCatalog() {
+		return resolved.context().profiles();
 	}
 
 	public ResolvedProfiles resolvedProfiles() {
