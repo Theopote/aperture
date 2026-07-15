@@ -1,0 +1,71 @@
+package dev.aperture.render.mesh;
+
+import dev.aperture.geometry.model.GeometryResult;
+import dev.aperture.geometry.model.GeometrySolid;
+import dev.aperture.render.data.PartId;
+import dev.aperture.render.data.RenderDelta;
+import dev.aperture.render.data.RenderDocument;
+import dev.aperture.render.data.RenderPart;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+/**
+ * Compiles only dirty mesh parts and patches the existing asset.
+ */
+public final class MeshBakeService {
+	private final MeshCompiler compiler;
+
+	public MeshBakeService(MeshCompiler compiler) {
+		this.compiler = Objects.requireNonNull(compiler, "compiler");
+	}
+
+	public MeshAsset bakeAll(GeometryResult geometry, LODLevel level) {
+		Map<PartId, MeshSection> sections = new HashMap<>();
+		for (GeometrySolid solid : geometry.solids()) {
+			MeshSection section = compiler.compile(solid, level);
+			sections.put(section.partId(), section);
+		}
+		return new MeshAsset(level, sections, geometry.bounds());
+	}
+
+	public MeshAsset bakeDirty(RenderDocument document, MeshAsset existing, Set<PartId> dirtyParts, LODLevel level) {
+		Objects.requireNonNull(document, "document");
+		Objects.requireNonNull(existing, "existing");
+		Objects.requireNonNull(dirtyParts, "dirtyParts");
+
+		if (dirtyParts.isEmpty()) {
+			return existing;
+		}
+
+		Map<PartId, MeshSection> updated = new HashMap<>();
+		for (PartId partId : dirtyParts) {
+			RenderPart part = document.parts().get(partId)
+				.orElseThrow(() -> new IllegalStateException("Missing render part for dirty id: " + partId.componentPath()));
+			MeshSection section = compiler.compile(part.solid(), level);
+			part.setMeshHandle(section.handle());
+			updated.put(partId, section);
+		}
+
+		return MeshAsset.patch(existing, updated, Set.of());
+	}
+
+	public MeshAsset applyDelta(
+		RenderDocument document,
+		MeshAsset existing,
+		RenderDelta delta,
+		LODLevel level
+	) {
+		Map<PartId, MeshSection> updated = new HashMap<>();
+		for (PartId partId : delta.dirty()) {
+			RenderPart part = document.parts().get(partId)
+				.orElseThrow(() -> new IllegalStateException("Missing render part for dirty id: " + partId.componentPath()));
+			MeshSection section = compiler.compile(part.solid(), level);
+			part.setMeshHandle(section.handle());
+			updated.put(partId, section);
+		}
+		return MeshAsset.patch(existing, updated, delta.removed());
+	}
+}

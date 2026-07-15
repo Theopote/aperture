@@ -25,6 +25,14 @@ aperture/
 │       ├── generators/
 │       └── model/
 │
+├── aperture-render/                 # Pure Java render contracts
+│   └── src/main/java/dev/aperture/render/
+│       ├── data/
+│       ├── mesh/
+│       ├── material/
+│       ├── pipeline/
+│       └── collision/
+│
 ├── aperture-api/                    # Public extension API
 │   └── src/main/java/dev/aperture/api/
 │       ├── ApertureApi.java

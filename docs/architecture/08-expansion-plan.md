@@ -15,7 +15,8 @@
 - [x] Placement core (preview + validation; MC raycast adapter pending)
 - [x] Fabric placement adapter (raycast → PlacementContext)
 - [x] Placement preview wireframe (Gizmos overlay)
-- [ ] Rendering pipeline
+- [x] Rendering architecture + `aperture-render` module (delta engine, box compiler)
+- [ ] Fabric ghost mesh preview (`FabricRenderBackend`)
 - [ ] World persistence (NBT)
 
 ## Phase 1 — Opening Platform (Months 4–8)

@@ -26,6 +26,7 @@ dependencies {
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	implementation project(':aperture-api')
+	clientImplementation project(':aperture-render')
 }
 
 processResources {

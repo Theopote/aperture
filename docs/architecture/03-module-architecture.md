@@ -7,6 +7,7 @@ flowchart TB
     subgraph PureJava["Pure Java (platform-agnostic)"]
         CORE[aperture-core]
         GEO[aperture-geometry]
+        RENDER[aperture-render]
         API[aperture-api]
     end
 
@@ -20,8 +21,11 @@ flowchart TB
     end
 
     GEO --> CORE
+    RENDER --> GEO
+    RENDER --> CORE
     API --> CORE
     API --> GEO
+    API --> RENDER
     ROOT --> API
     DATA --> CORE
     ADDON --> API
@@ -33,6 +37,7 @@ flowchart TB
 |---|---|---|
 | `aperture-core` | Domain model, parameters, validation, codec contracts | **Forbidden** |
 | `aperture-geometry` | Procedural mesh/solid generation | **Forbidden** |
+| `aperture-render` | Render data, mesh, material, pipeline contracts | **Forbidden** |
 | `aperture-api` | Stable public surface for addons | **Forbidden** |
 | `aperture` (root) | World instances, placement, host cuts, networking, save, render | Allowed |
 | `aperture-data` | Opening families, profiles, presets (JSON packs) | N/A |
@@ -44,8 +49,9 @@ Enforced in CI — violations fail the build.
 ```
 aperture-core        →  (no upward deps)
 aperture-geometry    →  core
-aperture-api         →  core, geometry
-aperture (root mod)  →  api
+aperture-render      →  core, geometry
+aperture-api         →  core, geometry, render
+aperture (root mod)  →  api, render (client)
 addon mods           →  api only (never common internals)
 ```
 
@@ -57,6 +63,7 @@ All Java code uses `dev.aperture` as the root package.
 |---|---|
 | core | `dev.aperture.core.*` |
 | geometry | `dev.aperture.geometry.*` |
+| render | `dev.aperture.render.*` |
 | api | `dev.aperture.api.*` |
 | fabric mod | `dev.aperture.*` (bootstrap, registry, network) |
 | fabric client | `dev.aperture.client.*` |
