@@ -1,4 +1,5 @@
 {
   "key.aperture.commit_placement": "Commit Opening Placement",
-  "key.category.aperture": "Aperture"
+  "key.category.aperture": "Aperture",
+  "block.aperture.opening": "Opening"
 }

@@ -3,10 +3,12 @@ package dev.aperture.client.placement;
 import dev.aperture.api.ApertureApi;
 import dev.aperture.client.render.placement.PlacementPreviewMeshService;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
+import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.placement.PlacementSession;
 import dev.aperture.fabric.placement.FabricPlacementAdapter;
 import dev.aperture.fabric.placement.FabricPlacementTarget;
+import dev.aperture.fabric.placement.OpeningWorldPlacement;
 import net.minecraft.client.Minecraft;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,8 +76,12 @@ public final class ClientPlacementPreview {
 			return false;
 		}
 
+		Minecraft client = Minecraft.getInstance();
 		try {
-			ApertureApi.get().placement().commit(session.get());
+			OpeningInstance committed = ApertureApi.get().placement().commit(session.get());
+			if (client.level != null) {
+				OpeningWorldPlacement.placeCommittedInstance(client.level, committed);
+			}
 			LOGGER.info("Committed opening at host {}", currentTarget.host().anchor());
 			return true;
 		} catch (IllegalStateException exception) {

@@ -1,7 +1,9 @@
 package dev.aperture.bootstrap;
 
 import dev.aperture.api.ApertureApi;
+import dev.aperture.api.material.VanillaMaterialResolver;
 import dev.aperture.api.registry.GeneratorRegistry;
+import dev.aperture.api.registry.MaterialResolverRegistry;
 import dev.aperture.api.service.OpeningGenerationService;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.catalog.OpeningTypeCatalogLoader;
@@ -15,6 +17,8 @@ import dev.aperture.core.placement.PlacementService;
 import dev.aperture.fabric.placement.FabricPlacementAdapter;
 import dev.aperture.geometry.generator.RectangularWindowGenerator;
 import dev.aperture.geometry.model.GeometryResult;
+import dev.aperture.registry.ApertureBlockEntities;
+import dev.aperture.registry.ApertureBlocks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +30,7 @@ public final class ApertureBootstrap {
 
 	private final OpeningTypeRegistry openingTypes = new OpeningTypeRegistry();
 	private final GeneratorRegistry generators = new GeneratorRegistry();
+	private final MaterialResolverRegistry materials = new MaterialResolverRegistry(VanillaMaterialResolver.INSTANCE);
 	private final OpeningInstanceStore instances = new InMemoryOpeningInstanceStore();
 	private final OpeningTypeCatalogLoader catalogLoader = new OpeningTypeCatalogLoader();
 	private final OpeningGenerationService generation = new OpeningGenerationService(openingTypes, generators);
@@ -33,12 +38,19 @@ public final class ApertureBootstrap {
 	private final FabricPlacementAdapter fabricPlacement = new FabricPlacementAdapter();
 
 	public void initialize() {
+		registerBlocks();
 		registerGenerators();
 		loadOpeningTypes();
-		ApertureApi.init(new ApertureApi(openingTypes, generators, instances, generation, placement));
+		ApertureApi.init(new ApertureApi(openingTypes, generators, materials, instances, generation, placement));
 		verifyReferencePipeline();
 		LOGGER.info("Aperture bootstrap complete — {} opening types, {} generators",
 			openingTypes.all().size(), 1);
+	}
+
+	private void registerBlocks() {
+		ApertureBlocks.registerAll();
+		ApertureBlockEntities.registerAll();
+		LOGGER.info("Registered opening block + block entity");
 	}
 
 	private void registerGenerators() {
@@ -74,6 +86,10 @@ public final class ApertureBootstrap {
 
 	public GeneratorRegistry generators() {
 		return generators;
+	}
+
+	public MaterialResolverRegistry materials() {
+		return materials;
 	}
 
 	public OpeningInstanceStore instances() {

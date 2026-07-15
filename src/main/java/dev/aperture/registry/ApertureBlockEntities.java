@@ -2,12 +2,11 @@ package dev.aperture.registry;
 
 import dev.aperture.Aperture;
 import dev.aperture.block.entity.OpeningBlockEntity;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-
-import java.util.Set;
 
 /**
  * Registers Aperture block entity types.
@@ -15,7 +14,7 @@ import java.util.Set;
 public final class ApertureBlockEntities {
 	public static final BlockEntityType<OpeningBlockEntity> OPENING = register(
 		"opening",
-		new BlockEntityType<>(OpeningBlockEntity::new, Set.of(ApertureBlocks.OPENING))
+		FabricBlockEntityTypeBuilder.create(OpeningBlockEntity::new, ApertureBlocks.OPENING).build()
 	);
 
 	private ApertureBlockEntities() {

@@ -16,7 +16,7 @@ public final class ApertureBlocks {
 		"opening",
 		new OpeningBlock(
 			BlockBehaviour.Properties.of()
-				.noCollission()
+				.noCollision()
 				.noOcclusion()
 				.noLootTable()
 				.strength(-1.0F, 3600000.0F)

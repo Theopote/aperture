@@ -263,8 +263,8 @@ src/client/java/dev/aperture/client/render/
 | Phase | Deliverable | Status |
 |---|---|---|
 | 1a | `aperture-render` module: data + mesh contracts, delta engine, box compiler | **In progress** |
-| 1b | `FabricRenderBackend`, ghost preview mesh | Planned |
-| 2a | Material resolver, preview filters | Planned |
+| 1b | `FabricRenderBackend`, `OpeningInstanceRenderer`, ghost preview mesh | **Done** |
+| 2a | Material resolver, preview filters | **In progress** (VanillaMaterialResolver done) |
 | 2b | Async bake, live resize debounce | Planned |
 | 3 | Instancing, LOD pre-bake, collision proxies | Planned |
 | 4 | GPU mesh gen, RT backend extension | Future |

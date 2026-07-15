@@ -30,7 +30,7 @@ public final class OpeningInstanceRenderer implements BlockEntityRenderer<Openin
 		OpeningInstanceRenderState state,
 		float tickProgress,
 		Vec3 cameraPos,
-		@Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
+		ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay
 	) {
 		BlockEntityRenderer.super.extractRenderState(blockEntity, state, tickProgress, cameraPos, crumblingOverlay);
 		blockEntity.resolveInstance().ifPresentOrElse(
@@ -56,6 +56,7 @@ public final class OpeningInstanceRenderer implements BlockEntityRenderer<Openin
 			queue,
 			state.lightCoords,
 			state.meshAsset(),
+			state.materialBindings(),
 			state.transform(),
 			state.blockPos
 		);

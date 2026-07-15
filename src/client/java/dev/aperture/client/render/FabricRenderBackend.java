@@ -1,8 +1,11 @@
 package dev.aperture.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.aperture.client.render.material.FabricMaterialGraphics;
 import dev.aperture.core.geometry.Transform3d;
 import dev.aperture.geometry.model.GeometryLayer;
+import dev.aperture.render.material.MaterialBinding;
+import dev.aperture.render.material.MaterialBindingSet;
 import dev.aperture.render.mesh.MeshAsset;
 import dev.aperture.render.mesh.MeshSection;
 import dev.aperture.render.pipeline.DrawCommand;
@@ -20,7 +23,7 @@ import org.jspecify.annotations.Nullable;
  */
 public final class FabricRenderBackend implements RenderBackend {
 	public static final FabricRenderBackend INSTANCE = new FabricRenderBackend();
-	private static final Identifier PLACEHOLDER_TEXTURE = Identifier.withDefaultNamespace("block/oak_planks");
+	private static final Identifier FALLBACK_TEXTURE = Identifier.withDefaultNamespace("block/stone");
 
 	private final MeshBufferCache cache = new MeshBufferCache();
 	private @Nullable RenderFrameContext frameContext;
@@ -33,9 +36,10 @@ public final class FabricRenderBackend implements RenderBackend {
 		SubmitNodeCollector queue,
 		int lightCoords,
 		Transform3d transform,
-		BlockPos blockPos
+		BlockPos blockPos,
+		MaterialBindingSet materialBindings
 	) {
-		this.frameContext = new RenderFrameContext(poseStack, queue, lightCoords, transform, blockPos);
+		this.frameContext = new RenderFrameContext(poseStack, queue, lightCoords, transform, blockPos, materialBindings);
 	}
 
 	public void endFrame() {
@@ -47,10 +51,11 @@ public final class FabricRenderBackend implements RenderBackend {
 		SubmitNodeCollector queue,
 		int lightCoords,
 		MeshAsset asset,
+		MaterialBindingSet materialBindings,
 		Transform3d transform,
 		BlockPos blockPos
 	) {
-		beginFrame(poseStack, queue, lightCoords, transform, blockPos);
+		beginFrame(poseStack, queue, lightCoords, transform, blockPos, materialBindings);
 		for (MeshSection section : asset.sections().values()) {
 			upload(section);
 			drawSection(section);
@@ -89,33 +94,38 @@ public final class FabricRenderBackend implements RenderBackend {
 			return;
 		}
 
-		RenderType renderType = renderTypeFor(section.layer());
-		int color = colorFor(section.layer());
-		frameContext.queue().submitCustomGeometry(frameContext.poseStack(), renderType, (pose, buffer) -> MeshSectionEmitter.emit(
-			pose,
-			buffer,
-			section,
-			frameContext.transform(),
-			frameContext.blockPos(),
-			color,
-			frameContext.lightCoords()
-		));
+		MaterialBinding binding = frameContext.materialBindings().get(section.partId()).orElse(null);
+		FabricMaterialGraphics.ResolvedMaterialDraw draw = binding != null
+			? FabricMaterialGraphics.resolve(binding.material())
+			: fallbackDraw(section.layer());
+
+		frameContext.queue().submitCustomGeometry(
+			frameContext.poseStack(),
+			draw.renderType(),
+			(pose, buffer) -> MeshSectionEmitter.emit(
+				pose,
+				buffer,
+				section,
+				frameContext.transform(),
+				frameContext.blockPos(),
+				draw.tintArgb(),
+				frameContext.lightCoords()
+			)
+		);
 	}
 
-	private static RenderType renderTypeFor(GeometryLayer layer) {
-		return switch (layer) {
-			case OPAQUE_FRAME -> RenderTypes.entitySolid(PLACEHOLDER_TEXTURE);
-			case CUTOUT_HARDWARE -> RenderTypes.entityCutout(PLACEHOLDER_TEXTURE);
-			case TRANSLUCENT_GLASS -> RenderTypes.entityTranslucent(PLACEHOLDER_TEXTURE);
+	private static FabricMaterialGraphics.ResolvedMaterialDraw fallbackDraw(GeometryLayer layer) {
+		RenderType renderType = switch (layer) {
+			case OPAQUE_FRAME -> RenderTypes.entitySolid(FALLBACK_TEXTURE);
+			case CUTOUT_HARDWARE -> RenderTypes.entityCutout(FALLBACK_TEXTURE);
+			case TRANSLUCENT_GLASS -> RenderTypes.entityTranslucent(FALLBACK_TEXTURE);
 		};
-	}
-
-	private static int colorFor(GeometryLayer layer) {
-		return switch (layer) {
+		int tint = switch (layer) {
 			case OPAQUE_FRAME -> 0xFFC8A878;
 			case CUTOUT_HARDWARE -> 0xFF909090;
 			case TRANSLUCENT_GLASS -> 0xAA88CCFF;
 		};
+		return new FabricMaterialGraphics.ResolvedMaterialDraw(renderType, tint);
 	}
 
 	private record RenderFrameContext(
@@ -123,7 +133,8 @@ public final class FabricRenderBackend implements RenderBackend {
 		SubmitNodeCollector queue,
 		int lightCoords,
 		Transform3d transform,
-		BlockPos blockPos
+		BlockPos blockPos,
+		MaterialBindingSet materialBindings
 	) {
 	}
 }

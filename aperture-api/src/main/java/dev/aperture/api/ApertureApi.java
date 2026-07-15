@@ -1,6 +1,7 @@
 package dev.aperture.api;
 
 import dev.aperture.api.registry.GeneratorRegistry;
+import dev.aperture.api.registry.MaterialResolverRegistry;
 import dev.aperture.api.service.OpeningGenerationService;
 import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.core.instance.OpeningInstanceStore;
@@ -14,6 +15,7 @@ public final class ApertureApi {
 
 	private final OpeningTypeRegistry openingTypes;
 	private final GeneratorRegistry generators;
+	private final MaterialResolverRegistry materials;
 	private final OpeningInstanceStore instances;
 	private final OpeningGenerationService generation;
 	private final PlacementService placement;
@@ -21,12 +23,14 @@ public final class ApertureApi {
 	public ApertureApi(
 		OpeningTypeRegistry openingTypes,
 		GeneratorRegistry generators,
+		MaterialResolverRegistry materials,
 		OpeningInstanceStore instances,
 		OpeningGenerationService generation,
 		PlacementService placement
 	) {
 		this.openingTypes = openingTypes;
 		this.generators = generators;
+		this.materials = materials;
 		this.instances = instances;
 		this.generation = generation;
 		this.placement = placement;
@@ -49,6 +53,10 @@ public final class ApertureApi {
 
 	public GeneratorRegistry generators() {
 		return generators;
+	}
+
+	public MaterialResolverRegistry materials() {
+		return materials;
 	}
 
 	public OpeningInstanceStore instances() {

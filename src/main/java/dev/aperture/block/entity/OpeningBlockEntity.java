@@ -2,10 +2,10 @@ package dev.aperture.block.entity;
 
 import dev.aperture.api.ApertureApi;
 import dev.aperture.core.instance.OpeningInstance;
+import dev.aperture.registry.ApertureBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -20,8 +20,8 @@ import java.util.UUID;
 public final class OpeningBlockEntity extends BlockEntity {
 	private @Nullable UUID instanceId;
 
-	public OpeningBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-		super(type, pos, state);
+	public OpeningBlockEntity(BlockPos pos, BlockState state) {
+		super(ApertureBlockEntities.OPENING, pos, state);
 	}
 
 	public Optional<UUID> instanceId() {

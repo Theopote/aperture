@@ -2,6 +2,7 @@ package dev.aperture.client;
 
 import dev.aperture.Aperture;
 import dev.aperture.client.placement.ClientPlacementPreview;
+import dev.aperture.client.render.ApertureRenderers;
 import dev.aperture.client.render.placement.PlacementPreviewRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -28,6 +29,7 @@ public class ApertureClient implements ClientModInitializer {
 
 		ClientTickEvents.END_CLIENT_TICK.register(this::onClientTick);
 		LevelRenderEvents.BEFORE_GIZMOS.register(context -> PlacementPreviewRenderer.emit());
+		ApertureRenderers.registerAll();
 		Aperture.LOGGER.info("Aperture client initialized — crosshair placement preview active");
 	}
 

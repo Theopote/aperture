@@ -3,3 +3,7 @@ dependencies {
 	api project(':aperture-geometry')
 	api project(':aperture-render')
 }
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

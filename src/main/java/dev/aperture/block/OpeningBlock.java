@@ -2,7 +2,6 @@ package dev.aperture.block;
 
 import com.mojang.serialization.MapCodec;
 import dev.aperture.block.entity.OpeningBlockEntity;
-import dev.aperture.registry.ApertureBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -47,6 +46,6 @@ public final class OpeningBlock extends BaseEntityBlock {
 
 	@Override
 	public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new OpeningBlockEntity(ApertureBlockEntities.OPENING, pos, state);
+		return new OpeningBlockEntity(pos, state);
 	}
 }
