@@ -106,9 +106,8 @@ public final class ApertureBootstrap {
 
 	private void verifyReferencePipeline() {
 		OpeningTypeDefinition definition = openingTypes.require(BuiltinOpeningTypes.FIXED_WINDOW_ID);
-		ParameterSet parameters = ParameterSet.mergeDefaults(definition.parameters(), ParameterSet.empty());
 		OpeningInstance instance = OpeningInstance.builder(definition.id())
-			.parameters(parameters)
+			.parameters(ParameterSet.empty())
 			.build();
 
 		instances.put(instance);

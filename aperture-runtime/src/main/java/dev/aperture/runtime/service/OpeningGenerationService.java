@@ -93,12 +93,9 @@ public final class OpeningGenerationService {
 
 	private GenerationContext validatedContext(OpeningInstance instance) {
 		OpeningTypeDefinition definition = openingTypes.require(instance.typeId());
-		ParameterSet resolved = ParameterSet.mergeDefaults(definition.parameters(), instance.parameters());
+		ParameterSet resolved = definition.resolveParameters(instance.parameters());
 
-		ValidationResult validation = parameterValidator.validate(
-			definition,
-			instance.withParameters(resolved)
-		);
+		ValidationResult validation = parameterValidator.validate(definition, instance);
 		if (!validation.isValid()) {
 			throw new IllegalStateException("Opening instance failed validation: " + validation.issues());
 		}

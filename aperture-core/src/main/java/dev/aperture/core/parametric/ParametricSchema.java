@@ -57,6 +57,27 @@ public final class ParametricSchema {
 		return ParameterSet.mergeDefaults(toLegacyMap(), overrides);
 	}
 
+	/**
+	 * Returns only values that differ from schema defaults — the canonical storage form for instances.
+	 */
+	public ParameterSet extractOverrides(ParameterSet values) {
+		Objects.requireNonNull(values, "values");
+		ParameterSet.Builder builder = ParameterSet.builder();
+		for (Map.Entry<String, ParameterValue> entry : values.asMap().entrySet()) {
+			String name = entry.getKey();
+			ParameterValue value = entry.getValue();
+			Optional<Parameter> parameter = get(name);
+			if (parameter.isEmpty()) {
+				builder.put(name, value);
+				continue;
+			}
+			if (!parameter.get().defaultValue().equals(value)) {
+				builder.put(name, value);
+			}
+		}
+		return builder.build();
+	}
+
 	public static Builder builder() {
 		return new Builder();
 	}

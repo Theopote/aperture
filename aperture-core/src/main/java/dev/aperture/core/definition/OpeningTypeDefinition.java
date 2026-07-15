@@ -47,6 +47,16 @@ public record OpeningTypeDefinition(
 		return parametricSchema.toLegacyMap();
 	}
 
+	/** Resolves sparse instance overrides to the full effective parameter set. */
+	public ParameterSet resolveParameters(ParameterSet overrides) {
+		return parametricSchema.mergeDefaults(overrides);
+	}
+
+	/** Strips schema defaults, producing sparse overrides for instance storage. */
+	public ParameterSet extractOverrides(ParameterSet values) {
+		return parametricSchema.extractOverrides(values);
+	}
+
 	public static Builder builder(OpeningId id, OpeningCategory category, GeneratorId generator) {
 		return new Builder(id, category, generator);
 	}

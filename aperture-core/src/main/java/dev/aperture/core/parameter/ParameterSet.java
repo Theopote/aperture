@@ -8,6 +8,10 @@ import java.util.Optional;
 
 /**
  * Resolved parameter values for an opening instance or generation request.
+ * <p>
+ * Instances store <em>sparse overrides</em> (see {@link dev.aperture.core.parametric.InstanceParameters}).
+ * Use {@link #mergeDefaults} or {@link dev.aperture.core.definition.OpeningTypeDefinition#resolveParameters}
+ * to obtain the full effective set before generation or validation.
  */
 public final class ParameterSet {
 	private final Map<String, ParameterValue> values;

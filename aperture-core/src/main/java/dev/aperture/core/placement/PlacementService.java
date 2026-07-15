@@ -51,9 +51,8 @@ public final class PlacementService {
 		PlacementContext context
 	) {
 		OpeningTypeDefinition definition = openingTypes.require(typeId);
-		ParameterSet parameters = ParameterSet.mergeDefaults(definition.parameters(), parameterOverrides);
 		OpeningInstance candidate = OpeningInstance.builder(typeId)
-			.parameters(parameters)
+			.parameters(parameterOverrides)
 			.transform(transform)
 			.host(host)
 			.build();

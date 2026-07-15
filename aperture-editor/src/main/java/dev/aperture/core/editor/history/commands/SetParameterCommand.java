@@ -62,7 +62,7 @@ public final class SetParameterCommand implements EditCommand {
 			return EditResult.failed(description, validation.issues());
 		}
 		OpeningInstance next = object.instance()
-			.withParameters(editor.resolve())
+			.withParameters(editor.overridesOnly())
 			.withRevision(object.instance().revision() + 1);
 		context.replaceObject(EditorObject.create(object.definition(), next));
 		return EditResult.ok(description);

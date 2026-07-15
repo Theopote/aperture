@@ -9,6 +9,9 @@ import java.util.UUID;
 
 /**
  * A placed opening in the world (Revit "instance").
+ * <p>
+ * {@link #parameters()} stores sparse overrides only. Resolve against the opening type schema
+ * via {@link dev.aperture.core.parametric.InstanceParameters#resolve} before generation.
  */
 public record OpeningInstance(
 	int schemaVersion,
