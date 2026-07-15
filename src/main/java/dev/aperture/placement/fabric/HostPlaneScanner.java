@@ -23,16 +23,16 @@ public final class HostPlaneScanner {
 		int minV = 0;
 		int maxV = 0;
 
-		while (minU > -MAX_PLANE_EXPANSION && planeSliceSolid(level, hitPos, axes, minU - 1, minV, maxV)) {
+		while (minU > -MAX_PLANE_EXPANSION && isPlaneUSliceSolid(level, hitPos, axes, minU - 1, minV, maxV)) {
 			minU--;
 		}
-		while (maxU < MAX_PLANE_EXPANSION && planeSliceSolid(level, hitPos, axes, maxU + 1, minV, maxV)) {
+		while (maxU < MAX_PLANE_EXPANSION && isPlaneUSliceSolid(level, hitPos, axes, maxU + 1, minV, maxV)) {
 			maxU++;
 		}
-		while (minV > -MAX_PLANE_EXPANSION && planeSliceSolid(level, hitPos, axes, minU, maxU, minV - 1)) {
+		while (minV > -MAX_PLANE_EXPANSION && isPlaneVSliceSolid(level, hitPos, axes, minU, maxU, minV - 1)) {
 			minV--;
 		}
-		while (maxV < MAX_PLANE_EXPANSION && planeSliceSolid(level, hitPos, axes, minU, maxU, maxV + 1)) {
+		while (maxV < MAX_PLANE_EXPANSION && isPlaneVSliceSolid(level, hitPos, axes, minU, maxU, maxV + 1)) {
 			maxV++;
 		}
 
@@ -50,7 +50,7 @@ public final class HostPlaneScanner {
 		return new HostRegion(regionMin, regionMax, face);
 	}
 
-	private static boolean planeSliceSolid(
+	private static boolean isPlaneUSliceSolid(
 		Level level,
 		BlockPos origin,
 		PlaneAxes axes,
@@ -66,7 +66,7 @@ public final class HostPlaneScanner {
 		return true;
 	}
 
-	private static boolean planeSliceSolid(
+	private static boolean isPlaneVSliceSolid(
 		Level level,
 		BlockPos origin,
 		PlaneAxes axes,
