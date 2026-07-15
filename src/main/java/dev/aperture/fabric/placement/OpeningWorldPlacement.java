@@ -1,11 +1,10 @@
 package dev.aperture.fabric.placement;
 
+import dev.aperture.block.entity.OpeningBlockEntity;
 import dev.aperture.core.geometry.Transform3d;
 import dev.aperture.core.geometry.Vec3d;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.registry.ApertureBlocks;
-import dev.aperture.block.entity.OpeningBlockEntity;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -22,12 +21,7 @@ public final class OpeningWorldPlacement {
 	private OpeningWorldPlacement() {
 	}
 
-	public static void placeCommittedInstance(Minecraft client, OpeningInstance instance) {
-		Level level = client.level;
-		if (level == null) {
-			return;
-		}
-
+	public static void placeCommittedInstance(Level level, OpeningInstance instance) {
 		BlockPos pos = transformToBlockPos(instance.transform());
 		BlockState state = ApertureBlocks.OPENING.defaultBlockState();
 		if (!level.setBlock(pos, state, Block.UPDATE_NEIGHBORS | Block.UPDATE_CLIENTS)) {
