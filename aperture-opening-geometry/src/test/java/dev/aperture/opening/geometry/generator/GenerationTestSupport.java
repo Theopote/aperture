@@ -25,7 +25,7 @@ public final class GenerationTestSupport {
 	public static GenerationContext context(OpeningTypeDefinition definition, ParameterSet overrides) {
 		return new GenerationContext(
 			definition,
-			ParameterSet.mergeDefaults(definition.parameters(), overrides),
+			definition.resolveParameters(overrides),
 			PROFILES
 		);
 	}

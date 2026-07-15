@@ -24,8 +24,8 @@ class OpeningTypeDefinitionReaderTest {
 			assertEquals(BuiltinOpeningTypes.FIXED_WINDOW_ID, definition.id());
 			assertEquals(OpeningCategory.WINDOW, definition.category());
 			assertEquals("aperture:rectangular_window_v1", definition.generator().toString());
-			assertTrue(definition.parameters().containsKey("width"));
-			assertEquals(ParameterType.LENGTH, definition.parameters().get("width").type());
+			assertTrue(definition.parametricSchema().get("width").isPresent());
+			assertEquals(ParameterType.LENGTH, definition.parametricSchema().require("width").storageType());
 			assertEquals(2, definition.materialSlots().size());
 		}
 	}

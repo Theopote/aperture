@@ -74,7 +74,7 @@ public final class SetParameterCommand implements EditCommand {
 		double beforeMm,
 		double afterMm
 	) {
-		ParameterSet resolved = object.definition().parametricSchema().mergeDefaults(object.instance().parameters());
+		ParameterSet resolved = object.definition().resolveParameters(object.instance().parameters());
 		ParameterValue before = resolved.get(parameterName).orElse(ParameterValue.length(beforeMm));
 		return new SetParameterCommand(
 			object.id(),

@@ -11,16 +11,20 @@ import java.util.Map;
 import java.util.OptionalDouble;
 
 /**
- * Converts between legacy {@link ParameterDefinition} records and typed {@link Parameter} schemas.
+ * Converts external values for {@link ParametricEditor} and legacy {@link ParameterDefinition} interop.
  */
 public final class ParameterBridge {
 	private ParameterBridge() {
 	}
 
+	/** @deprecated Use typed {@link Parameter} entries in {@link ParametricSchema}. */
+	@Deprecated
 	public static Parameter fromDefinition(ParameterDefinition definition) {
 		return fromDefinition(definition, ParameterMetadata.defaults());
 	}
 
+	/** @deprecated Use typed {@link Parameter} entries in {@link ParametricSchema}. */
+	@Deprecated
 	public static Parameter fromDefinition(ParameterDefinition definition, ParameterMetadata metadata) {
 		return switch (definition.type()) {
 			case BOOL -> BooleanParameter.of(
@@ -59,6 +63,8 @@ public final class ParameterBridge {
 		return builder.build();
 	}
 
+	/** @deprecated Use {@link ParametricSchema#parameters()}. */
+	@Deprecated
 	public static Map<String, ParameterDefinition> toLegacyMap(Map<String, Parameter> parameters) {
 		Map<String, ParameterDefinition> legacy = new LinkedHashMap<>();
 		for (Map.Entry<String, Parameter> entry : parameters.entrySet()) {
@@ -67,6 +73,8 @@ public final class ParameterBridge {
 		return legacy;
 	}
 
+	/** @deprecated Use {@link ParametricSchema#builder()}. */
+	@Deprecated
 	public static Map<String, Parameter> fromLegacyMap(Map<String, ParameterDefinition> legacy) {
 		Map<String, Parameter> parameters = new LinkedHashMap<>();
 		for (Map.Entry<String, ParameterDefinition> entry : legacy.entrySet()) {

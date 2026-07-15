@@ -11,7 +11,9 @@ import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.parameter.ParameterType;
 import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.core.parametric.NumberParameter;
 import dev.aperture.core.parametric.ParametricEditor;
+import dev.aperture.core.parametric.RangeParameter;
 
 import java.util.Map;
 import java.util.Optional;
@@ -25,7 +27,7 @@ public final class EditorOperations {
 	}
 
 	public static double currentLength(EditorObject object, String parameterName) {
-		ParameterSet resolved = object.definition().parametricSchema().mergeDefaults(object.instance().parameters());
+		ParameterSet resolved = object.definition().resolveParameters(object.instance().parameters());
 		return resolved.get(parameterName)
 			.filter(value -> value.type() == ParameterType.LENGTH)
 			.map(value -> ((ParameterValue.LengthValue) value).millimeters())
@@ -33,15 +35,21 @@ public final class EditorOperations {
 	}
 
 	public static double clampLength(EditorObject object, String parameterName, double valueMm) {
-		var parameter = object.definition().parametricSchema().require(parameterName).toDefinition();
-		double clamped = valueMm;
-		if (parameter.min().isPresent()) {
-			clamped = Math.max(clamped, parameter.min().getAsDouble());
-		}
-		if (parameter.max().isPresent()) {
-			clamped = Math.min(clamped, parameter.max().getAsDouble());
-		}
-		return clamped;
+		var parameter = object.definition().parametricSchema().require(parameterName);
+		return switch (parameter) {
+			case RangeParameter range -> Math.max(range.min(), Math.min(range.max(), valueMm));
+			case NumberParameter number -> {
+				double clamped = valueMm;
+				if (number.min().isPresent()) {
+					clamped = Math.max(clamped, number.min().getAsDouble());
+				}
+				if (number.max().isPresent()) {
+					clamped = Math.min(clamped, number.max().getAsDouble());
+				}
+				yield clamped;
+			}
+			default -> throw new IllegalArgumentException("Not a numeric parameter: " + parameterName);
+		};
 	}
 
 	public static Optional<ResizeHandle> handleForAxis(EditorObject object, ResizeAxis axis) {
@@ -90,7 +98,7 @@ public final class EditorOperations {
 	}
 
 	public static Optional<ParameterValue> mirroredHingeSide(EditorObject object) {
-		ParameterSet resolved = object.definition().parametricSchema().mergeDefaults(object.instance().parameters());
+		ParameterSet resolved = object.definition().resolveParameters(object.instance().parameters());
 		if (resolved.get("hinge_side").isEmpty()) {
 			return Optional.empty();
 		}

@@ -16,7 +16,7 @@ class ParameterConstraintValidatorTest {
 	@Test
 	void acceptsDefaultFixedWindowParameters() {
 		OpeningTypeDefinition definition = BuiltinOpeningTypes.fixedWindow();
-		ParameterSet parameters = ParameterSet.mergeDefaults(definition.parameters(), ParameterSet.empty());
+		ParameterSet parameters = definition.resolveParameters(ParameterSet.empty());
 		OpeningInstance instance = OpeningInstance.builder(definition.id()).parameters(parameters).build();
 
 		assertTrue(validator.validate(definition, instance).isValid());
@@ -25,10 +25,9 @@ class ParameterConstraintValidatorTest {
 	@Test
 	void rejectsWidthBelowMinimum() {
 		OpeningTypeDefinition definition = BuiltinOpeningTypes.fixedWindow();
-		ParameterSet parameters = ParameterSet.mergeDefaults(definition.parameters(), ParameterSet.builder()
-			.put("width", ParameterValue.length(100))
-			.build());
-		OpeningInstance instance = OpeningInstance.builder(definition.id()).parameters(parameters).build();
+		OpeningInstance instance = OpeningInstance.builder(definition.id())
+			.parameters(ParameterSet.builder().put("width", ParameterValue.length(100)).build())
+			.build();
 
 		assertFalse(validator.validate(definition, instance).isValid());
 	}
