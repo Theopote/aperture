@@ -13,7 +13,7 @@ import net.minecraft.gizmos.Gizmos;
 import net.minecraft.world.phys.AABB;
 
 /**
- * Draws placement preview wireframes using the Minecraft Gizmos API.
+ * Draws placement preview overlays using the Minecraft Gizmos API.
  */
 public final class PlacementPreviewRenderer {
 	private static final int COLOR_HOST = 0xFF00BFFF;
@@ -30,7 +30,10 @@ public final class PlacementPreviewRenderer {
 	private static void emitForTarget(FabricPlacementTarget target) {
 		emitHostBounds(target.hostBounds());
 
-		ClientPlacementPreview.session().ifPresent(session -> emitOpeningFootprint(session));
+		ClientPlacementPreview.session().ifPresent(session -> {
+			emitOpeningFootprint(session);
+			GhostPreviewRenderer.emit(session, PlacementPreviewMeshService.meshAsset());
+		});
 	}
 
 	private static void emitHostBounds(BoundingBox hostBounds) {

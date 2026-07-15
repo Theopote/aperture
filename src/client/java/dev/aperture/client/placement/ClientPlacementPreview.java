@@ -1,6 +1,7 @@
 package dev.aperture.client.placement;
 
 import dev.aperture.api.ApertureApi;
+import dev.aperture.client.render.placement.PlacementPreviewMeshService;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.placement.PlacementSession;
@@ -53,6 +54,7 @@ public final class ClientPlacementPreview {
 				currentTarget.host(),
 				currentTarget.placementContext()
 			);
+			PlacementPreviewMeshService.update(currentSession);
 		} catch (IllegalStateException notInitialized) {
 			clear();
 		}
@@ -85,5 +87,6 @@ public final class ClientPlacementPreview {
 	private static void clear() {
 		currentTarget = null;
 		currentSession = null;
+		PlacementPreviewMeshService.clear();
 	}
 }

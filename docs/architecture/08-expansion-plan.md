@@ -16,7 +16,8 @@
 - [x] Fabric placement adapter (raycast → PlacementContext)
 - [x] Placement preview wireframe (Gizmos overlay)
 - [x] Rendering architecture + `aperture-render` module (delta engine, box compiler)
-- [ ] Fabric ghost mesh preview (`FabricRenderBackend`)
+- [x] Ghost mesh placement preview (Gizmos overlay via render pipeline)
+- [ ] `FabricRenderBackend` (GPU buffer upload for committed instances)
 - [ ] World persistence (NBT)
 
 ## Phase 1 — Opening Platform (Months 4–8)
