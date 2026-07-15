@@ -26,10 +26,10 @@ public final class PanelKinematics {
 		}
 
 		return switch (hinge.toLowerCase()) {
-			case "left" -> Transform3d.rotateAboutAxis(new Vec3d(frameFace, 0, 0), AXIS_Y, radians);
-			case "right" -> Transform3d.rotateAboutAxis(new Vec3d(width - frameFace, 0, 0), AXIS_Y, -radians);
-			case "top" -> Transform3d.rotateAboutAxis(new Vec3d(0, height - frameFace, 0), AXIS_X, -radians);
-			case "bottom" -> Transform3d.rotateAboutAxis(new Vec3d(0, frameFace, 0), AXIS_X, radians);
+			case "left" -> Transform3d.rotateAboutAxis(new Vec3d(frameFace, 0, 0), AXIS_Y, -radians);
+			case "right" -> Transform3d.rotateAboutAxis(new Vec3d(width - frameFace, 0, 0), AXIS_Y, radians);
+			case "top" -> Transform3d.rotateAboutAxis(new Vec3d(0, height - frameFace, 0), AXIS_X, radians);
+			case "bottom" -> Transform3d.rotateAboutAxis(new Vec3d(0, frameFace, 0), AXIS_X, -radians);
 			default -> throw new IllegalArgumentException("Unknown panel hinge: " + hinge);
 		};
 	}

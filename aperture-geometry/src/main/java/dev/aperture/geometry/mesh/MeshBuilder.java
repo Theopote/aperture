@@ -36,6 +36,10 @@ public final class MeshBuilder {
 		addTriangle(a, c, d, uvA, uvC, uvD);
 	}
 
+	public boolean isEmpty() {
+		return vertices.isEmpty();
+	}
+
 	public Mesh build() {
 		if (vertices.isEmpty()) {
 			throw new IllegalStateException("mesh has no vertices");

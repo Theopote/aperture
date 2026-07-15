@@ -23,7 +23,10 @@ public final class MeshCsg {
 			Vec3d a = readPosition(mesh, mesh.indices()[index]);
 			Vec3d b = readPosition(mesh, mesh.indices()[index + 1]);
 			Vec3d c = readPosition(mesh, mesh.indices()[index + 2]);
-			emitOutsideFragments(a, b, c, box, builder, mesh, index);
+			emitOutsideFragments(a, b, c, box, builder, mesh, triangle);
+		}
+		if (builder.isEmpty()) {
+			throw new IllegalStateException("subtraction removed all mesh geometry");
 		}
 		return builder.build();
 	}
@@ -37,17 +40,66 @@ public final class MeshCsg {
 		Mesh source,
 		int triangleIndex
 	) {
+		if (isFullyOutside(a, b, c, box)) {
+			Vec2d uvA = sampleUv(source, triangleIndex, 0);
+			Vec2d uvB = sampleUv(source, triangleIndex, 1);
+			Vec2d uvC = sampleUv(source, triangleIndex, 2);
+			builder.addTriangle(a, b, c, uvA, uvB, uvC);
+			return;
+		}
+		if (isFullyInside(a, b, c, box)) {
+			return;
+		}
+
 		List<List<Vec3d>> polygons = subtractAabb(List.of(a, b, c), box);
 		for (List<Vec3d> polygon : polygons) {
 			triangulateFan(polygon, builder, source, triangleIndex);
 		}
 	}
 
+	private static boolean isFullyOutside(Vec3d a, Vec3d b, Vec3d c, BoundingBox box) {
+		double minX = Math.min(a.x(), Math.min(b.x(), c.x()));
+		double maxX = Math.max(a.x(), Math.max(b.x(), c.x()));
+		if (maxX < box.min().x() || minX > box.max().x()) {
+			return true;
+		}
+
+		double minY = Math.min(a.y(), Math.min(b.y(), c.y()));
+		double maxY = Math.max(a.y(), Math.max(b.y(), c.y()));
+		if (maxY < box.min().y() || minY > box.max().y()) {
+			return true;
+		}
+
+		double minZ = Math.min(a.z(), Math.min(b.z(), c.z()));
+		double maxZ = Math.max(a.z(), Math.max(b.z(), c.z()));
+		return maxZ < box.min().z() || minZ > box.max().z();
+	}
+
+	private static boolean isFullyInside(Vec3d a, Vec3d b, Vec3d c, BoundingBox box) {
+		return isInsideBox(a, box) && isInsideBox(b, box) && isInsideBox(c, box);
+	}
+
 	private static List<List<Vec3d>> subtractAabb(List<Vec3d> polygon, BoundingBox box) {
 		List<List<Vec3d>> polygons = List.of(polygon);
 		polygons = splitOutside(polygons, box.min().x(), box.max().x(), Axis.X);
 		polygons = splitOutside(polygons, box.min().y(), box.max().y(), Axis.Y);
-		return splitOutside(polygons, box.min().z(), box.max().z(), Axis.Z);
+		polygons = splitOutside(polygons, box.min().z(), box.max().z(), Axis.Z);
+		return polygons.stream()
+			.filter(poly -> shouldKeepPolygon(poly, box))
+			.toList();
+	}
+
+	private static boolean shouldKeepPolygon(List<Vec3d> polygon, BoundingBox box) {
+		if (polygon.size() < 3) {
+			return false;
+		}
+		return polygon.stream().anyMatch(point -> !isInsideBox(point, box));
+	}
+
+	private static boolean isInsideBox(Vec3d point, BoundingBox box) {
+		return point.x() >= box.min().x() - EPSILON && point.x() <= box.max().x() + EPSILON
+			&& point.y() >= box.min().y() - EPSILON && point.y() <= box.max().y() + EPSILON
+			&& point.z() >= box.min().z() - EPSILON && point.z() <= box.max().z() + EPSILON;
 	}
 
 	private static List<List<Vec3d>> splitOutside(List<List<Vec3d>> polygons, double min, double max, Axis axis) {
