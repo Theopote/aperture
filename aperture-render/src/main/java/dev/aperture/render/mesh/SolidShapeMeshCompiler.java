@@ -12,14 +12,7 @@ public final class SolidShapeMeshCompiler implements MeshCompiler {
 	@Override
 	public MeshSection compile(GeometrySolid solid, LODLevel level) {
 		Mesh mesh = ShapeMesher.mesh(solid.shape(), solid.localTransform());
-		return new MeshSection(
-			PartId.of(solid.componentPath()),
-			solid.layer(),
-			mesh.vertices(),
-			mesh.indices(),
-			mesh.bounds(),
-			MeshHandle.next()
-		);
+		return MeshSectionFactory.fromMesh(PartId.of(solid.componentPath()), solid.layer(), mesh);
 	}
 
 	@Override

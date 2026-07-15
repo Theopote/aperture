@@ -1,9 +1,16 @@
 package dev.aperture.render.mesh;
 
+import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.geometry.BoundingBox;
+import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.geometry.generator.RectangularWindowGenerator;
+import dev.aperture.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.geometry.model.GeometrySolid;
+import dev.aperture.geometry.pipeline.PipelineResult;
+import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.render.data.PartId;
 import dev.aperture.render.data.RenderDocument;
 import org.junit.jupiter.api.Test;
@@ -16,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MeshBakeServiceTest {
 	private final MeshBakeService bakeService = new MeshBakeService(new SolidShapeMeshCompiler());
+	private static final ProfileCatalogLoader PROFILE_LOADER = new ProfileCatalogLoader();
 
 	@Test
 	void incrementalBakeReusesUnchangedSections() {
@@ -64,5 +72,37 @@ class MeshBakeServiceTest {
 
 		assertEquals(12, section.triangleCount());
 		assertEquals(PartId.of("frame"), section.partId());
+	}
+
+	@Test
+	void assemblyDeltaReusesUnchangedSections() {
+		RenderDocument document = RenderDocument.forPreview(UUID.randomUUID());
+		PipelineResult before = windowPipeline(1200, 1500, 1);
+		var delta1 = document.updateFrom(before.geometry());
+		MeshAsset asset = bakeService.applyDeltaFromAssembly(document, MeshAsset.empty(LODLevel.FULL), delta1, before, LODLevel.FULL);
+		MeshHandle glazingHandle = asset.section(PartId.of("glazing")).orElseThrow().handle();
+
+		PipelineResult after = windowPipeline(1200, 1500, 2);
+		var delta2 = document.updateFrom(after.geometry());
+		MeshAsset patched = bakeService.applyDeltaFromAssembly(document, asset, delta2, after, LODLevel.FULL);
+
+		assertEquals(6, patched.partIds().size());
+		assertTrue(delta2.unchanged().contains(PartId.of("glazing")));
+		assertEquals(glazingHandle, patched.section(PartId.of("glazing")).orElseThrow().handle());
+		assertTrue(patched.section(PartId.of("frame.mullion.2")).isPresent());
+	}
+
+	private static PipelineResult windowPipeline(double width, double height, int mullions) {
+		var definition = BuiltinOpeningTypes.fixedWindow();
+		GenerationContext context = new GenerationContext(
+			definition,
+			ParameterSet.mergeDefaults(definition.parameters(), ParameterSet.builder()
+				.put("width", ParameterValue.length(width))
+				.put("height", ParameterValue.length(height))
+				.put("mullions", ParameterValue.count(mullions))
+				.build()),
+			PROFILE_LOADER.loadClasspathCatalog()
+		);
+		return new RectangularWindowGenerator().generate(context);
 	}
 }

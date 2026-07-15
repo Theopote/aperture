@@ -11,6 +11,7 @@ import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.placement.PlacementSession;
 import dev.aperture.fabric.placement.McUnits;
 import dev.aperture.geometry.model.GeometryResult;
+import dev.aperture.geometry.pipeline.PipelineResult;
 import dev.aperture.render.data.PreviewRenderContext;
 import dev.aperture.render.data.RenderDelta;
 import dev.aperture.render.material.MaterialBindingSet;
@@ -49,9 +50,10 @@ public final class PlacementPreviewMeshService {
 				currentHostAnchor = hostAnchor;
 			}
 
-			GeometryResult geometry = api.generation().generate(session.previewInstance());
+			PipelineResult pipeline = api.generation().generatePipeline(session.previewInstance());
+			GeometryResult geometry = pipeline.geometry();
 			RenderDelta delta = context.updateGeometry(geometry);
-			meshAsset = BAKE_SERVICE.applyDelta(context.document(), meshAsset, delta, LODLevel.FULL);
+			meshAsset = BAKE_SERVICE.applyDeltaFromAssembly(context.document(), meshAsset, delta, pipeline, LODLevel.FULL);
 
 			var definition = api.openingTypes().require(session.selectedTypeId());
 			ParameterSet mergedParameters = ParameterSet.mergeDefaults(definition.parameters(), session.parameterOverrides());

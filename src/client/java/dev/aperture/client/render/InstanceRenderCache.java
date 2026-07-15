@@ -6,6 +6,7 @@ import dev.aperture.core.geometry.Transform3d;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.geometry.model.GeometryResult;
+import dev.aperture.geometry.pipeline.PipelineResult;
 import dev.aperture.render.data.RenderDelta;
 import dev.aperture.render.data.RenderDocument;
 import dev.aperture.render.material.MaterialBindingSet;
@@ -41,10 +42,17 @@ public final class InstanceRenderCache {
 			id -> new CachedInstanceRender(RenderDocument.forInstance(id))
 		);
 
-		GeometryResult geometry = api.generation().generate(instance);
+		PipelineResult pipeline = api.generation().generatePipeline(instance);
+		GeometryResult geometry = pipeline.geometry();
 		RenderDelta delta = cached.document().updateFrom(geometry);
 		if (!delta.isEmpty() || cached.meshAsset().partIds().isEmpty()) {
-			cached.meshAsset = BAKE_SERVICE.applyDelta(cached.document(), cached.meshAsset(), delta, LODLevel.FULL);
+			cached.meshAsset = BAKE_SERVICE.applyDeltaFromAssembly(
+				cached.document(),
+				cached.meshAsset(),
+				delta,
+				pipeline,
+				LODLevel.FULL
+			);
 		}
 
 		ParameterSet mergedParameters = ParameterSet.mergeDefaults(

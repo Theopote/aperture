@@ -9,6 +9,7 @@ import dev.aperture.core.validation.OpeningValidator;
 import dev.aperture.core.validation.ParameterConstraintValidator;
 import dev.aperture.core.validation.ValidationResult;
 import dev.aperture.geometry.model.GeometryResult;
+import dev.aperture.geometry.pipeline.PipelineResult;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 
 /**
@@ -41,6 +42,10 @@ public final class OpeningGenerationService {
 	}
 
 	public GeometryResult generate(OpeningInstance instance) {
+		return generatePipeline(instance).geometry();
+	}
+
+	public PipelineResult generatePipeline(OpeningInstance instance) {
 		OpeningTypeDefinition definition = openingTypes.require(instance.typeId());
 		ParameterSet resolved = ParameterSet.mergeDefaults(definition.parameters(), instance.parameters());
 
@@ -52,6 +57,6 @@ public final class OpeningGenerationService {
 			throw new IllegalStateException("Opening instance failed validation: " + validation.issues());
 		}
 
-		return generators.generate(definition, resolved, profiles);
+		return generators.generatePipeline(definition, resolved, profiles);
 	}
 }
