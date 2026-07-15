@@ -7,6 +7,8 @@ import dev.aperture.geometry.recipe.GeometryRecipeBuilder;
 import dev.aperture.geometry.recipe.GeometryRecipeExecutor;
 import dev.aperture.geometry.recipe.shape.UnionRecipe;
 import dev.aperture.opening.geometry.generator.GenerationTestSupport;
+import dev.aperture.opening.geometry.pipeline.OpeningLayout;
+import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
