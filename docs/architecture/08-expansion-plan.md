@@ -16,7 +16,9 @@
 - [x] Fabric placement adapter (raycast → PlacementContext)
 - [x] Placement preview wireframe (Gizmos overlay)
 - [x] Rendering architecture + `aperture-render` module (delta engine, box compiler)
-- [x] Ghost mesh placement preview (Gizmos overlay via render pipeline)
+- [x] Ghost mesh placement preview (material-aware via `FabricRenderBackend`)
+- [x] JSON material catalog (`aperture-data/aperture/materials/`) + `CatalogMaterialResolver`
+- [x] Placement preview material filter (M key: full / frame / glass)
 - [x] `FabricRenderBackend` + `OpeningInstanceRenderer` for committed instances
 - [ ] World persistence (NBT)
 

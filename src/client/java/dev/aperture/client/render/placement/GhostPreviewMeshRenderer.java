@@ -1,14 +1,9 @@
 package dev.aperture.client.render.placement;
 
-import dev.aperture.api.ApertureApi;
-import dev.aperture.api.material.MaterialBindingBuilder;
 import dev.aperture.client.placement.ClientPlacementPreview;
-import dev.aperture.client.render.ClientMaterialPreview;
 import dev.aperture.client.render.FabricRenderBackend;
 import dev.aperture.core.geometry.Transform3d;
 import dev.aperture.core.geometry.Vec3d;
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.placement.PlacementSession;
 import dev.aperture.fabric.placement.McUnits;
 import dev.aperture.render.material.MaterialBindingSet;
 import dev.aperture.render.mesh.MeshAsset;
@@ -29,8 +24,7 @@ public final class GhostPreviewMeshRenderer {
 	public static void emit(LevelRenderContext context) {
 		ClientPlacementPreview.session().ifPresent(session -> {
 			MeshAsset meshAsset = PlacementPreviewMeshService.meshAsset();
-			MaterialBindingSet bindings = PlacementPreviewMeshService.materialBindings()
-				.forPreviewMode(ClientMaterialPreview.mode());
+			MaterialBindingSet bindings = PlacementPreviewMeshService.materialBindings();
 			if (meshAsset.partIds().isEmpty() || bindings.partIds().isEmpty()) {
 				return;
 			}

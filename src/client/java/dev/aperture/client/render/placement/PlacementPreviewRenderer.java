@@ -32,7 +32,6 @@ public final class PlacementPreviewRenderer {
 
 		ClientPlacementPreview.session().ifPresent(session -> {
 			emitOpeningFootprint(session);
-			GhostPreviewRenderer.emit(session, PlacementPreviewMeshService.meshAsset());
 		});
 	}
 

@@ -16,8 +16,12 @@ public final class ClientMaterialPreview {
 	}
 
 	public static void cycle() {
-		MaterialPreviewMode[] values = MaterialPreviewMode.values();
-		mode = values[(mode.ordinal() + 1) % values.length];
+		mode = switch (mode) {
+			case FULL -> MaterialPreviewMode.FRAME_ONLY;
+			case FRAME_ONLY -> MaterialPreviewMode.GLASS_ONLY;
+			case GLASS_ONLY -> MaterialPreviewMode.FULL;
+			default -> MaterialPreviewMode.FULL;
+		};
 	}
 
 	public static void set(MaterialPreviewMode newMode) {

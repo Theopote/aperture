@@ -12,6 +12,15 @@ import java.util.Optional;
  * Registry of catalog material definitions and per-slot defaults.
  */
 public final class MaterialCatalogRegistry {
+	private static final MaterialDefinition FALLBACK = new MaterialDefinition(
+		"aperture:vanilla/fallback",
+		"minecraft:block/stone",
+		0.5f,
+		0.0f,
+		BlendMode.OPAQUE,
+		false
+	);
+
 	private final Map<String, MaterialDefinition> byId = new LinkedHashMap<>();
 	private final Map<String, String> slotDefaults = new LinkedHashMap<>();
 
@@ -34,6 +43,10 @@ public final class MaterialCatalogRegistry {
 
 	public Optional<MaterialDefinition> findDefaultForSlot(String slot) {
 		return Optional.ofNullable(slotDefaults.get(slot)).flatMap(this::findById);
+	}
+
+	public MaterialDefinition resolveSlot(String slot) {
+		return findDefaultForSlot(slot).orElse(FALLBACK);
 	}
 
 	public Map<String, MaterialDefinition> all() {

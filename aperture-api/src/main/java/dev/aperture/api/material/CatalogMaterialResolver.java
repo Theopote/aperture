@@ -1,6 +1,6 @@
 package dev.aperture.api.material;
 
-import dev.aperture.api.registry.MaterialCatalogRegistry;
+import dev.aperture.api.catalog.MaterialCatalogRegistry;
 import dev.aperture.render.material.MaterialDefinition;
 import dev.aperture.render.material.MaterialInstance;
 

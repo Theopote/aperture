@@ -1,5 +1,7 @@
 {
   "key.aperture.commit_placement": "Commit Opening Placement",
+  "key.aperture.cycle_preview_mode": "Cycle Preview Material Mode",
+  "key.category.aperture.placement": "Aperture Placement",
   "key.category.aperture": "Aperture",
   "block.aperture.opening": "Opening"
 }

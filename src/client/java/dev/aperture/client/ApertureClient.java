@@ -3,6 +3,8 @@ package dev.aperture.client;
 import dev.aperture.Aperture;
 import dev.aperture.client.placement.ClientPlacementPreview;
 import dev.aperture.client.render.ApertureRenderers;
+import dev.aperture.client.render.ClientMaterialPreview;
+import dev.aperture.client.render.placement.GhostPreviewMeshRenderer;
 import dev.aperture.client.render.placement.PlacementPreviewRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -18,6 +20,7 @@ public class ApertureClient implements ClientModInitializer {
 		Identifier.fromNamespaceAndPath(Aperture.MOD_ID, "placement")
 	);
 	public static KeyMapping commitPlacementKey;
+	public static KeyMapping cyclePreviewModeKey;
 
 	@Override
 	public void onInitializeClient() {
@@ -26,8 +29,14 @@ public class ApertureClient implements ClientModInitializer {
 			GLFW.GLFW_KEY_P,
 			KEY_CATEGORY
 		));
+		cyclePreviewModeKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+			"key.aperture.cycle_preview_mode",
+			GLFW.GLFW_KEY_M,
+			KEY_CATEGORY
+		));
 
 		ClientTickEvents.END_CLIENT_TICK.register(this::onClientTick);
+		LevelRenderEvents.COLLECT_SUBMITS.register(GhostPreviewMeshRenderer::emit);
 		LevelRenderEvents.BEFORE_GIZMOS.register(context -> PlacementPreviewRenderer.emit());
 		ApertureRenderers.registerAll();
 		Aperture.LOGGER.info("Aperture client initialized — crosshair placement preview active");
@@ -40,6 +49,11 @@ public class ApertureClient implements ClientModInitializer {
 			if (ClientPlacementPreview.commitPreview()) {
 				Aperture.LOGGER.info("Placement preview committed");
 			}
+		}
+
+		while (cyclePreviewModeKey.consumeClick()) {
+			ClientMaterialPreview.cycle();
+			Aperture.LOGGER.debug("Placement preview material mode: {}", ClientMaterialPreview.mode());
 		}
 	}
 }

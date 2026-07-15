@@ -57,8 +57,32 @@ public final class FabricRenderBackend implements RenderBackend {
 	) {
 		beginFrame(poseStack, queue, lightCoords, transform, blockPos, materialBindings);
 		for (MeshSection section : asset.sections().values()) {
+			if (materialBindings.get(section.partId()).isEmpty()) {
+				continue;
+			}
 			upload(section);
 			drawSection(section);
+		}
+		endFrame();
+	}
+
+	public void submitAssetGhost(
+		PoseStack poseStack,
+		SubmitNodeCollector queue,
+		int lightCoords,
+		MeshAsset asset,
+		MaterialBindingSet materialBindings,
+		Transform3d transform,
+		BlockPos blockPos,
+		boolean valid
+	) {
+		beginFrame(poseStack, queue, lightCoords, transform, blockPos, materialBindings);
+		for (MeshSection section : asset.sections().values()) {
+			if (materialBindings.get(section.partId()).isEmpty()) {
+				continue;
+			}
+			upload(section);
+			drawSection(section, valid);
 		}
 		endFrame();
 	}
@@ -90,14 +114,23 @@ public final class FabricRenderBackend implements RenderBackend {
 	}
 
 	private void drawSection(MeshSection section) {
+		drawSection(section, null);
+	}
+
+	private void drawSection(MeshSection section, @Nullable Boolean ghostValid) {
 		if (frameContext == null) {
 			return;
 		}
 
 		MaterialBinding binding = frameContext.materialBindings().get(section.partId()).orElse(null);
-		FabricMaterialGraphics.ResolvedMaterialDraw draw = binding != null
-			? FabricMaterialGraphics.resolve(binding.material())
-			: fallbackDraw(section.layer());
+		FabricMaterialGraphics.ResolvedMaterialDraw draw;
+		if (binding != null) {
+			draw = ghostValid != null
+				? FabricMaterialGraphics.resolveGhost(binding, ghostValid)
+				: FabricMaterialGraphics.resolveCommitted(binding.material());
+		} else {
+			draw = fallbackDraw(section.layer());
+		}
 
 		frameContext.queue().submitCustomGeometry(
 			frameContext.poseStack(),

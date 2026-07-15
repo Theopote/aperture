@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.aperture.api.ApertureApi;
 import dev.aperture.api.material.MaterialBindingBuilder;
 import dev.aperture.client.placement.ClientPlacementPreview;
-import dev.aperture.client.placement.ClientPlacementPreviewMode;
+import dev.aperture.client.render.ClientMaterialPreview;
 import dev.aperture.client.render.FabricRenderBackend;
 import dev.aperture.core.geometry.Transform3d;
 import dev.aperture.core.parameter.ParameterSet;
@@ -81,7 +81,7 @@ public final class PlacementPreviewMeshService {
 	}
 
 	public static MaterialBindingSet materialBindings() {
-		return materialBindings.forPreviewMode(ClientPlacementPreviewMode.current());
+		return materialBindings.forPreviewMode(ClientMaterialPreview.mode());
 	}
 
 	public static void clear() {

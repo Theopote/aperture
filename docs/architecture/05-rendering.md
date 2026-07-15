@@ -262,13 +262,17 @@ src/client/java/dev/aperture/client/render/
 
 | Phase | Deliverable | Status |
 |---|---|---|
-| 1a | `aperture-render` module: data + mesh contracts, delta engine, box compiler | **In progress** |
+| 1a | `aperture-render` module: data + mesh contracts, delta engine, box compiler | **Done** |
 | 1b | `FabricRenderBackend`, `OpeningInstanceRenderer`, ghost preview mesh | **Done** |
-| 2a | Material resolver, preview filters | **In progress** (VanillaMaterialResolver done) |
+| 2a | Material resolver, catalog JSON, preview filters | **Done** |
 | 2b | Async bake, live resize debounce | Planned |
 | 3 | Instancing, LOD pre-bake, collision proxies | Planned |
 | 4 | GPU mesh gen, RT backend extension | Future |
 
 ## Phase 0 Placement Preview (current)
 
-Wireframe overlay via `PlacementPreviewRenderer` + Gizmos API. See [10-fabric-placement-adapter.md](10-fabric-placement-adapter.md).
+- Ghost mesh via `GhostPreviewMeshRenderer` + `COLLECT_SUBMITS` (resolved materials, translucent tint)
+- Wireframe overlay via `PlacementPreviewRenderer` + Gizmos API (host bounds + footprint)
+- **M** cycles `MaterialPreviewMode`: full → frame only → glass only
+
+See [10-fabric-placement-adapter.md](10-fabric-placement-adapter.md).

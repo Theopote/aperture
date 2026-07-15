@@ -55,6 +55,17 @@ public final class MaterialCatalogLoader {
 		}
 	}
 
+	public MaterialCatalogRegistry loadClasspathCatalog() {
+		MaterialCatalogRegistry registry = new MaterialCatalogRegistry();
+		for (MaterialCatalogEntry entry : loadClasspathDirectory("aperture/materials")) {
+			registry.register(entry.toDefinition());
+		}
+		for (var slotBinding : loadClasspathSlotBindings("aperture/material_slots.json").entrySet()) {
+			registry.setSlotDefault(slotBinding.getKey(), slotBinding.getValue());
+		}
+		return registry;
+	}
+
 	public List<MaterialCatalogEntry> loadDirectory(Path directory) throws IOException {
 		List<MaterialCatalogEntry> entries = new ArrayList<>();
 		try (Stream<Path> paths = Files.walk(directory)) {
