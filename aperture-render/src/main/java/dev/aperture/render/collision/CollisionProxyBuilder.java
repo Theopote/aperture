@@ -30,8 +30,8 @@ public final class CollisionProxyBuilder {
 
 	private static CollisionLayer mapLayer(GeometryLayer layer) {
 		return switch (layer) {
-			case OPAQUE_FRAME, CUTOUT_HARDWARE -> CollisionLayer.SOLID;
-			case TRANSLUCENT_GLASS -> CollisionLayer.OPEN;
+			case OPAQUE, CUTOUT -> CollisionLayer.SOLID;
+			case TRANSLUCENT -> CollisionLayer.OPEN;
 		};
 	}
 }

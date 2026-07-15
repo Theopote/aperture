@@ -18,7 +18,7 @@ import dev.aperture.core.instance.OpeningInstanceStore;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.placement.PlacementService;
 import dev.aperture.fabric.placement.FabricPlacementAdapter;
-import dev.aperture.geometry.generator.RectangularWindowGenerator;
+import dev.aperture.opening.geometry.generator.RectangularWindowGenerator;
 import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
@@ -53,7 +53,7 @@ public final class ApertureBootstrap {
 		loadMaterialCatalog();
 		ApertureApi.init(new ApertureApi(openingTypes, generators, profileCatalog, materialCatalog, materials, instances, generation, placement));
 		verifyReferencePipeline();
-		LOGGER.info("Aperture bootstrap complete — {} opening types, {} generators",
+		LOGGER.info("Aperture bootstrap complete - {} opening types, {} generators",
 			openingTypes.all().size(), 1);
 	}
 

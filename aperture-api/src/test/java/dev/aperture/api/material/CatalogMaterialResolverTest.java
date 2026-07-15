@@ -19,14 +19,14 @@ class CatalogMaterialResolverTest {
 
 		var frame = resolver.resolve(new MaterialResolveContext(
 			"frame",
-			GeometryLayer.OPAQUE_FRAME,
+			GeometryLayer.OPAQUE,
 			definition.id(),
 			definition,
 			ParameterSet.empty()
 		));
 		var glazing = resolver.resolve(new MaterialResolveContext(
 			"glazing",
-			GeometryLayer.TRANSLUCENT_GLASS,
+			GeometryLayer.TRANSLUCENT,
 			definition.id(),
 			definition,
 			ParameterSet.empty()

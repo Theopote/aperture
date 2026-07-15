@@ -1,6 +1,8 @@
 dependencies {
 	api project(':aperture-core')
 	api project(':aperture-geometry')
+
+	testImplementation project(':aperture-opening-geometry')
 }
 
 processTestResources {

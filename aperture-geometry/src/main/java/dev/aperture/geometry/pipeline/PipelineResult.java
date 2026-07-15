@@ -4,7 +4,7 @@ import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.geometry.pipeline.mesh.MeshAssembly;
 
 /**
- * Complete output of the opening generator pipeline.
+ * Complete output of procedural geometry generation (solids + baked meshes).
  */
 public record PipelineResult(
 	GeometryResult geometry,

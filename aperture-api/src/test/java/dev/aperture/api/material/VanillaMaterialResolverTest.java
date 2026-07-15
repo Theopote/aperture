@@ -16,7 +16,7 @@ class VanillaMaterialResolverTest {
 		var definition = BuiltinOpeningTypes.fixedWindow();
 		var context = new MaterialResolveContext(
 			"frame",
-			GeometryLayer.OPAQUE_FRAME,
+			GeometryLayer.OPAQUE,
 			definition.id(),
 			definition,
 			ParameterSet.empty()
@@ -33,7 +33,7 @@ class VanillaMaterialResolverTest {
 		var definition = BuiltinOpeningTypes.fixedWindow();
 		var context = new MaterialResolveContext(
 			"glazing",
-			GeometryLayer.TRANSLUCENT_GLASS,
+			GeometryLayer.TRANSLUCENT,
 			definition.id(),
 			definition,
 			ParameterSet.empty()
@@ -53,7 +53,7 @@ class VanillaMaterialResolverTest {
 			.build();
 		var context = new MaterialResolveContext(
 			"frame",
-			GeometryLayer.OPAQUE_FRAME,
+			GeometryLayer.OPAQUE,
 			definition.id(),
 			definition,
 			parameters

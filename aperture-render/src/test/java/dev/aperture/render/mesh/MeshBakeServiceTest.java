@@ -4,8 +4,8 @@ import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.geometry.BoundingBox;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.parameter.ParameterValue;
-import dev.aperture.geometry.generator.RectangularWindowGenerator;
-import dev.aperture.geometry.generator.pipeline.GenerationContext;
+import dev.aperture.opening.geometry.generator.RectangularWindowGenerator;
+import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.geometry.model.GeometrySolid;
@@ -30,8 +30,8 @@ class MeshBakeServiceTest {
 		RenderDocument document = RenderDocument.forPreview(UUID.randomUUID());
 		GeometryResult v1 = new GeometryResult(
 			java.util.List.of(
-				GeometrySolid.box("frame", "frame", GeometryLayer.OPAQUE_FRAME, BoundingBox.fromSize(1000, 1200, 50)),
-				GeometrySolid.box("glazing", "glazing", GeometryLayer.TRANSLUCENT_GLASS, BoundingBox.fromSize(900, 1100, 10))
+				GeometrySolid.box("frame", "frame", GeometryLayer.OPAQUE, BoundingBox.fromSize(1000, 1200, 50)),
+				GeometrySolid.box("glazing", "glazing", GeometryLayer.TRANSLUCENT, BoundingBox.fromSize(900, 1100, 10))
 			),
 			BoundingBox.fromSize(1000, 1200, 50),
 			BoundingBox.fromSize(1000, 1200, 200)
@@ -43,8 +43,8 @@ class MeshBakeServiceTest {
 
 		GeometryResult v2 = new GeometryResult(
 			java.util.List.of(
-				GeometrySolid.box("frame", "frame", GeometryLayer.OPAQUE_FRAME, BoundingBox.fromSize(1200, 1200, 50)),
-				GeometrySolid.box("glazing", "glazing", GeometryLayer.TRANSLUCENT_GLASS, BoundingBox.fromSize(900, 1100, 10))
+				GeometrySolid.box("frame", "frame", GeometryLayer.OPAQUE, BoundingBox.fromSize(1200, 1200, 50)),
+				GeometrySolid.box("glazing", "glazing", GeometryLayer.TRANSLUCENT, BoundingBox.fromSize(900, 1100, 10))
 			),
 			BoundingBox.fromSize(1200, 1200, 50),
 			BoundingBox.fromSize(1200, 1200, 200)
@@ -64,7 +64,7 @@ class MeshBakeServiceTest {
 		GeometrySolid solid = GeometrySolid.box(
 			"frame",
 			"frame",
-			GeometryLayer.OPAQUE_FRAME,
+			GeometryLayer.OPAQUE,
 			BoundingBox.fromSize(100, 200, 30)
 		);
 

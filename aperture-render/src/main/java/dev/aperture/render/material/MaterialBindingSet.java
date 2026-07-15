@@ -41,8 +41,8 @@ public final class MaterialBindingSet {
 	public MaterialBindingSet forPreviewMode(MaterialPreviewMode mode) {
 		return switch (mode) {
 			case FULL, ALBEDO, NORMALS, WIREFRAME -> this;
-			case FRAME_ONLY -> filtered(binding -> binding.layer() != GeometryLayer.TRANSLUCENT_GLASS);
-			case GLASS_ONLY -> filtered(binding -> binding.layer() == GeometryLayer.TRANSLUCENT_GLASS);
+			case FRAME_ONLY -> filtered(binding -> binding.layer() != GeometryLayer.TRANSLUCENT);
+			case GLASS_ONLY -> filtered(binding -> binding.layer() == GeometryLayer.TRANSLUCENT);
 		};
 	}
 }

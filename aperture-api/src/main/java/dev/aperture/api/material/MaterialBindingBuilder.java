@@ -59,9 +59,9 @@ public final class MaterialBindingBuilder {
 
 	private static BlendMode blendModeFor(GeometryLayer layer, BlendMode resolved) {
 		return switch (layer) {
-			case OPAQUE_FRAME -> BlendMode.OPAQUE;
-			case CUTOUT_HARDWARE -> BlendMode.CUTOUT;
-			case TRANSLUCENT_GLASS -> BlendMode.TRANSLUCENT;
+			case OPAQUE -> BlendMode.OPAQUE;
+			case CUTOUT -> BlendMode.CUTOUT;
+			case TRANSLUCENT -> BlendMode.TRANSLUCENT;
 		};
 	}
 }

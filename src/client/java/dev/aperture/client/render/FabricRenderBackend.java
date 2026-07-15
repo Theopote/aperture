@@ -149,14 +149,14 @@ public final class FabricRenderBackend implements RenderBackend {
 
 	private static FabricMaterialGraphics.ResolvedMaterialDraw fallbackDraw(GeometryLayer layer) {
 		RenderType renderType = switch (layer) {
-			case OPAQUE_FRAME -> RenderTypes.entitySolid(FALLBACK_TEXTURE);
-			case CUTOUT_HARDWARE -> RenderTypes.entityCutout(FALLBACK_TEXTURE);
-			case TRANSLUCENT_GLASS -> RenderTypes.entityTranslucent(FALLBACK_TEXTURE);
+			case OPAQUE -> RenderTypes.entitySolid(FALLBACK_TEXTURE);
+			case CUTOUT -> RenderTypes.entityCutout(FALLBACK_TEXTURE);
+			case TRANSLUCENT -> RenderTypes.entityTranslucent(FALLBACK_TEXTURE);
 		};
 		int tint = switch (layer) {
-			case OPAQUE_FRAME -> 0xFFC8A878;
-			case CUTOUT_HARDWARE -> 0xFF909090;
-			case TRANSLUCENT_GLASS -> 0xAA88CCFF;
+			case OPAQUE -> 0xFFC8A878;
+			case CUTOUT -> 0xFF909090;
+			case TRANSLUCENT -> 0xAA88CCFF;
 		};
 		return new FabricMaterialGraphics.ResolvedMaterialDraw(renderType, tint);
 	}
