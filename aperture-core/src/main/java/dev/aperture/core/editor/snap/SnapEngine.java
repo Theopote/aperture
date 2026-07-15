@@ -43,6 +43,7 @@ public final class SnapEngine {
 	}
 
 	private static double distance(Vec3d a, Vec3d b) {
-		return a.subtract(b).length();
+		Vec3d delta = a.subtract(b);
+		return Math.sqrt(delta.x() * delta.x() + delta.y() * delta.y() + delta.z() * delta.z());
 	}
 }

@@ -23,9 +23,9 @@ public final class EditorManipulatorFactory {
 
 	public static ManipulationLayout layout(OpeningTypeDefinition definition, OpeningInstance instance) {
 		ParameterSet resolved = definition.parametricSchema().mergeDefaults(instance.parameters());
-		double width = length(resolved, "width").orElse(1000);
-		double height = length(resolved, "height").orElse(1500);
-		double depth = thickness(resolved).orElse(80);
+		double width = length(resolved, "width").orElse(1000.0);
+		double height = length(resolved, "height").orElse(1500.0);
+		double depth = thickness(resolved).orElse(80.0);
 
 		List<ResizeHandle> handles = new ArrayList<>();
 		Map<String, ResizeHandle> handlesById = new LinkedHashMap<>();

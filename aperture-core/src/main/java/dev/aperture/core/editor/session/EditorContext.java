@@ -43,15 +43,15 @@ public final class EditorContext {
 		return validator;
 	}
 
-	void replaceObject(EditorObject object) {
+	public void replaceObject(EditorObject object) {
 		objects.put(object.id(), object);
 	}
 
-	void addObject(EditorObject object) {
+	public void addObject(EditorObject object) {
 		objects.put(object.id(), object);
 	}
 
-	void removeObject(EditorObjectId id) {
+	public void removeObject(EditorObjectId id) {
 		objects.remove(id);
 	}
 }
