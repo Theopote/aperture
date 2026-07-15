@@ -3,13 +3,16 @@
 ## Phase 0 — Foundation (Months 1–3) ← **Current**
 
 - [x] Architecture documentation
-- [ ] Multi-module Gradle split
-- [ ] `OpeningTypeDefinition` model + schema
-- [ ] Parameter engine (static values + min/max)
-- [ ] Geometry kernel: rectangular frame + glazing stub
-- [ ] Instance store interfaces
-- [ ] Basic bootstrap wiring
-- [ ] One reference type: fixed window (data only)
+- [x] Multi-module Gradle split
+- [x] `OpeningTypeDefinition` model + schema
+- [x] Parameter engine (static values + min/max)
+- [x] Geometry kernel: rectangular frame + glazing stub
+- [x] Instance store interfaces
+- [x] Basic bootstrap wiring
+- [x] One reference type: fixed window (JSON data pack)
+- [ ] Placement system (preview + validation)
+- [ ] Rendering pipeline
+- [ ] World persistence (NBT)
 
 ## Phase 1 — Opening Platform (Months 4–8)
 

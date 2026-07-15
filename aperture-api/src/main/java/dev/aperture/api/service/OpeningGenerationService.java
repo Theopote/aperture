@@ -1,0 +1,49 @@
+package dev.aperture.api.service;
+
+import dev.aperture.api.registry.GeneratorRegistry;
+import dev.aperture.core.catalog.OpeningTypeRegistry;
+import dev.aperture.core.definition.OpeningTypeDefinition;
+import dev.aperture.core.instance.OpeningInstance;
+import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.core.validation.OpeningValidator;
+import dev.aperture.core.validation.ParameterConstraintValidator;
+import dev.aperture.core.validation.ValidationResult;
+import dev.aperture.geometry.model.GeometryResult;
+
+/**
+ * Orchestrates validation and procedural generation for a placed opening instance.
+ */
+public final class OpeningGenerationService {
+	private final OpeningTypeRegistry openingTypes;
+	private final GeneratorRegistry generators;
+	private final OpeningValidator parameterValidator;
+
+	public OpeningGenerationService(OpeningTypeRegistry openingTypes, GeneratorRegistry generators) {
+		this(openingTypes, generators, new ParameterConstraintValidator());
+	}
+
+	public OpeningGenerationService(
+		OpeningTypeRegistry openingTypes,
+		GeneratorRegistry generators,
+		OpeningValidator parameterValidator
+	) {
+		this.openingTypes = openingTypes;
+		this.generators = generators;
+		this.parameterValidator = parameterValidator;
+	}
+
+	public GeometryResult generate(OpeningInstance instance) {
+		OpeningTypeDefinition definition = openingTypes.require(instance.typeId());
+		ParameterSet resolved = ParameterSet.mergeDefaults(definition.parameters(), instance.parameters());
+
+		ValidationResult validation = parameterValidator.validate(
+			definition,
+			instance.withParameters(resolved)
+		);
+		if (!validation.isValid()) {
+			throw new IllegalStateException("Opening instance failed validation: " + validation.issues());
+		}
+
+		return generators.generate(definition, resolved);
+	}
+}

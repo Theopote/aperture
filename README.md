@@ -30,10 +30,15 @@ See [`docs/architecture/README.md`](docs/architecture/README.md) for the full ar
 - [x] Architecture documentation
 - [x] Multi-module Gradle structure
 - [x] Core domain model (`OpeningTypeDefinition`, `OpeningInstance`, parameters)
+- [x] JSON data pack loader (`aperture-data/`)
 - [x] Reference generator (`RectangularWindowGenerator`)
+- [x] Instance store interface + in-memory implementation
+- [x] Generation service (validate → generate pipeline)
 - [ ] Placement system
 - [ ] Rendering pipeline
 - [ ] World persistence (NBT)
+
+Requires **Java 21+** (set `java_version` in `gradle.properties`; bump to 25 when targeting MC 26.1 with JDK 25).
 
 ## Build
 
@@ -41,7 +46,9 @@ See [`docs/architecture/README.md`](docs/architecture/README.md) for the full ar
 ./gradlew build
 ```
 
-Requires Java 25 and Minecraft 26.1 (Fabric).
+Requires Java 21+ and Minecraft 26.1 (Fabric).
+
+Set `java_version` in `gradle.properties` (default `21`).
 
 ## License
 

@@ -1,7 +1,9 @@
 package dev.aperture.api;
 
 import dev.aperture.api.registry.GeneratorRegistry;
+import dev.aperture.api.service.OpeningGenerationService;
 import dev.aperture.core.catalog.OpeningTypeRegistry;
+import dev.aperture.core.instance.OpeningInstanceStore;
 
 /**
  * Public API surface for Aperture addon mods.
@@ -11,10 +13,19 @@ public final class ApertureApi {
 
 	private final OpeningTypeRegistry openingTypes;
 	private final GeneratorRegistry generators;
+	private final OpeningInstanceStore instances;
+	private final OpeningGenerationService generation;
 
-	public ApertureApi(OpeningTypeRegistry openingTypes, GeneratorRegistry generators) {
+	public ApertureApi(
+		OpeningTypeRegistry openingTypes,
+		GeneratorRegistry generators,
+		OpeningInstanceStore instances,
+		OpeningGenerationService generation
+	) {
 		this.openingTypes = openingTypes;
 		this.generators = generators;
+		this.instances = instances;
+		this.generation = generation;
 	}
 
 	public static void init(ApertureApi api) {
@@ -34,5 +45,13 @@ public final class ApertureApi {
 
 	public GeneratorRegistry generators() {
 		return generators;
+	}
+
+	public OpeningInstanceStore instances() {
+		return instances;
+	}
+
+	public OpeningGenerationService generation() {
+		return generation;
 	}
 }

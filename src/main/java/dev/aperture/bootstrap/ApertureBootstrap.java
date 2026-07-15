@@ -2,32 +2,36 @@ package dev.aperture.bootstrap;
 
 import dev.aperture.api.ApertureApi;
 import dev.aperture.api.registry.GeneratorRegistry;
+import dev.aperture.api.service.OpeningGenerationService;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
+import dev.aperture.core.catalog.OpeningTypeCatalogLoader;
 import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.core.definition.OpeningTypeDefinition;
+import dev.aperture.core.instance.InMemoryOpeningInstanceStore;
 import dev.aperture.core.instance.OpeningInstance;
+import dev.aperture.core.instance.OpeningInstanceStore;
 import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.validation.ParameterConstraintValidator;
-import dev.aperture.core.validation.ValidationResult;
 import dev.aperture.geometry.generators.RectangularWindowGenerator;
 import dev.aperture.geometry.model.GeometryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Wires core registries, builtin content, and generators at mod startup.
+ * Wires core registries, data packs, generators, and services at mod startup.
  */
 public final class ApertureBootstrap {
 	private static final Logger LOGGER = LoggerFactory.getLogger("aperture");
 
 	private final OpeningTypeRegistry openingTypes = new OpeningTypeRegistry();
 	private final GeneratorRegistry generators = new GeneratorRegistry();
-	private final ParameterConstraintValidator parameterValidator = new ParameterConstraintValidator();
+	private final OpeningInstanceStore instances = new InMemoryOpeningInstanceStore();
+	private final OpeningTypeCatalogLoader catalogLoader = new OpeningTypeCatalogLoader();
+	private final OpeningGenerationService generation = new OpeningGenerationService(openingTypes, generators);
 
 	public void initialize() {
 		registerGenerators();
-		registerBuiltinOpeningTypes();
-		ApertureApi.init(new ApertureApi(openingTypes, generators));
+		loadOpeningTypes();
+		ApertureApi.init(new ApertureApi(openingTypes, generators, instances, generation));
 		verifyReferencePipeline();
 		LOGGER.info("Aperture bootstrap complete — {} opening types, {} generators",
 			openingTypes.all().size(), 1);
@@ -37,8 +41,10 @@ public final class ApertureBootstrap {
 		generators.register(new RectangularWindowGenerator());
 	}
 
-	private void registerBuiltinOpeningTypes() {
-		openingTypes.register(BuiltinOpeningTypes.fixedWindow());
+	private void loadOpeningTypes() {
+		OpeningTypeDefinition fromData = catalogLoader.loadClasspathResource("aperture/opening_types/fixed_window.json");
+		openingTypes.register(fromData);
+		LOGGER.info("Loaded opening type from data pack: {}", fromData.id());
 	}
 
 	private void verifyReferencePipeline() {
@@ -48,12 +54,9 @@ public final class ApertureBootstrap {
 			.parameters(parameters)
 			.build();
 
-		ValidationResult validation = parameterValidator.validate(definition, instance);
-		if (!validation.isValid()) {
-			throw new IllegalStateException("Builtin fixed window failed validation: " + validation.issues());
-		}
+		instances.put(instance);
+		GeometryResult geometry = generation.generate(instance);
 
-		GeometryResult geometry = generators.generate(definition, parameters);
 		LOGGER.info("Reference window geometry: {} solids, bounds {}x{}x{} mm",
 			geometry.solids().size(),
 			geometry.bounds().width(),
@@ -67,5 +70,13 @@ public final class ApertureBootstrap {
 
 	public GeneratorRegistry generators() {
 		return generators;
+	}
+
+	public OpeningInstanceStore instances() {
+		return instances;
+	}
+
+	public OpeningGenerationService generation() {
+		return generation;
 	}
 }

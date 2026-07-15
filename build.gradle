@@ -32,19 +32,25 @@ processResources {
 	def version = project.version
 	inputs.property "version", version
 
+	from("${rootProject.projectDir}/aperture-data/aperture") {
+		into "aperture"
+	}
+
 	filesMatching("fabric.mod.json") {
 		expand "version": version
 	}
 }
 
+def javaVersion = Integer.parseInt(findProperty('java_version') ?: '21')
+
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 25
+	it.options.release = javaVersion
 }
 
 java {
 	withSourcesJar()
-	sourceCompatibility = JavaVersion.VERSION_25
-	targetCompatibility = JavaVersion.VERSION_25
+	sourceCompatibility = JavaVersion.toVersion(javaVersion)
+	targetCompatibility = JavaVersion.toVersion(javaVersion)
 }
 
 jar {
@@ -64,6 +70,7 @@ subprojects {
 	version = rootProject.mod_version
 
 	repositories {
+		mavenCentral()
 	}
 
 	dependencies {
@@ -71,14 +78,16 @@ subprojects {
 		testImplementation 'org.junit.jupiter:junit-jupiter'
 	}
 
+	def subJavaVersion = Integer.parseInt(rootProject.findProperty('java_version') ?: '21')
+
 	tasks.withType(JavaCompile).configureEach {
-		it.options.release = 25
+		it.options.release = subJavaVersion
 	}
 
 	java {
 		withSourcesJar()
-		sourceCompatibility = JavaVersion.VERSION_25
-		targetCompatibility = JavaVersion.VERSION_25
+		sourceCompatibility = JavaVersion.toVersion(subJavaVersion)
+		targetCompatibility = JavaVersion.toVersion(subJavaVersion)
 	}
 }
 
@@ -90,5 +99,6 @@ publishing {
 	}
 
 	repositories {
+		mavenCentral()
 	}
 }
