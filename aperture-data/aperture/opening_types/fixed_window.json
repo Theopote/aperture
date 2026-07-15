@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "aperture:fixed_window",
+  "category": "window",
+  "parameters": {
+    "width": { "type": "length", "default": 1200, "min": 300, "max": 6000 },
+    "height": { "type": "length", "default": 1500, "min": 300, "max": 4000 },
+    "mullions": { "type": "count", "default": 0, "min": 0, "max": 10 },
+    "frame_width": { "type": "length", "default": 50, "min": 20, "max": 150 }
+  },
+  "generator": "aperture:rectangular_window_v1",
+  "components": {
+    "frame": { "profile": "aperture:frame_standard_50" },
+    "glazing": { "system": "aperture:single_glazed" }
+  },
+  "materialSlots": ["frame", "glazing"]
+}

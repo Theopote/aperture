@@ -3,23 +3,22 @@
 	"id": "aperture",
 	"version": "${version}",
 	"name": "Aperture",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Architectural Opening Design System — procedural doors, windows, curtain walls, skylights, and façade elements.",
 	"authors": [
-		"Me!"
+		"Aperture Team"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/aperture-mod/aperture"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/aperture/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.example.Aperture"
+			"dev.aperture.Aperture"
 		],
 		"client": [
-			"com.example.client.ApertureClient"
+			"dev.aperture.client.ApertureClient"
 		]
 	},
 	"mixins": [

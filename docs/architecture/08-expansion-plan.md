@@ -1,0 +1,72 @@
+# 08 — Expansion Plan
+
+## Phase 0 — Foundation (Months 1–3) ← **Current**
+
+- [x] Architecture documentation
+- [ ] Multi-module Gradle split
+- [ ] `OpeningTypeDefinition` model + schema
+- [ ] Parameter engine (static values + min/max)
+- [ ] Geometry kernel: rectangular frame + glazing stub
+- [ ] Instance store interfaces
+- [ ] Basic bootstrap wiring
+- [ ] One reference type: fixed window (data only)
+
+## Phase 1 — Opening Platform (Months 4–8)
+
+- Full validator chain + host cut system
+- Door + skylight generators
+- Material slot resolver (vanilla blocks)
+- Network sync
+- Public `aperture-api` for addon registration
+- Golden geometry tests
+
+## Phase 2 — Design Tools (Months 9–14)
+
+- In-game opening editor (parameter panel + handles)
+- Undo/redo stack
+- Catalog browser (families/presets)
+- Profile editor (2D profile → extrude)
+- Curtain wall grid generator
+
+## Phase 3 — Node Graph / Parametric (Months 15–24)
+
+- `aperture-core/graph` node evaluation engine
+- Visual node editor (client UI)
+- Expression parameters with full dependency graph
+- `ParametricGraphGenerator` binding
+- Constraint solver
+
+## Phase 4 — BIM & Interchange (Year 2–3)
+
+- Export: instances + host relationships → JSON / glTF / IFC subset
+- Import: parameter mapping from external schema
+- Layer/phase metadata
+- Quantity takeoff reports
+
+## Phase 5 — AI & Multiplayer Design (Year 3+)
+
+- AI suggests definitions + parameters from natural language
+- AI validates compliance rules (extensible rule packs)
+- Collaborative editing: instance locking, region permissions
+- Design session replay via revision log
+
+## Cross-Cutting: 5-Year Maintainability
+
+### ADRs
+
+Every major decision gets `docs/architecture/ADRs/NNNN-title.md`.
+
+### Testing Strategy
+
+| Layer | Test Type |
+|---|---|
+| `aperture-core` | Unit: params, constraints, migrations |
+| `aperture-geometry` | Golden snapshots: mesh bounds |
+| Fabric mod | Integration: place → save → reload |
+| Client | Visual regression (optional) |
+
+### CI Enforcement
+
+- Module dependency lint (no MC imports in core)
+- Schema validation on `aperture-data` JSON
+- Golden test diff on geometry changes

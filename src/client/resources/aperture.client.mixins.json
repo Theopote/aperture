@@ -1,10 +1,8 @@
 {
 	"required": true,
-	"package": "com.example.client.mixin",
+	"package": "dev.aperture.client.mixin",
 	"compatibilityLevel": "JAVA_25",
-	"client": [
-		"ExampleClientMixin"
-	],
+	"client": [],
 	"injectors": {
 		"defaultRequire": 1
 	},

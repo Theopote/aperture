@@ -1,0 +1,34 @@
+package dev.aperture.api.registry;
+
+import dev.aperture.api.generator.OpeningGenerator;
+import dev.aperture.core.definition.OpeningTypeDefinition;
+import dev.aperture.core.opening.GeneratorId;
+import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.geometry.model.GeometryResult;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Registry of procedural opening generators.
+ */
+public final class GeneratorRegistry {
+	private final Map<String, OpeningGenerator> generators = new ConcurrentHashMap<>();
+
+	public void register(OpeningGenerator generator) {
+		generators.put(generator.id(), generator);
+	}
+
+	public Optional<OpeningGenerator> get(GeneratorId id) {
+		return Optional.ofNullable(generators.get(id.toString()));
+	}
+
+	public OpeningGenerator require(GeneratorId id) {
+		return get(id).orElseThrow(() -> new IllegalArgumentException("Unknown generator: " + id));
+	}
+
+	public GeometryResult generate(OpeningTypeDefinition definition, ParameterSet parameters) {
+		return require(definition.generator()).generate(definition, parameters);
+	}
+}

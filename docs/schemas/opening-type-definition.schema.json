@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aperture.dev/schemas/opening-type-definition.schema.json",
+  "title": "OpeningTypeDefinition",
+  "type": "object",
+  "required": ["schemaVersion", "id", "category", "generator"],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*:[a-z][a-z0-9_/]*$"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["door", "window", "curtain_wall", "skylight", "facade"]
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/parameterDefinition"
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["expr", "message"],
+        "properties": {
+          "expr": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "generator": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*:[a-z][a-z0-9_/]*$"
+    },
+    "components": {
+      "type": "object"
+    },
+    "materialSlots": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "parameterDefinition": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["length", "angle", "count", "enum", "bool", "material_ref"]
+        },
+        "default": {},
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "values": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

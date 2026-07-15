@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aperture.dev/schemas/opening-instance.schema.json",
+  "title": "OpeningInstance",
+  "type": "object",
+  "required": ["schemaVersion", "instanceId", "typeId", "transform", "revision"],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "instanceId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "typeId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*:[a-z][a-z0-9_/]*$"
+    },
+    "parameters": {
+      "type": "object"
+    },
+    "transform": {
+      "type": "object",
+      "required": ["x", "y", "z", "facing"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" },
+        "facing": {
+          "type": "string",
+          "enum": ["north", "south", "east", "west", "up", "down"]
+        }
+      }
+    },
+    "host": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["wall", "roof", "curtain_wall_host", "free_standing"]
+        },
+        "anchor": { "type": "string" }
+      }
+    },
+    "state": {
+      "type": "object"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}
