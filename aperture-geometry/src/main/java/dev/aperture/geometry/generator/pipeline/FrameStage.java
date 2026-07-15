@@ -31,7 +31,7 @@ public final class FrameStage implements GenerationStage {
 		double height = context.requireLength("height");
 		int mullions = context.requireCount("mullions");
 
-		ProfileDefinition profileDefinition = context.requireComponentProfile("frame");
+		ProfileDefinition profileDefinition = context.scaledFrameProfile();
 		ProfileCurve profile = profileDefinition.curve();
 		double frameFace = profileDefinition.bounds().width();
 		double frameDepth = profileDefinition.bounds().depth();

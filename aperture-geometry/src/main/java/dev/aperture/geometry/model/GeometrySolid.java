@@ -47,12 +47,22 @@ public record GeometrySolid(
 		GeometryLayer layer,
 		SolidShape shape
 	) {
+		return of(componentPath, materialSlot, layer, shape, Transform3d.identity());
+	}
+
+	public static GeometrySolid of(
+		String componentPath,
+		String materialSlot,
+		GeometryLayer layer,
+		SolidShape shape,
+		Transform3d localTransform
+	) {
 		return new GeometrySolid(
 			componentPath,
 			materialSlot,
 			layer,
 			shape,
-			Transform3d.at(0, 0, 0, Facing.NORTH)
+			localTransform
 		);
 	}
 }

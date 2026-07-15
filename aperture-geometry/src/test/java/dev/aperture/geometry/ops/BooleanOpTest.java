@@ -30,6 +30,7 @@ class BooleanOpTest {
 		Mesh trimmed = ShapeMesher.meshLocal(mitered);
 
 		assertTrue(trimmed.triangleCount() < full.triangleCount());
+		assertTrue(trimmed.triangleCount() >= 8);
 	}
 
 	@Test

@@ -18,11 +18,7 @@ public final class ShapeMesher {
 	}
 
 	public static Mesh mesh(SolidShape shape, Transform3d transform) {
-		Mesh localMesh = meshLocal(shape);
-		if (transform.origin().equals(Vec3d.ZERO)) {
-			return localMesh;
-		}
-		return translate(localMesh, transform.origin());
+		return TransformOps.apply(meshLocal(shape), transform);
 	}
 
 	public static Mesh meshLocal(SolidShape shape) {
@@ -30,7 +26,13 @@ public final class ShapeMesher {
 			case BoxShape box -> meshBox(box.bounds());
 			case ExtrusionShape extrusion -> meshExtrusion(extrusion);
 			case UnionShape union -> MeshOps.unionAll(union.operands().stream().map(ShapeMesher::meshLocal).toList());
-			case SubtractShape subtract -> MeshOps.subtractByBounds(meshLocal(subtract.base()), subtract.tool().bounds());
+			case SubtractShape subtract -> {
+				Mesh base = meshLocal(subtract.base());
+				if (subtract.tool() instanceof BoxShape box) {
+					yield MeshCsg.subtractBox(base, box.bounds());
+				}
+				yield MeshCsg.subtractBox(base, subtract.tool().bounds());
+			}
 		};
 	}
 
@@ -151,17 +153,6 @@ public final class ShapeMesher {
 				builder.addTriangle(center, b, a, Vec2d.ZERO, new Vec2d(i + 1, 0), new Vec2d(i, 0));
 			}
 		}
-	}
-
-	private static Mesh translate(Mesh mesh, Vec3d offset) {
-		float[] vertices = mesh.vertices().clone();
-		for (int i = 0; i < vertices.length; i += Mesh.FLOATS_PER_VERTEX) {
-			vertices[i] += (float) offset.x();
-			vertices[i + 1] += (float) offset.y();
-			vertices[i + 2] += (float) offset.z();
-		}
-		BoundingBox bounds = new BoundingBox(mesh.bounds().min().add(offset), mesh.bounds().max().add(offset));
-		return new Mesh(vertices, mesh.indices(), bounds);
 	}
 
 	private enum Axis {

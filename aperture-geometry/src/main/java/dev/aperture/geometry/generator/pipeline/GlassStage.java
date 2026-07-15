@@ -19,10 +19,14 @@ public final class GlassStage implements GenerationStage {
 
 	@Override
 	public void contribute(GenerationContext context, GeometryAssemblyBuilder builder) {
+		if (context.hasComponent("panel")) {
+			return;
+		}
+
 		double width = context.requireLength("width");
 		double height = context.requireLength("height");
 
-		ProfileDefinition profileDefinition = context.requireComponentProfile("frame");
+		ProfileDefinition profileDefinition = context.scaledFrameProfile();
 		double frameFace = profileDefinition.bounds().width();
 
 		double innerWidth = width - frameFace * 2;

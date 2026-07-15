@@ -33,6 +33,10 @@ public final class GenerationTestSupport {
 		return new RectangularWindowGenerator().generate(context(BuiltinOpeningTypes.fixedWindow(), overrides));
 	}
 
+	public static GeometryResult generateCasementWindow(ParameterSet overrides) {
+		return new RectangularWindowGenerator().generate(context(BuiltinOpeningTypes.casementWindow(), overrides));
+	}
+
 	public static GeometryResult generateFixedWindow() {
 		return generateFixedWindow(ParameterSet.empty());
 	}
