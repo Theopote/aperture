@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "aperture",
+	"version": "${version}",
+	"name": "Aperture",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/aperture/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.example.Aperture"
+		],
+		"client": [
+			"com.example.client.ApertureClient"
+		]
+	},
+	"mixins": [
+		"aperture.mixins.json",
+		{
+			"config": "aperture.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.1",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
