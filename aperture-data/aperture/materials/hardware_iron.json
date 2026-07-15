@@ -1,0 +1,8 @@
+{
+  "id": "aperture:hardware_iron",
+  "albedoTexture": "minecraft:block/iron_block",
+  "roughness": 0.4,
+  "metalness": 0.8,
+  "blendMode": "cutout",
+  "doubleSided": false
+}

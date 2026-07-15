@@ -1,10 +1,19 @@
 package dev.aperture.client.render.placement;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import dev.aperture.api.ApertureApi;
+import dev.aperture.api.material.MaterialBindingBuilder;
+import dev.aperture.client.placement.ClientPlacementPreview;
+import dev.aperture.client.placement.ClientPlacementPreviewMode;
+import dev.aperture.client.render.FabricRenderBackend;
+import dev.aperture.core.geometry.Transform3d;
+import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.placement.PlacementSession;
+import dev.aperture.fabric.placement.McUnits;
 import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.render.data.PreviewRenderContext;
 import dev.aperture.render.data.RenderDelta;
+import dev.aperture.render.material.MaterialBindingSet;
 import dev.aperture.render.mesh.BoxMeshCompiler;
 import dev.aperture.render.mesh.LODLevel;
 import dev.aperture.render.mesh.MeshAsset;
@@ -21,6 +30,8 @@ public final class PlacementPreviewMeshService {
 
 	private static PreviewRenderContext context;
 	private static MeshAsset meshAsset = MeshAsset.empty(LODLevel.FULL);
+	private static MaterialBindingSet materialBindings = new MaterialBindingSet(java.util.Map.of());
+	private static ParameterSet lastParameters = ParameterSet.empty();
 	private static String currentHostAnchor;
 
 	private PlacementPreviewMeshService() {
@@ -28,17 +39,31 @@ public final class PlacementPreviewMeshService {
 
 	public static void update(PlacementSession session) {
 		try {
+			ApertureApi api = ApertureApi.get();
 			String hostAnchor = session.targetHost().anchor();
 			if (context == null || !hostAnchor.equals(currentHostAnchor)) {
 				context = new PreviewRenderContext(previewToken(hostAnchor));
 				context.bind(session);
 				meshAsset = MeshAsset.empty(LODLevel.FULL);
+				lastParameters = ParameterSet.empty();
 				currentHostAnchor = hostAnchor;
 			}
 
-			GeometryResult geometry = ApertureApi.get().generation().generate(session.previewInstance());
+			GeometryResult geometry = api.generation().generate(session.previewInstance());
 			RenderDelta delta = context.updateGeometry(geometry);
 			meshAsset = BAKE_SERVICE.applyDelta(context.document(), meshAsset, delta, LODLevel.FULL);
+
+			var definition = api.openingTypes().require(session.selectedTypeId());
+			ParameterSet mergedParameters = ParameterSet.mergeDefaults(definition.parameters(), session.parameterOverrides());
+			if (!mergedParameters.equals(lastParameters)) {
+				materialBindings = MaterialBindingBuilder.build(
+					definition,
+					session.previewInstance(),
+					geometry,
+					api.materials()
+				);
+				lastParameters = mergedParameters;
+			}
 		} catch (IllegalStateException notInitialized) {
 			clear();
 		} catch (RuntimeException exception) {
@@ -55,9 +80,15 @@ public final class PlacementPreviewMeshService {
 		return meshAsset;
 	}
 
+	public static MaterialBindingSet materialBindings() {
+		return materialBindings.forPreviewMode(ClientPlacementPreviewMode.current());
+	}
+
 	public static void clear() {
 		context = null;
 		meshAsset = MeshAsset.empty(LODLevel.FULL);
+		materialBindings = new MaterialBindingSet(java.util.Map.of());
+		lastParameters = ParameterSet.empty();
 		currentHostAnchor = null;
 	}
 

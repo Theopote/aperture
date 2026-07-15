@@ -1,6 +1,9 @@
 package dev.aperture.bootstrap;
 
 import dev.aperture.api.ApertureApi;
+import dev.aperture.api.catalog.MaterialCatalogLoader;
+import dev.aperture.api.catalog.MaterialCatalogRegistry;
+import dev.aperture.api.material.CatalogMaterialResolver;
 import dev.aperture.api.material.VanillaMaterialResolver;
 import dev.aperture.api.registry.GeneratorRegistry;
 import dev.aperture.api.registry.MaterialResolverRegistry;
@@ -30,6 +33,7 @@ public final class ApertureBootstrap {
 
 	private final OpeningTypeRegistry openingTypes = new OpeningTypeRegistry();
 	private final GeneratorRegistry generators = new GeneratorRegistry();
+	private final MaterialCatalogRegistry materialCatalog = new MaterialCatalogRegistry();
 	private final MaterialResolverRegistry materials = new MaterialResolverRegistry(VanillaMaterialResolver.INSTANCE);
 	private final OpeningInstanceStore instances = new InMemoryOpeningInstanceStore();
 	private final OpeningTypeCatalogLoader catalogLoader = new OpeningTypeCatalogLoader();
@@ -41,7 +45,8 @@ public final class ApertureBootstrap {
 		registerBlocks();
 		registerGenerators();
 		loadOpeningTypes();
-		ApertureApi.init(new ApertureApi(openingTypes, generators, materials, instances, generation, placement));
+		loadMaterialCatalog();
+		ApertureApi.init(new ApertureApi(openingTypes, generators, materialCatalog, materials, instances, generation, placement));
 		verifyReferencePipeline();
 		LOGGER.info("Aperture bootstrap complete — {} opening types, {} generators",
 			openingTypes.all().size(), 1);
@@ -61,6 +66,18 @@ public final class ApertureBootstrap {
 		OpeningTypeDefinition fromData = catalogLoader.loadClasspathResource("aperture/opening_types/fixed_window.json");
 		openingTypes.register(fromData);
 		LOGGER.info("Loaded opening type from data pack: {}", fromData.id());
+	}
+
+	private void loadMaterialCatalog() {
+		MaterialCatalogRegistry loaded = new MaterialCatalogLoader().loadClasspathCatalog();
+		for (var definition : loaded.all().values()) {
+			materialCatalog.register(definition);
+		}
+		for (var entry : loaded.slotDefaults().entrySet()) {
+			materialCatalog.setSlotDefault(entry.getKey(), entry.getValue());
+		}
+		materials.setFallback(new CatalogMaterialResolver(materialCatalog));
+		LOGGER.info("Loaded {} catalog materials", materialCatalog.all().size());
 	}
 
 	private void verifyReferencePipeline() {
@@ -86,6 +103,10 @@ public final class ApertureBootstrap {
 
 	public GeneratorRegistry generators() {
 		return generators;
+	}
+
+	public MaterialCatalogRegistry materialCatalog() {
+		return materialCatalog;
 	}
 
 	public MaterialResolverRegistry materials() {

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "materials": [
+    "frame_oak",
+    "glazing_clear",
+    "hardware_iron"
+  ],
+  "slotDefaults": {
+    "frame": "aperture:frame_oak",
+    "glazing": "aperture:glazing_clear",
+    "hardware": "aperture:hardware_iron"
+  }
+}

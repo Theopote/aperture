@@ -1,0 +1,8 @@
+{
+  "id": "aperture:frame_oak",
+  "albedoTexture": "minecraft:block/oak_planks",
+  "roughness": 0.7,
+  "metalness": 0.0,
+  "blendMode": "opaque",
+  "doubleSided": false
+}
