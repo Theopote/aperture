@@ -14,15 +14,37 @@ import dev.aperture.core.parametric.ParameterMetadata;
 import dev.aperture.core.parametric.RangeParameter;
 
 import java.util.List;
+import java.util.Set;
 
 /**
- * Built-in reference opening types for Phase 0 development and testing.
+ * Built-in reference opening types for platform development and integration testing.
+ *
+ * <p><strong>Family library freeze:</strong> only {@link #fixedWindow()}, {@link #door()}, and
+ * {@link #curtainWall()} are allowed reference types while Phase B/C platform work is in progress.
+ * Do not add new door/window variants here — see {@code docs/architecture/13-platform-roadmap-af.md}.
+ *
+ * <p>Runtime catalog entries load from {@code aperture-data/aperture/opening_types/*.json}.
+ * These Java factories mirror those packs for unit tests and stay in sync with them.
  */
 public final class BuiltinOpeningTypes {
 	public static final OpeningId FIXED_WINDOW_ID = OpeningId.aperture("fixed_window");
 	public static final OpeningId DOOR_ID = OpeningId.aperture("door");
 	public static final OpeningId CURTAIN_WALL_ID = OpeningId.aperture("curtain_wall");
 	public static final GeneratorId RECTANGULAR_WINDOW_GENERATOR = GeneratorId.parse("aperture:rectangular_window_v1");
+
+	private static final Set<OpeningId> REFERENCE_IDS = Set.of(FIXED_WINDOW_ID, DOOR_ID, CURTAIN_WALL_ID);
+
+	public static Set<OpeningId> referenceIds() {
+		return REFERENCE_IDS;
+	}
+
+	public static boolean isReferenceType(OpeningId id) {
+		return REFERENCE_IDS.contains(id);
+	}
+
+	public static List<OpeningTypeDefinition> referenceDefinitions() {
+		return List.of(fixedWindow(), door(), curtainWall());
+	}
 
 	public static OpeningTypeDefinition fixedWindow() {
 		return OpeningTypeDefinition.builder(FIXED_WINDOW_ID, OpeningCategory.WINDOW, RECTANGULAR_WINDOW_GENERATOR)
@@ -56,48 +78,6 @@ public final class BuiltinOpeningTypes {
 			.materialSlot("glazing")
 			.components(ComponentAssemblyPresets.fixedWindow(
 				"aperture:frame_l_50x80",
-				"aperture:single_glazed"
-			))
-			.build();
-	}
-
-	public static OpeningTypeDefinition casementWindow() {
-		return OpeningTypeDefinition.builder(FIXED_WINDOW_ID, OpeningCategory.WINDOW, RECTANGULAR_WINDOW_GENERATOR)
-			.parameter("width", RangeParameter.builder(NumberUnit.LENGTH_MM)
-				.defaultNumber(1200)
-				.min(300)
-				.max(6000)
-				.build())
-			.parameter("height", RangeParameter.builder(NumberUnit.LENGTH_MM)
-				.defaultNumber(1500)
-				.min(300)
-				.max(4000)
-				.build())
-			.parameter("mullions", RangeParameter.builder(NumberUnit.COUNT)
-				.defaultNumber(0)
-				.min(0)
-				.max(10)
-				.build())
-			.parameter("frame_width", RangeParameter.builder(NumberUnit.LENGTH_MM)
-				.defaultNumber(50)
-				.min(20)
-				.max(150)
-				.build())
-			.parameter("frame_depth", RangeParameter.builder(NumberUnit.LENGTH_MM)
-				.defaultNumber(80)
-				.min(30)
-				.max(200)
-				.build())
-			.parameter("open_angle", RangeParameter.builder(NumberUnit.ANGLE_DEG)
-				.defaultNumber(0)
-				.min(0)
-				.max(90)
-				.build())
-			.materialSlot("frame")
-			.materialSlot("glazing")
-			.components(ComponentAssemblyPresets.casementWindow(
-				"aperture:frame_l_50x80",
-				"aperture:frame_standard_50",
 				"aperture:single_glazed"
 			))
 			.build();

@@ -41,7 +41,7 @@ class OpeningRecipeExportTest {
 
 	@Test
 	void casementPanelRecipeUsesExtrudeLinearOps() {
-		var context = GenerationTestSupport.context(BuiltinOpeningTypes.casementWindow(), ParameterSet.builder()
+		var context = GenerationTestSupport.context(OpeningTestFixtures.casementWindow(), ParameterSet.builder()
 			.put("open_angle", ParameterValue.angle(30))
 			.build());
 		GeometryRecipe recipe = PIPELINE.compileRecipe(context);

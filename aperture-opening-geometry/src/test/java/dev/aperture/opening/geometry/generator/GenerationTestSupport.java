@@ -1,6 +1,7 @@
 package dev.aperture.opening.geometry.generator;
 
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
+import dev.aperture.opening.test.OpeningTestFixtures;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
@@ -43,7 +44,7 @@ public final class GenerationTestSupport {
 	}
 
 	public static PipelineResult generateCasementWindowPipeline(ParameterSet overrides) {
-		return new RectangularWindowGenerator().generate(context(BuiltinOpeningTypes.casementWindow(), overrides));
+		return new RectangularWindowGenerator().generate(context(OpeningTestFixtures.casementWindow(), overrides));
 	}
 
 	public static PipelineResult generateDoorPipeline(ParameterSet overrides) {

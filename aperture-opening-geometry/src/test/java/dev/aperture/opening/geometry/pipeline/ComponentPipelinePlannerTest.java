@@ -1,6 +1,7 @@
 package dev.aperture.opening.geometry.pipeline;
 
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
+import dev.aperture.opening.test.OpeningTestFixtures;
 import dev.aperture.core.component.ComponentAssemblyPresets;
 import dev.aperture.opening.component.ComponentPlanBuilder;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ class ComponentPipelinePlannerTest {
 
 	@Test
 	void casementPipelineIncludesPanelStep() {
-		var steps = ComponentPipelinePlanner.plannedStepIds(BuiltinOpeningTypes.casementWindow().components());
+		var steps = ComponentPipelinePlanner.plannedStepIds(OpeningTestFixtures.casementWindow().components());
 		assertTrue(steps.contains("panel"));
 		assertTrue(steps.contains("glazing"));
 	}

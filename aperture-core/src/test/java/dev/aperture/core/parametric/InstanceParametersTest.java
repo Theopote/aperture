@@ -1,6 +1,7 @@
 package dev.aperture.core.parametric;
 
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
+import dev.aperture.core.catalog.OpeningTestFixtures;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.instance.OpeningState;
@@ -53,7 +54,7 @@ class InstanceParametersTest {
 
 	@Test
 	void forGenerationAppliesOpenRatioToMaxAngle() {
-		OpeningTypeDefinition definition = BuiltinOpeningTypes.casementWindow();
+		OpeningTypeDefinition definition = OpeningTestFixtures.casementWindow();
 		OpeningInstance halfOpen = OpeningInstance.builder(definition.id())
 			.state(new OpeningState(0.5))
 			.build();
@@ -65,7 +66,7 @@ class InstanceParametersTest {
 
 	@Test
 	void forGenerationPreservesExplicitOpenAngleOverride() {
-		OpeningTypeDefinition definition = BuiltinOpeningTypes.casementWindow();
+		OpeningTypeDefinition definition = OpeningTestFixtures.casementWindow();
 		OpeningInstance preview = OpeningInstance.builder(definition.id())
 			.parameters(ParameterSet.of("open_angle", ParameterValue.angle(30.0)))
 			.state(new OpeningState(1.0))
