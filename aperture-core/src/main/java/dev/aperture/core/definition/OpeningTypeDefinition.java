@@ -45,9 +45,8 @@ public record OpeningTypeDefinition(
 	}
 
 	/**
-	 * @deprecated Use {@link #parametricSchema()}.
+	 * @deprecated Use {@link #parametricSchema()} and {@link #resolveParameters(ParameterSet)}.
 	 */
-	@Deprecated
 	@Deprecated
 	public Map<String, ParameterDefinition> parameters() {
 		return parametricSchema.toLegacyMap();

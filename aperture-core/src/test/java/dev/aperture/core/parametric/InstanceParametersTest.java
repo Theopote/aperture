@@ -3,6 +3,7 @@ package dev.aperture.core.parametric;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.instance.OpeningInstance;
+import dev.aperture.core.instance.OpeningState;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.parameter.ParameterValue;
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,31 @@ class InstanceParametersTest {
 
 		assertEquals(1, updated.parameters().asMap().size());
 		assertEquals(800.0, InstanceParameters.resolve(definition, updated).requireLength("width"));
+	}
+
+	@Test
+	void forGenerationAppliesOpenRatioToMaxAngle() {
+		OpeningTypeDefinition definition = BuiltinOpeningTypes.casementWindow();
+		OpeningInstance halfOpen = OpeningInstance.builder(definition.id())
+			.state(new OpeningState(0.5))
+			.build();
+
+		ParameterSet generated = InstanceParameters.forGeneration(definition, halfOpen);
+
+		assertEquals(45.0, generated.angleOrDefault("open_angle", 0.0), 0.001);
+	}
+
+	@Test
+	void forGenerationPreservesExplicitOpenAngleOverride() {
+		OpeningTypeDefinition definition = BuiltinOpeningTypes.casementWindow();
+		OpeningInstance preview = OpeningInstance.builder(definition.id())
+			.parameters(ParameterSet.of("open_angle", ParameterValue.angle(30.0)))
+			.state(new OpeningState(1.0))
+			.build();
+
+		ParameterSet generated = InstanceParameters.forGeneration(definition, preview);
+
+		assertEquals(30.0, generated.angleOrDefault("open_angle", 0.0), 0.001);
 	}
 
 	@Test
