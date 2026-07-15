@@ -16,6 +16,7 @@ loom {
 		"aperture" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
+			sourceSet("main", ":aperture-fabric")
 		}
 	}
 }
@@ -26,6 +27,7 @@ dependencies {
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	implementation project(':aperture-runtime')
+	implementation project(path: ':aperture-fabric', configuration: 'namedElements')
 	clientImplementation project(':aperture-editor')
 	clientImplementation project(':aperture-render')
 }
@@ -67,6 +69,10 @@ jar {
 }
 
 subprojects {
+	if (project.name == 'aperture-fabric') {
+		return
+	}
+
 	apply plugin: 'java-library'
 	apply plugin: 'maven-publish'
 
