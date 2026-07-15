@@ -5,16 +5,15 @@ import dev.aperture.math.Transform3d;
 import dev.aperture.math.Vec3d;
 import dev.aperture.opening.geometry.kinematic.PanelKinematics;
 import dev.aperture.geometry.model.GeometryLayer;
-import dev.aperture.geometry.model.GeometrySolid;
-import dev.aperture.geometry.ops.ExtrudeOp;
+import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
+import dev.aperture.geometry.recipe.shape.ShapeRecipe;
+import dev.aperture.geometry.recipe.shape.ShapeRecipes;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.geometry.pipeline.OpeningParameters;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 import dev.aperture.opening.geometry.pipeline.PipelineStep;
-import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 import dev.aperture.opening.geometry.pipeline.frame.FrameRailBuilder;
 import dev.aperture.geometry.profile.ProfileCurve;
-import dev.aperture.geometry.shape.SolidShape;
 
 import java.util.List;
 
@@ -69,20 +68,20 @@ public final class PanelGenerator implements PipelineStep {
 		double panelWidth = cell.width();
 		double panelHeight = cell.height();
 
-		target.addSolid(extrudedRail(prefix + ".bottom", sashProfile, panelTransform,
+		emitExtrudedRail(target, prefix + ".bottom", sashProfile, panelTransform,
 			new Vec3d(originX, originY, 0),
-			new Vec3d(originX + panelWidth, originY, 0)));
-		target.addSolid(extrudedRail(prefix + ".top", sashProfile, panelTransform,
+			new Vec3d(originX + panelWidth, originY, 0));
+		emitExtrudedRail(target, prefix + ".top", sashProfile, panelTransform,
 			new Vec3d(originX, originY + panelHeight - layout.sashFace(), 0),
-			new Vec3d(originX + panelWidth, originY + panelHeight - layout.sashFace(), 0)));
-		target.addSolid(extrudedRail(prefix + ".left", sashProfile, panelTransform,
+			new Vec3d(originX + panelWidth, originY + panelHeight - layout.sashFace(), 0));
+		emitExtrudedRail(target, prefix + ".left", sashProfile, panelTransform,
 			new Vec3d(originX, originY + layout.sashFace(), 0),
 			new Vec3d(originX, originY + panelHeight - layout.sashFace(), 0),
-			FrameRailBuilder.axisX(), FrameRailBuilder.axisZ()));
-		target.addSolid(extrudedRail(prefix + ".right", sashProfile, panelTransform,
+			FrameRailBuilder.axisX(), FrameRailBuilder.axisZ());
+		emitExtrudedRail(target, prefix + ".right", sashProfile, panelTransform,
 			new Vec3d(originX + panelWidth - layout.sashFace(), originY + layout.sashFace(), 0),
 			new Vec3d(originX + panelWidth - layout.sashFace(), originY + panelHeight - layout.sashFace(), 0),
-			FrameRailBuilder.axisX(), FrameRailBuilder.axisZ()));
+			FrameRailBuilder.axisX(), FrameRailBuilder.axisZ());
 
 		double innerWidth = panelWidth - layout.sashFace() * 2;
 		if (innerWidth <= 0) {
@@ -91,41 +90,43 @@ public final class PanelGenerator implements PipelineStep {
 
 		if (cell.glassHeight() > 0) {
 			double glassHeight = Math.min(cell.glassHeight(), panelHeight - layout.sashFace() * 2);
-			target.addSolid(GeometrySolid.of(
+			target.emitSolid(
 				prefix + ".glazing",
 				"glazing",
 				GeometryLayer.TRANSLUCENT,
-				new dev.aperture.geometry.shape.BoxShape(new BoundingBox(
+				ShapeRecipes.box(new BoundingBox(
 					new Vec3d(originX + layout.sashFace(), cell.glassBottomY(), 0),
 					new Vec3d(originX + layout.sashFace() + innerWidth, cell.glassBottomY() + glassHeight, PANEL_GLAZING_DEPTH)
 				)),
 				panelTransform
-			));
+			);
 		}
 
 		if (cell.solidHeight() > layout.sashFace()) {
 			double infillHeight = cell.solidHeight() - layout.sashFace();
-			target.addSolid(GeometrySolid.of(
+			target.emitSolid(
 				prefix + ".infill",
 				"frame",
 				GeometryLayer.OPAQUE,
-				new dev.aperture.geometry.shape.BoxShape(new BoundingBox(
+				ShapeRecipes.box(new BoundingBox(
 					new Vec3d(originX + layout.sashFace(), originY + layout.sashFace(), 0),
 					new Vec3d(originX + layout.sashFace() + innerWidth, originY + layout.sashFace() + infillHeight, layout.frameDepth() * 0.6)
 				)),
 				panelTransform
-			));
+			);
 		}
 	}
 
-	private static GeometrySolid extrudedRail(
+	private static void emitExtrudedRail(
+		GeometryCompilationTarget target,
 		String componentPath,
 		ProfileCurve profile,
 		Transform3d transform,
 		Vec3d pathStart,
 		Vec3d pathEnd
 	) {
-		return extrudedRail(
+		emitExtrudedRail(
+			target,
 			componentPath,
 			profile,
 			transform,
@@ -136,7 +137,8 @@ public final class PanelGenerator implements PipelineStep {
 		);
 	}
 
-	private static GeometrySolid extrudedRail(
+	private static void emitExtrudedRail(
+		GeometryCompilationTarget target,
 		String componentPath,
 		ProfileCurve profile,
 		Transform3d transform,
@@ -145,7 +147,7 @@ public final class PanelGenerator implements PipelineStep {
 		Vec3d profileU,
 		Vec3d profileV
 	) {
-		SolidShape shape = ExtrudeOp.linear(profile, pathStart, pathEnd, profileU, profileV);
-		return GeometrySolid.of(componentPath, "frame", GeometryLayer.OPAQUE, shape, transform);
+		ShapeRecipe shape = ShapeRecipes.extrudeLinear(profile, pathStart, pathEnd, profileU, profileV);
+		target.emitSolid(componentPath, "frame", GeometryLayer.OPAQUE, shape, transform);
 	}
 }

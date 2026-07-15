@@ -13,6 +13,7 @@ package dev.aperture.geometry.kernel;
  *   <li>{@link dev.aperture.geometry.ops.BooleanOp} — CSG union / subtract</li>
  *   <li>{@link dev.aperture.geometry.mesh.ShapeMesher} — solid → triangle mesh</li>
  *   <li>{@link dev.aperture.geometry.recipe.GeometryRecipe} — declarative op IR for kernel evaluation</li>
+ *   <li>{@link dev.aperture.geometry.export.GeometryExport} — recipe JSON + glTF export</li>
  *   <li>{@link ProfileExtruder} — profile rail extrusion helper</li>
  * </ul>
  */

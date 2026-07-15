@@ -51,7 +51,7 @@ public final class ComponentPipelinePlanner {
 	private ComponentPipelinePlanner() {
 	}
 
-	public static OpeningPipeline pipelineFor(ComponentAssembly target) {
+	public static OpeningPipeline pipelineFor(ComponentAssembly assembly) {
 		List<PipelineStep> steps = new ArrayList<>();
 		steps.add(new ProfileGenerator());
 		for (ComponentKind kind : STEP_ORDER) {
@@ -65,7 +65,7 @@ public final class ComponentPipelinePlanner {
 		return new OpeningPipeline(steps, new MeshAssembler());
 	}
 
-	public static List<String> plannedStepIds(ComponentAssembly target) {
+	public static List<String> plannedStepIds(ComponentAssembly assembly) {
 		return pipelineFor(assembly).stepIds();
 	}
 }

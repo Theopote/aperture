@@ -3,12 +3,12 @@ package dev.aperture.opening.geometry.pipeline.glass;
 import dev.aperture.math.BoundingBox;
 import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.model.GeometryLayer;
-import dev.aperture.geometry.model.GeometrySolid;
+import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
+import dev.aperture.geometry.recipe.shape.ShapeRecipes;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.geometry.pipeline.OpeningParameters;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 import dev.aperture.opening.geometry.pipeline.PipelineStep;
-import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 
 /**
  * Generates fixed glazing when no operable panel is present.
@@ -39,15 +39,15 @@ public final class GlassGenerator implements PipelineStep {
 			return;
 		}
 
-		target.addSolid(GeometrySolid.box(
+		target.emitSolid(
 			"glazing",
 			"glazing",
 			GeometryLayer.TRANSLUCENT,
-			new BoundingBox(
+			ShapeRecipes.box(new BoundingBox(
 				new Vec3d(layout.frameFace(), layout.frameFace(), 0),
 				new Vec3d(layout.frameFace() + layout.innerWidth(), layout.frameFace() + layout.innerHeight(), GLAZING_DEPTH)
-			)
-		));
+			))
+		);
 	}
 
 	private static void emitGridGlazing(
@@ -66,15 +66,15 @@ public final class GlassGenerator implements PipelineStep {
 				if (maxX <= minX || maxY <= minY) {
 					continue;
 				}
-				target.addSolid(GeometrySolid.box(
+				target.emitSolid(
 					"glazing." + row + "." + col,
 					"glazing",
 					GeometryLayer.TRANSLUCENT,
-					new BoundingBox(
+					ShapeRecipes.box(new BoundingBox(
 						new Vec3d(minX, minY, 0),
 						new Vec3d(maxX, maxY, GLAZING_DEPTH)
-					)
-				));
+					))
+				);
 			}
 		}
 	}
