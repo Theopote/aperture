@@ -3,6 +3,7 @@ package dev.aperture.opening.geometry.pipeline;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
+import dev.aperture.opening.test.OpeningTestFixtures;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.parameter.ParameterValue;
 import dev.aperture.geometry.export.GeometryExport;

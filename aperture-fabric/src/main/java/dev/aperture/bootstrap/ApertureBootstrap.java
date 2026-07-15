@@ -81,7 +81,18 @@ public final class ApertureBootstrap {
 		openingTypes.register(catalogLoader.loadClasspathResource("aperture/opening_types/fixed_window.json"));
 		openingTypes.register(catalogLoader.loadClasspathResource("aperture/opening_types/door.json"));
 		openingTypes.register(catalogLoader.loadClasspathResource("aperture/opening_types/curtain_wall.json"));
+		enforceReferenceTypeFreeze();
 		LOGGER.info("Loaded {} opening types from data pack", openingTypes.all().size());
+	}
+
+	private void enforceReferenceTypeFreeze() {
+		for (OpeningTypeDefinition definition : openingTypes.all()) {
+			if (!BuiltinOpeningTypes.isReferenceType(definition.id())) {
+				throw new IllegalStateException(
+					"Family library freeze: unexpected opening type in catalog: " + definition.id()
+				);
+			}
+		}
 	}
 
 	private void loadProfileCatalog() {

@@ -1,5 +1,6 @@
 package dev.aperture.core.catalog;
 
+import dev.aperture.core.definition.OpeningTypeDefinition;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
