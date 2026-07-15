@@ -20,16 +20,27 @@ public final class PanelKinematics {
 		double height,
 		double openAngleDegrees
 	) {
+		Vec3d axisOrigin = switch (hinge.toLowerCase()) {
+			case "left" -> new Vec3d(frameFace, 0, 0);
+			case "right" -> new Vec3d(width - frameFace, 0, 0);
+			case "top" -> new Vec3d(0, height - frameFace, 0);
+			case "bottom" -> new Vec3d(0, frameFace, 0);
+			default -> throw new IllegalArgumentException("Unknown panel hinge: " + hinge);
+		};
+		return solveAtHinge(hinge, axisOrigin, openAngleDegrees);
+	}
+
+	public static Transform3d solveAtHinge(String hinge, Vec3d axisOrigin, double openAngleDegrees) {
 		double radians = Math.toRadians(openAngleDegrees);
 		if (Math.abs(radians) < 1.0e-9) {
 			return Transform3d.identity();
 		}
 
 		return switch (hinge.toLowerCase()) {
-			case "left" -> Transform3d.rotateAboutAxis(new Vec3d(frameFace, 0, 0), AXIS_Y, -radians);
-			case "right" -> Transform3d.rotateAboutAxis(new Vec3d(width - frameFace, 0, 0), AXIS_Y, radians);
-			case "top" -> Transform3d.rotateAboutAxis(new Vec3d(0, height - frameFace, 0), AXIS_X, radians);
-			case "bottom" -> Transform3d.rotateAboutAxis(new Vec3d(0, frameFace, 0), AXIS_X, -radians);
+			case "left" -> Transform3d.rotateAboutAxis(axisOrigin, AXIS_Y, -radians);
+			case "right" -> Transform3d.rotateAboutAxis(axisOrigin, AXIS_Y, radians);
+			case "top" -> Transform3d.rotateAboutAxis(axisOrigin, AXIS_X, radians);
+			case "bottom" -> Transform3d.rotateAboutAxis(axisOrigin, AXIS_X, -radians);
 			default -> throw new IllegalArgumentException("Unknown panel hinge: " + hinge);
 		};
 	}

@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "id": "aperture:curtain_wall",
+  "category": "curtain_wall",
+  "generator": "aperture:rectangular_window_v1",
+  "parameters": {
+    "width": {
+      "kind": "range",
+      "type": "length",
+      "label": "Width",
+      "group": "Dimensions",
+      "default": 3600,
+      "min": 600,
+      "max": 12000,
+      "step": 50
+    },
+    "height": {
+      "kind": "range",
+      "type": "length",
+      "label": "Height",
+      "group": "Dimensions",
+      "default": 3000,
+      "min": 600,
+      "max": 6000,
+      "step": 50
+    },
+    "cols": {
+      "kind": "range",
+      "type": "count",
+      "label": "Columns",
+      "group": "Grid",
+      "default": 4,
+      "min": 1,
+      "max": 12
+    },
+    "rows": {
+      "kind": "range",
+      "type": "count",
+      "label": "Rows",
+      "group": "Grid",
+      "default": 3,
+      "min": 1,
+      "max": 20
+    },
+    "frame_width": {
+      "kind": "range",
+      "type": "length",
+      "label": "Frame Width",
+      "group": "Frame",
+      "default": 50,
+      "min": 20,
+      "max": 120
+    },
+    "frame_depth": {
+      "kind": "range",
+      "type": "length",
+      "label": "Frame Depth",
+      "group": "Frame",
+      "default": 80,
+      "min": 30,
+      "max": 200
+    }
+  },
+  "constraints": [
+    {
+      "expr": "width > height * 0.2",
+      "message": "Curtain wall span must exceed 20% of the height"
+    },
+    {
+      "expr": "cols >= 1 and rows >= 1",
+      "message": "Grid must contain at least one cell"
+    }
+  ],
+  "materialSlots": ["frame", "glazing"],
+  "components": [
+    { "kind": "frame", "id": "grid_frame", "profile": "aperture:frame_l_50x80" },
+    { "kind": "divider", "id": "vertical_mullions", "source": "parameter:cols" },
+    { "kind": "divider", "id": "horizontal_mullions", "source": "parameter:rows" },
+    { "kind": "glass", "id": "unit_glazing", "system": "aperture:single_glazed" },
+    { "kind": "header", "id": "head", "profile": "aperture:frame_l_50x80" },
+    { "kind": "sill", "id": "sill", "profile": "aperture:frame_l_50x80" }
+  ]
+}

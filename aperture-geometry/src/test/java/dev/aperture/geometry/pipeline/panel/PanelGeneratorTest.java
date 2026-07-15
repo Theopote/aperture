@@ -43,4 +43,26 @@ class PanelGeneratorTest {
 		assertTrue(openPanel.bounds().max().z() > closedPanel.bounds().max().z());
 		assertTrue(openPanel.localTransform().hasRotation());
 	}
+
+	@Test
+	void doorPanelCountCreatesMultipleLeaves() {
+		var result = GenerationTestSupport.generateDoorPipeline(ParameterSet.builder()
+			.put("panel_count", ParameterValue.count(2))
+			.put("glass_ratio", ParameterValue.number(0.35))
+			.build());
+
+		assertTrue(result.meshes().partsByPath().containsKey("panel.0.bottom"));
+		assertTrue(result.meshes().partsByPath().containsKey("panel.1.bottom"));
+	}
+
+	@Test
+	void doorGlassRatioCreatesInfillAndUpperGlazing() {
+		var result = GenerationTestSupport.generateDoorPipeline(ParameterSet.builder()
+			.put("panel_count", ParameterValue.count(1))
+			.put("glass_ratio", ParameterValue.number(0.35))
+			.build());
+
+		assertTrue(result.meshes().partsByPath().containsKey("panel.glazing"));
+		assertTrue(result.meshes().partsByPath().containsKey("panel.infill"));
+	}
 }

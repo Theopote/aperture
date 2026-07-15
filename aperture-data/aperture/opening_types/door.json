@@ -96,7 +96,7 @@
       "message": "Glass ratio must stay between 0 and 1"
     }
   ],
-  "materialSlots": ["frame", "glazing"],
+  "materialSlots": ["frame", "glazing", "hardware"],
   "components": [
     { "kind": "frame", "id": "door_frame", "profile": "aperture:frame_standard_50" },
     { "kind": "panel", "id": "door_leaf", "profile": "aperture:frame_standard_50", "hinge": "left" },

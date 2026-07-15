@@ -16,8 +16,10 @@ import dev.aperture.geometry.pipeline.frame.FrameRailBuilder;
 import dev.aperture.geometry.profile.ProfileCurve;
 import dev.aperture.geometry.shape.SolidShape;
 
+import java.util.List;
+
 /**
- * Generates operable panel sash geometry with hinge kinematics.
+ * Generates operable panel sash geometry with multi-panel layout and glass ratio support.
  */
 public final class PanelGenerator implements PipelineStep {
 	public static final String STEP_ID = "panel";
@@ -37,47 +39,79 @@ public final class PanelGenerator implements PipelineStep {
 
 		OpeningLayout layout = context.layout();
 		ProfileCurve sashProfile = context.resolvedProfiles().panelProfile().orElseThrow().curve();
-		double panelWidth = layout.innerWidth();
-		double panelHeight = layout.innerHeight();
-		if (panelWidth <= 0 || panelHeight <= 0) {
+		List<PanelCellLayout> cells = PanelLayoutPlanner.plan(parameters, layout);
+		for (PanelCellLayout cell : cells) {
+			emitPanelCell(assembly, sashProfile, layout, cell);
+		}
+	}
+
+	private static void emitPanelCell(
+		GeometryAssemblyBuilder assembly,
+		ProfileCurve sashProfile,
+		OpeningLayout layout,
+		PanelCellLayout cell
+	) {
+		if (cell.width() <= 0 || cell.height() <= 0) {
 			return;
 		}
 
-		Transform3d panelTransform = PanelKinematics.solve(
-			parameters.panelHinge(),
-			layout.frameFace(),
-			layout.width(),
-			layout.height(),
-			parameters.openAngleDegrees()
-		);
-		double originX = layout.frameFace();
-		double originY = layout.frameFace();
+		Transform3d panelTransform = cell.operable()
+			? PanelKinematics.solveAtHinge(
+				cell.hingeSide(),
+				new Vec3d(cell.hingeX(), cell.originY(), 0),
+				cell.openAngleDegrees()
+			)
+			: Transform3d.identity();
 
-		assembly.addSolid(extrudedRail("panel.bottom", sashProfile, panelTransform,
+		String prefix = cell.pathPrefix();
+		double originX = cell.originX();
+		double originY = cell.originY();
+		double panelWidth = cell.width();
+		double panelHeight = cell.height();
+
+		assembly.addSolid(extrudedRail(prefix + ".bottom", sashProfile, panelTransform,
 			new Vec3d(originX, originY, 0),
 			new Vec3d(originX + panelWidth, originY, 0)));
-		assembly.addSolid(extrudedRail("panel.top", sashProfile, panelTransform,
+		assembly.addSolid(extrudedRail(prefix + ".top", sashProfile, panelTransform,
 			new Vec3d(originX, originY + panelHeight - layout.sashFace(), 0),
 			new Vec3d(originX + panelWidth, originY + panelHeight - layout.sashFace(), 0)));
-		assembly.addSolid(extrudedRail("panel.left", sashProfile, panelTransform,
+		assembly.addSolid(extrudedRail(prefix + ".left", sashProfile, panelTransform,
 			new Vec3d(originX, originY + layout.sashFace(), 0),
 			new Vec3d(originX, originY + panelHeight - layout.sashFace(), 0),
 			FrameRailBuilder.axisX(), FrameRailBuilder.axisZ()));
-		assembly.addSolid(extrudedRail("panel.right", sashProfile, panelTransform,
+		assembly.addSolid(extrudedRail(prefix + ".right", sashProfile, panelTransform,
 			new Vec3d(originX + panelWidth - layout.sashFace(), originY + layout.sashFace(), 0),
 			new Vec3d(originX + panelWidth - layout.sashFace(), originY + panelHeight - layout.sashFace(), 0),
 			FrameRailBuilder.axisX(), FrameRailBuilder.axisZ()));
 
 		double innerWidth = panelWidth - layout.sashFace() * 2;
-		double innerHeight = panelHeight - layout.sashFace() * 2;
-		if (innerWidth > 0 && innerHeight > 0) {
+		if (innerWidth <= 0) {
+			return;
+		}
+
+		if (cell.glassHeight() > 0) {
+			double glassHeight = Math.min(cell.glassHeight(), panelHeight - layout.sashFace() * 2);
 			assembly.addSolid(GeometrySolid.of(
-				"panel.glazing",
+				prefix + ".glazing",
 				"glazing",
 				GeometryLayer.TRANSLUCENT_GLASS,
 				new dev.aperture.geometry.shape.BoxShape(new BoundingBox(
+					new Vec3d(originX + layout.sashFace(), cell.glassBottomY(), 0),
+					new Vec3d(originX + layout.sashFace() + innerWidth, cell.glassBottomY() + glassHeight, PANEL_GLAZING_DEPTH)
+				)),
+				panelTransform
+			));
+		}
+
+		if (cell.solidHeight() > layout.sashFace()) {
+			double infillHeight = cell.solidHeight() - layout.sashFace();
+			assembly.addSolid(GeometrySolid.of(
+				prefix + ".infill",
+				"frame",
+				GeometryLayer.OPAQUE_FRAME,
+				new dev.aperture.geometry.shape.BoxShape(new BoundingBox(
 					new Vec3d(originX + layout.sashFace(), originY + layout.sashFace(), 0),
-					new Vec3d(originX + layout.sashFace() + innerWidth, originY + layout.sashFace() + innerHeight, PANEL_GLAZING_DEPTH)
+					new Vec3d(originX + layout.sashFace() + innerWidth, originY + layout.sashFace() + infillHeight, layout.frameDepth() * 0.6)
 				)),
 				panelTransform
 			));

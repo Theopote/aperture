@@ -34,6 +34,11 @@ public final class GlassGenerator implements PipelineStep {
 			return;
 		}
 
+		if (parameters.cols() > 1 || parameters.rows() > 1) {
+			emitGridGlazing(assembly, layout, parameters);
+			return;
+		}
+
 		assembly.addSolid(GeometrySolid.box(
 			"glazing",
 			"glazing",
@@ -43,5 +48,34 @@ public final class GlassGenerator implements PipelineStep {
 				new Vec3d(layout.frameFace() + layout.innerWidth(), layout.frameFace() + layout.innerHeight(), GLAZING_DEPTH)
 			)
 		));
+	}
+
+	private static void emitGridGlazing(
+		GeometryAssemblyBuilder assembly,
+		OpeningLayout layout,
+		OpeningParameters parameters
+	) {
+		double cellWidth = layout.innerWidth() / parameters.cols();
+		double cellHeight = layout.innerHeight() / parameters.rows();
+		for (int row = 0; row < parameters.rows(); row++) {
+			for (int col = 0; col < parameters.cols(); col++) {
+				double minX = layout.frameFace() + col * cellWidth + layout.frameFace() * 0.25;
+				double maxX = layout.frameFace() + (col + 1) * cellWidth - layout.frameFace() * 0.25;
+				double minY = layout.frameFace() + row * cellHeight + layout.frameFace() * 0.25;
+				double maxY = layout.frameFace() + (row + 1) * cellHeight - layout.frameFace() * 0.25;
+				if (maxX <= minX || maxY <= minY) {
+					continue;
+				}
+				assembly.addSolid(GeometrySolid.box(
+					"glazing." + row + "." + col,
+					"glazing",
+					GeometryLayer.TRANSLUCENT_GLASS,
+					new BoundingBox(
+						new Vec3d(minX, minY, 0),
+						new Vec3d(maxX, maxY, GLAZING_DEPTH)
+					)
+				));
+			}
+		}
 	}
 }

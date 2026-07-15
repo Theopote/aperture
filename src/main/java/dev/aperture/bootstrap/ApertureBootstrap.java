@@ -70,6 +70,7 @@ public final class ApertureBootstrap {
 	private void loadOpeningTypes() {
 		openingTypes.register(catalogLoader.loadClasspathResource("aperture/opening_types/fixed_window.json"));
 		openingTypes.register(catalogLoader.loadClasspathResource("aperture/opening_types/door.json"));
+		openingTypes.register(catalogLoader.loadClasspathResource("aperture/opening_types/curtain_wall.json"));
 		LOGGER.info("Loaded {} opening types from data pack", openingTypes.all().size());
 	}
 

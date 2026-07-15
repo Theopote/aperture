@@ -21,6 +21,7 @@ import java.util.List;
 public final class BuiltinOpeningTypes {
 	public static final OpeningId FIXED_WINDOW_ID = OpeningId.aperture("fixed_window");
 	public static final OpeningId DOOR_ID = OpeningId.aperture("door");
+	public static final OpeningId CURTAIN_WALL_ID = OpeningId.aperture("curtain_wall");
 	public static final GeneratorId RECTANGULAR_WINDOW_GENERATOR = GeneratorId.parse("aperture:rectangular_window_v1");
 
 	public static OpeningTypeDefinition fixedWindow() {
@@ -163,11 +164,63 @@ public final class BuiltinOpeningTypes {
 			.constraint("glass_ratio >= 0 and glass_ratio <= 1", "Glass ratio must stay between 0 and 1")
 			.materialSlot("frame")
 			.materialSlot("glazing")
+			.materialSlot("hardware")
 			.components(ComponentAssemblyPresets.door(
 				"aperture:frame_standard_50",
 				"aperture:frame_standard_50",
 				"aperture:single_glazed",
 				"left"
+			))
+			.build();
+	}
+
+	public static OpeningTypeDefinition curtainWall() {
+		return OpeningTypeDefinition.builder(CURTAIN_WALL_ID, OpeningCategory.CURTAIN_WALL, RECTANGULAR_WINDOW_GENERATOR)
+			.parameter("width", RangeParameter.builder(NumberUnit.LENGTH_MM)
+				.defaultNumber(3600)
+				.min(600)
+				.max(12000)
+				.step(50)
+				.metadata(ParameterMetadata.grouped("Width", "Dimensions"))
+				.build())
+			.parameter("height", RangeParameter.builder(NumberUnit.LENGTH_MM)
+				.defaultNumber(3000)
+				.min(600)
+				.max(6000)
+				.step(50)
+				.metadata(ParameterMetadata.grouped("Height", "Dimensions"))
+				.build())
+			.parameter("cols", RangeParameter.builder(NumberUnit.COUNT)
+				.defaultNumber(4)
+				.min(1)
+				.max(12)
+				.metadata(ParameterMetadata.grouped("Columns", "Grid"))
+				.build())
+			.parameter("rows", RangeParameter.builder(NumberUnit.COUNT)
+				.defaultNumber(3)
+				.min(1)
+				.max(20)
+				.metadata(ParameterMetadata.grouped("Rows", "Grid"))
+				.build())
+			.parameter("frame_width", RangeParameter.builder(NumberUnit.LENGTH_MM)
+				.defaultNumber(50)
+				.min(20)
+				.max(120)
+				.metadata(ParameterMetadata.grouped("Frame Width", "Frame"))
+				.build())
+			.parameter("frame_depth", RangeParameter.builder(NumberUnit.LENGTH_MM)
+				.defaultNumber(80)
+				.min(30)
+				.max(200)
+				.metadata(ParameterMetadata.grouped("Frame Depth", "Frame"))
+				.build())
+			.constraint("width > height * 0.2", "Curtain wall span must exceed 20% of the height")
+			.constraint("cols >= 1 and rows >= 1", "Grid must contain at least one cell")
+			.materialSlot("frame")
+			.materialSlot("glazing")
+			.components(ComponentAssemblyPresets.curtainWall(
+				"aperture:frame_l_50x80",
+				"aperture:single_glazed"
 			))
 			.build();
 	}
