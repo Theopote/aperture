@@ -5,7 +5,7 @@ import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.geometry.model.GeometrySolid;
-import dev.aperture.api.generator.OpeningGenerator;
+import dev.aperture.geometry.generator.OpeningGenerator;
 
 import java.util.ArrayList;
 import java.util.List;

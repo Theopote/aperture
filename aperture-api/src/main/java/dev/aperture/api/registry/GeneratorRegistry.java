@@ -1,6 +1,6 @@
 package dev.aperture.api.registry;
 
-import dev.aperture.api.generator.OpeningGenerator;
+import dev.aperture.geometry.generator.OpeningGenerator;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.opening.GeneratorId;
 import dev.aperture.core.parameter.ParameterSet;
