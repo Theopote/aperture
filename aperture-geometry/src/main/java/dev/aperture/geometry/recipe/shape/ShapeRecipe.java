@@ -15,5 +15,6 @@ public sealed interface ShapeRecipe permits
 	BoxRecipe,
 	ExtrudeLinearRecipe,
 	SubtractBoxesRecipe,
+	UnionRecipe,
 	SolidShapeRecipe {
 }

@@ -16,6 +16,7 @@ import dev.aperture.geometry.recipe.shape.ShapeRecipe;
 import dev.aperture.geometry.recipe.shape.ShapeRecipeConverter;
 import dev.aperture.geometry.recipe.shape.SolidShapeRecipe;
 import dev.aperture.geometry.recipe.shape.SubtractBoxesRecipe;
+import dev.aperture.geometry.recipe.shape.UnionRecipe;
 import dev.aperture.math.BoundingBox;
 import dev.aperture.math.Facing;
 import dev.aperture.math.Transform3d;
@@ -138,6 +139,16 @@ public final class GeometryRecipeCodec {
 				json.add("subtractBoxes", boxes);
 				yield json;
 			}
+			case UnionRecipe union -> {
+				JsonObject json = new JsonObject();
+				json.addProperty("type", "union");
+				JsonArray operands = new JsonArray();
+				for (ShapeRecipe operand : union.operands()) {
+					operands.add(writeShape(operand));
+				}
+				json.add("operands", operands);
+				yield json;
+			}
 			case SolidShapeRecipe ignored -> throw new IllegalArgumentException("cannot serialize opaque SolidShapeRecipe");
 		};
 	}
@@ -159,6 +170,13 @@ public final class GeometryRecipeCodec {
 					boxes.add(readBounds(element.getAsJsonObject()));
 				}
 				yield new SubtractBoxesRecipe(base, boxes);
+			}
+			case "union" -> {
+				List<ShapeRecipe> operands = new ArrayList<>();
+				for (JsonElement element : json.getAsJsonArray("operands")) {
+					operands.add(readShape(element.getAsJsonObject()));
+				}
+				yield new UnionRecipe(operands);
 			}
 			default -> throw new IllegalArgumentException("unknown shape type: " + json.get("type").getAsString());
 		};

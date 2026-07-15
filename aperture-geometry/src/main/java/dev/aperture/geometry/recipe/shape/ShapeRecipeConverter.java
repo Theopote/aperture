@@ -27,7 +27,9 @@ public final class ShapeRecipeConverter {
 				extrusion.profileV()
 			);
 			case SubtractShape(var base, var tool) -> convertSubtract(base, tool);
-			case UnionShape(var operands) -> new SolidShapeRecipe(shape);
+			case UnionShape(var operands) -> new UnionRecipe(
+				operands.stream().map(ShapeRecipeConverter::fromSolid).toList()
+			);
 		};
 	}
 

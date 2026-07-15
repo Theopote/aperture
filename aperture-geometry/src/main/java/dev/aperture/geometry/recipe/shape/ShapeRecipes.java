@@ -40,6 +40,14 @@ public final class ShapeRecipes {
 		return new SubtractBoxesRecipe(base, List.of(subtractBoxes));
 	}
 
+	public static ShapeRecipe union(List<ShapeRecipe> operands) {
+		return new UnionRecipe(operands);
+	}
+
+	public static ShapeRecipe union(ShapeRecipe... operands) {
+		return new UnionRecipe(List.of(operands));
+	}
+
 	public static ShapeRecipe fromSolid(SolidShape shape) {
 		return new SolidShapeRecipe(shape);
 	}

@@ -7,6 +7,7 @@ import dev.aperture.geometry.recipe.shape.ExtrudeLinearRecipe;
 import dev.aperture.geometry.recipe.shape.ShapeRecipe;
 import dev.aperture.geometry.recipe.shape.SolidShapeRecipe;
 import dev.aperture.geometry.recipe.shape.SubtractBoxesRecipe;
+import dev.aperture.geometry.recipe.shape.UnionRecipe;
 import dev.aperture.geometry.shape.BoxShape;
 import dev.aperture.geometry.shape.SolidShape;
 import dev.aperture.math.BoundingBox;
@@ -25,6 +26,7 @@ public final class ShapeRecipeEvaluator {
 				ExtrudeOp.linear(profile, pathStart, pathEnd, profileU, profileV);
 			case SubtractBoxesRecipe(var base, var subtractBoxes) ->
 				BooleanOp.subtractBoxes(evaluate(base), subtractBoxes.toArray(BoundingBox[]::new));
+			case UnionRecipe(var operands) -> BooleanOp.unionAll(operands.stream().map(ShapeRecipeEvaluator::evaluate).toList());
 			case SolidShapeRecipe(var shape) -> shape;
 		};
 	}

@@ -45,6 +45,62 @@ public final class FrameRailBuilder {
 		);
 	}
 
+	/**
+	 * Merges the four outer frame rails into one {@link UnionRecipe} for single-mesh export or NodeCraft graphs.
+	 */
+	public static ShapeRecipe unionFrameShape(
+		ProfileCurve profile,
+		dev.aperture.opening.geometry.pipeline.OpeningLayout layout
+	) {
+		return dev.aperture.geometry.recipe.shape.ShapeRecipes.union(
+			miteredRailShape(
+				profile,
+				new Vec3d(0, 0, 0),
+				new Vec3d(layout.width(), 0, 0),
+				axisY(),
+				axisZ(),
+				corner(layout, Corner.BOTTOM_LEFT),
+				corner(layout, Corner.BOTTOM_RIGHT)
+			),
+			miteredRailShape(
+				profile,
+				new Vec3d(0, layout.height() - layout.frameFace(), 0),
+				new Vec3d(layout.width(), layout.height() - layout.frameFace(), 0),
+				axisY(),
+				axisZ(),
+				corner(layout, Corner.TOP_LEFT),
+				corner(layout, Corner.TOP_RIGHT)
+			),
+			miteredRailShape(
+				profile,
+				new Vec3d(0, layout.frameFace(), 0),
+				new Vec3d(0, layout.height() - layout.frameFace(), 0),
+				axisX(),
+				axisZ(),
+				corner(layout, Corner.BOTTOM_LEFT),
+				corner(layout, Corner.TOP_LEFT)
+			),
+			miteredRailShape(
+				profile,
+				new Vec3d(layout.width() - layout.frameFace(), layout.frameFace(), 0),
+				new Vec3d(layout.width() - layout.frameFace(), layout.height() - layout.frameFace(), 0),
+				axisX(),
+				axisZ(),
+				corner(layout, Corner.BOTTOM_RIGHT),
+				corner(layout, Corner.TOP_RIGHT)
+			)
+		);
+	}
+
+	public static void emitUnionFrame(
+		GeometryCompilationTarget target,
+		String componentPath,
+		ProfileCurve profile,
+		dev.aperture.opening.geometry.pipeline.OpeningLayout layout
+	) {
+		target.emitSolid(componentPath, "frame", GeometryLayer.OPAQUE, unionFrameShape(profile, layout));
+	}
+
 	public static BoundingBox corner(dev.aperture.opening.geometry.pipeline.OpeningLayout layout, Corner corner) {
 		return switch (corner) {
 			case BOTTOM_LEFT -> new BoundingBox(Vec3d.ZERO, new Vec3d(layout.frameFace(), layout.frameFace(), layout.frameDepth()));
