@@ -7,8 +7,8 @@ import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.opening.geometry.generator.RectangularWindowGenerator;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;
-import dev.aperture.render.data.PartId;
-import dev.aperture.render.material.MaterialBindingSet;
+import dev.aperture.geometry.model.PartId;
+import dev.aperture.geometry.material.MaterialBindingSet;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

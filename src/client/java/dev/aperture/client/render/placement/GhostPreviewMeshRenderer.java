@@ -5,7 +5,7 @@ import dev.aperture.client.render.FabricRenderBackend;
 import dev.aperture.math.Transform3d;
 import dev.aperture.math.Vec3d;
 import dev.aperture.fabric.placement.McUnits;
-import dev.aperture.render.material.MaterialBindingSet;
+import dev.aperture.geometry.material.MaterialBindingSet;
 import dev.aperture.render.mesh.MeshAsset;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.minecraft.client.Minecraft;

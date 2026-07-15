@@ -1,5 +1,7 @@
 package dev.aperture.render.data;
 
+import dev.aperture.geometry.model.PartId;
+
 import dev.aperture.geometry.model.GeometrySolid;
 import dev.aperture.render.mesh.MeshHandle;
 

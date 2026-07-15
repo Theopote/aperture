@@ -1,8 +1,8 @@
 package dev.aperture.client.render.material;
 
-import dev.aperture.render.material.BlendMode;
-import dev.aperture.render.material.MaterialBinding;
-import dev.aperture.render.material.MaterialInstance;
+import dev.aperture.core.material.BlendMode;
+import dev.aperture.geometry.material.MaterialBinding;
+import dev.aperture.core.material.MaterialInstance;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;

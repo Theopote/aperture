@@ -2,7 +2,7 @@ package dev.aperture.runtime.catalog;
 
 import dev.aperture.runtime.material.MaterialCatalogEntry;
 import dev.aperture.runtime.material.MaterialCatalogReader;
-import dev.aperture.render.material.MaterialDefinition;
+import dev.aperture.core.material.MaterialDefinition;
 
 import java.io.IOException;
 import java.io.InputStream;

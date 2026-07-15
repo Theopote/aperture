@@ -1,7 +1,7 @@
 package dev.aperture.render.mesh;
 
 import dev.aperture.math.BoundingBox;
-import dev.aperture.render.data.PartId;
+import dev.aperture.geometry.model.PartId;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;

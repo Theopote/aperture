@@ -1,5 +1,7 @@
 package dev.aperture.render.data;
 
+import dev.aperture.geometry.model.PartId;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;

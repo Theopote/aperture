@@ -1,7 +1,7 @@
 package dev.aperture.client.render;
 
 import dev.aperture.math.Transform3d;
-import dev.aperture.render.material.MaterialBindingSet;
+import dev.aperture.geometry.material.MaterialBindingSet;
 import dev.aperture.render.mesh.MeshAsset;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 

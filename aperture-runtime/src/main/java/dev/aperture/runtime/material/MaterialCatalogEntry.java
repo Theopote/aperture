@@ -1,7 +1,7 @@
 package dev.aperture.runtime.material;
 
-import dev.aperture.render.material.BlendMode;
-import dev.aperture.render.material.MaterialDefinition;
+import dev.aperture.core.material.BlendMode;
+import dev.aperture.core.material.MaterialDefinition;
 
 import java.util.Objects;
 

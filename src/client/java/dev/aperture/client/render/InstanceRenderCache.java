@@ -9,7 +9,7 @@ import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.geometry.pipeline.PipelineResult;
 import dev.aperture.render.data.RenderDelta;
 import dev.aperture.render.data.RenderDocument;
-import dev.aperture.render.material.MaterialBindingSet;
+import dev.aperture.geometry.material.MaterialBindingSet;
 import dev.aperture.render.mesh.LODLevel;
 import dev.aperture.render.mesh.MeshAsset;
 import dev.aperture.render.mesh.MeshBakeService;

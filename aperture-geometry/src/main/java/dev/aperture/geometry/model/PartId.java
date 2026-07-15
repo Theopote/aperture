@@ -1,4 +1,4 @@
-package dev.aperture.render.data;
+package dev.aperture.geometry.model;
 
 import java.util.Objects;
 

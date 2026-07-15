@@ -1,7 +1,7 @@
 package dev.aperture.render.pipeline;
 
 import dev.aperture.math.Transform3d;
-import dev.aperture.render.material.MaterialBinding;
+import dev.aperture.geometry.material.MaterialBinding;
 import dev.aperture.render.mesh.MeshSection;
 
 import java.util.Objects;

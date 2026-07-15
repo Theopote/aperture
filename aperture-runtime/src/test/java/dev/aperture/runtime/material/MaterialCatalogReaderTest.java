@@ -1,6 +1,6 @@
 package dev.aperture.runtime.material;
 
-import dev.aperture.render.material.BlendMode;
+import dev.aperture.core.material.BlendMode;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;

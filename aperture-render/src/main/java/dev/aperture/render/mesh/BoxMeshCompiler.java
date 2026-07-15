@@ -2,7 +2,7 @@ package dev.aperture.render.mesh;
 
 import dev.aperture.math.BoundingBox;
 import dev.aperture.geometry.model.GeometrySolid;
-import dev.aperture.render.data.PartId;
+import dev.aperture.geometry.model.PartId;
 
 /**
  * Phase 0 mesh compiler: axis-aligned bounding box to 12 triangles.

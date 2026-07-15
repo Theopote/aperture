@@ -6,6 +6,7 @@ import dev.aperture.core.parameter.ParameterValue;
 import dev.aperture.opening.geometry.generator.RectangularWindowGenerator;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.geometry.model.GeometryResult;
+import dev.aperture.geometry.model.PartId;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import org.junit.jupiter.api.Test;
 

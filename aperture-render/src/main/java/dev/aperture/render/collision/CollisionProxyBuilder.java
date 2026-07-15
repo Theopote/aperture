@@ -3,7 +3,7 @@ package dev.aperture.render.collision;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.geometry.model.GeometrySolid;
-import dev.aperture.render.data.PartId;
+import dev.aperture.geometry.model.PartId;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,8 +1,8 @@
 package dev.aperture.runtime.material;
 
 import dev.aperture.runtime.catalog.MaterialCatalogRegistry;
-import dev.aperture.render.material.MaterialDefinition;
-import dev.aperture.render.material.MaterialInstance;
+import dev.aperture.core.material.MaterialDefinition;
+import dev.aperture.core.material.MaterialInstance;
 
 import java.util.Objects;
 import java.util.Optional;

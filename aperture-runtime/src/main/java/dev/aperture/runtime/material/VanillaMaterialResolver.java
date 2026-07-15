@@ -1,9 +1,9 @@
 package dev.aperture.runtime.material;
 
 import dev.aperture.geometry.model.GeometryLayer;
-import dev.aperture.render.material.BlendMode;
-import dev.aperture.render.material.MaterialDefinition;
-import dev.aperture.render.material.MaterialInstance;
+import dev.aperture.core.material.BlendMode;
+import dev.aperture.core.material.MaterialDefinition;
+import dev.aperture.core.material.MaterialInstance;
 
 import java.util.Map;
 import java.util.Optional;

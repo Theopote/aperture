@@ -1,6 +1,6 @@
 package dev.aperture.render.pipeline;
 
-import dev.aperture.render.material.MaterialInstance;
+import dev.aperture.core.material.MaterialInstance;
 import dev.aperture.render.mesh.LODLevel;
 import dev.aperture.render.mesh.MeshSection;
 

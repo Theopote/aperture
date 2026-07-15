@@ -1,4 +1,4 @@
-package dev.aperture.render.material;
+package dev.aperture.core.material;
 
 import java.util.Objects;
 

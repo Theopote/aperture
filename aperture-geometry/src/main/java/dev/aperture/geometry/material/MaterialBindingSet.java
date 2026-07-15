@@ -1,7 +1,6 @@
-package dev.aperture.render.material;
+package dev.aperture.geometry.material;
 
-import dev.aperture.geometry.model.GeometryLayer;
-import dev.aperture.render.data.PartId;
+import dev.aperture.geometry.model.PartId;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -11,7 +10,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 /**
- * Immutable snapshot of material bindings for one render document revision.
+ * Immutable snapshot of material bindings for one geometry revision.
  */
 public final class MaterialBindingSet {
 	private final Map<PartId, MaterialBinding> byPart;
@@ -36,13 +35,5 @@ public final class MaterialBindingSet {
 			}
 		}
 		return new MaterialBindingSet(filtered);
-	}
-
-	public MaterialBindingSet forPreviewMode(MaterialPreviewMode mode) {
-		return switch (mode) {
-			case FULL, ALBEDO, NORMALS, WIREFRAME -> this;
-			case FRAME_ONLY -> filtered(binding -> binding.layer() != GeometryLayer.TRANSLUCENT);
-			case GLASS_ONLY -> filtered(binding -> binding.layer() == GeometryLayer.TRANSLUCENT);
-		};
 	}
 }

@@ -2,7 +2,7 @@ package dev.aperture.render.mesh;
 
 import dev.aperture.geometry.mesh.Mesh;
 import dev.aperture.geometry.model.GeometryLayer;
-import dev.aperture.render.data.PartId;
+import dev.aperture.geometry.model.PartId;
 
 /**
  * Converts geometry-kernel meshes into render mesh sections.

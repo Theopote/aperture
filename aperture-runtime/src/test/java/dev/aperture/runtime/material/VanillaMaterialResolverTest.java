@@ -5,7 +5,7 @@ import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.parameter.ParameterValue;
 import dev.aperture.geometry.model.GeometryLayer;
-import dev.aperture.render.material.BlendMode;
+import dev.aperture.core.material.BlendMode;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

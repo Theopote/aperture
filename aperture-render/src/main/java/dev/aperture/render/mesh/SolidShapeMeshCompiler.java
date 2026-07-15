@@ -3,7 +3,7 @@ package dev.aperture.render.mesh;
 import dev.aperture.geometry.mesh.Mesh;
 import dev.aperture.geometry.mesh.ShapeMesher;
 import dev.aperture.geometry.model.GeometrySolid;
-import dev.aperture.render.data.PartId;
+import dev.aperture.geometry.model.PartId;
 
 /**
  * Compiles {@link GeometrySolid} shapes into mesh sections via the geometry kernel.

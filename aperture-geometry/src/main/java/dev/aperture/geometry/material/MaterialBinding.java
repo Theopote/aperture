@@ -1,7 +1,9 @@
-package dev.aperture.render.material;
+package dev.aperture.geometry.material;
 
+import dev.aperture.core.material.BlendMode;
+import dev.aperture.core.material.MaterialInstance;
 import dev.aperture.geometry.model.GeometryLayer;
-import dev.aperture.render.data.PartId;
+import dev.aperture.geometry.model.PartId;
 
 import java.util.Objects;
 

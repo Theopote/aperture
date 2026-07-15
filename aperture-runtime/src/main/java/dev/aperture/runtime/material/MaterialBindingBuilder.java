@@ -7,11 +7,11 @@ import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.geometry.model.GeometrySolid;
-import dev.aperture.render.data.PartId;
-import dev.aperture.render.material.BlendMode;
-import dev.aperture.render.material.MaterialBinding;
-import dev.aperture.render.material.MaterialBindingSet;
-import dev.aperture.render.material.MaterialInstance;
+import dev.aperture.geometry.model.PartId;
+import dev.aperture.core.material.BlendMode;
+import dev.aperture.geometry.material.MaterialBinding;
+import dev.aperture.geometry.material.MaterialBindingSet;
+import dev.aperture.core.material.MaterialInstance;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
