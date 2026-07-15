@@ -36,4 +36,25 @@ public enum Facing {
 	public static Facing fromId(String id) {
 		return valueOf(id.toUpperCase());
 	}
+
+	public Facing rotateClockwise() {
+		return switch (this) {
+			case NORTH -> EAST;
+			case EAST -> SOUTH;
+			case SOUTH -> WEST;
+			case WEST -> NORTH;
+			default -> this;
+		};
+	}
+
+	public Facing getOpposite() {
+		return switch (this) {
+			case NORTH -> SOUTH;
+			case SOUTH -> NORTH;
+			case EAST -> WEST;
+			case WEST -> EAST;
+			case UP -> DOWN;
+			case DOWN -> UP;
+		};
+	}
 }

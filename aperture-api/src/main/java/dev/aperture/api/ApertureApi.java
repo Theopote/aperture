@@ -3,6 +3,7 @@ package dev.aperture.api;
 import dev.aperture.api.catalog.MaterialCatalogRegistry;
 import dev.aperture.api.registry.GeneratorRegistry;
 import dev.aperture.api.registry.MaterialResolverRegistry;
+import dev.aperture.api.service.EditorService;
 import dev.aperture.api.service.OpeningGenerationService;
 import dev.aperture.api.service.ParametricService;
 import dev.aperture.core.catalog.OpeningTypeRegistry;
@@ -24,6 +25,7 @@ public final class ApertureApi {
 	private final OpeningInstanceStore instances;
 	private final OpeningGenerationService generation;
 	private final ParametricService parametrics;
+	private final EditorService editor;
 	private final PlacementService placement;
 
 	public ApertureApi(
@@ -36,7 +38,7 @@ public final class ApertureApi {
 		OpeningGenerationService generation,
 		PlacementService placement
 	) {
-		this(openingTypes, generators, profiles, materialCatalog, materials, instances, generation, new ParametricService(), placement);
+		this(openingTypes, generators, profiles, materialCatalog, materials, instances, generation, new ParametricService(), new EditorService(), placement);
 	}
 
 	public ApertureApi(
@@ -48,6 +50,7 @@ public final class ApertureApi {
 		OpeningInstanceStore instances,
 		OpeningGenerationService generation,
 		ParametricService parametrics,
+		EditorService editor,
 		PlacementService placement
 	) {
 		this.openingTypes = openingTypes;
@@ -58,6 +61,7 @@ public final class ApertureApi {
 		this.instances = instances;
 		this.generation = generation;
 		this.parametrics = parametrics;
+		this.editor = editor;
 		this.placement = placement;
 	}
 
@@ -102,6 +106,10 @@ public final class ApertureApi {
 
 	public ParametricService parametrics() {
 		return parametrics;
+	}
+
+	public EditorService editor() {
+		return editor;
 	}
 
 	public PlacementService placement() {

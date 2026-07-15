@@ -65,6 +65,19 @@ public record OpeningInstance(
 		);
 	}
 
+	public OpeningInstance withTransform(Transform3d newTransform) {
+		return new OpeningInstance(
+			schemaVersion,
+			instanceId,
+			typeId,
+			parameters,
+			newTransform,
+			host,
+			state,
+			revision
+		);
+	}
+
 	public static final class Builder {
 		private final OpeningId typeId;
 		private UUID instanceId = UUID.randomUUID();
