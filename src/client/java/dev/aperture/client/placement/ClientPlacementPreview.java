@@ -1,6 +1,6 @@
 package dev.aperture.client.placement;
 
-import dev.aperture.api.ApertureApi;
+import dev.aperture.runtime.ApertureRuntime;
 import dev.aperture.client.editor.ClientEditorBridge;
 import dev.aperture.client.editor.GizmoDragController;
 import dev.aperture.client.parameter.ParameterEditorScreen;
@@ -48,12 +48,12 @@ public final class ClientPlacementPreview {
 		}
 
 		try {
-			ApertureApi api = ApertureApi.get();
+			ApertureRuntime runtime = ApertureRuntime.get();
 			Optional<FabricPlacementTarget> target = ADAPTER.fromCrosshair(
 				client.level,
 				client.player,
 				client.hitResult,
-				api.instances()
+				runtime.instances()
 			);
 
 			if (target.isEmpty()) {
@@ -69,7 +69,7 @@ public final class ClientPlacementPreview {
 					transformOverride = null;
 				}
 			}
-			refreshSession(api);
+			refreshSession(runtime);
 		} catch (IllegalStateException notInitialized) {
 			clear();
 		}
@@ -80,15 +80,15 @@ public final class ClientPlacementPreview {
 			return;
 		}
 
-		ApertureApi api = ApertureApi.get();
-		var definition = api.openingTypes().require(selectedTypeId);
+		ApertureRuntime runtime = ApertureRuntime.get();
+		var definition = runtime.openingTypes().require(selectedTypeId);
 		client.setScreen(new ParameterEditorScreen(definition, parameterOverrides, overrides -> {
 			parameterOverrides = overrides;
-			refreshSession(api);
+			refreshSession(runtime);
 		}));
 	}
 
-	private static void refreshSession(ApertureApi api) {
+	private static void refreshSession(ApertureRuntime runtime) {
 		if (currentTarget == null) {
 			return;
 		}
@@ -96,24 +96,24 @@ public final class ClientPlacementPreview {
 		Transform3d transform = transformOverride != null
 			? transformOverride
 			: currentTarget.suggestedTransform();
-		currentSession = api.placement().preview(
+		currentSession = runtime.placement().preview(
 			selectedTypeId,
 			parameterOverrides,
 			transform,
 			currentTarget.host(),
 			currentTarget.placementContext()
 		);
-		editorBridge.syncFromPreview(api, currentSession);
+		editorBridge.syncFromPreview(currentSession);
 		PlacementPreviewMeshService.update(currentSession);
 	}
 
 	public static void applyEditorInstance(OpeningInstance instance) {
 		try {
-			ApertureApi api = ApertureApi.get();
-			OpeningTypeDefinition definition = api.openingTypes().require(instance.typeId());
+			ApertureRuntime runtime = ApertureRuntime.get();
+			OpeningTypeDefinition definition = runtime.openingTypes().require(instance.typeId());
 			transformOverride = instance.transform();
 			parameterOverrides = overridesFromInstance(definition, instance);
-			refreshSession(api);
+			refreshSession(runtime);
 		} catch (IllegalStateException notInitialized) {
 			// Mod not bootstrapped yet on client.
 		}
@@ -166,7 +166,7 @@ public final class ClientPlacementPreview {
 
 		Minecraft client = Minecraft.getInstance();
 		try {
-			var committed = ApertureApi.get().placement().commit(session.get());
+			var committed = ApertureRuntime.get().placement().commit(session.get());
 			if (client.level != null) {
 				OpeningWorldPlacement.placeCommittedInstance(client.level, committed);
 			}

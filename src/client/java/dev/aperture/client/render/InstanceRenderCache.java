@@ -1,7 +1,7 @@
 package dev.aperture.client.render;
 
-import dev.aperture.api.ApertureApi;
-import dev.aperture.api.material.MaterialBindingBuilder;
+import dev.aperture.runtime.ApertureRuntime;
+import dev.aperture.runtime.material.MaterialBindingBuilder;
 import dev.aperture.math.Transform3d;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.parameter.ParameterSet;
@@ -36,13 +36,13 @@ public final class InstanceRenderCache {
 	}
 
 	public CachedInstanceRender resolve(OpeningInstance instance) {
-		ApertureApi api = ApertureApi.get();
+		ApertureRuntime runtime = ApertureRuntime.get();
 		CachedInstanceRender cached = cache.computeIfAbsent(
 			instance.instanceId(),
 			id -> new CachedInstanceRender(RenderDocument.forInstance(id))
 		);
 
-		PipelineResult pipeline = api.generation().generatePipeline(instance);
+		PipelineResult pipeline = runtime.generation().generatePipeline(instance);
 		GeometryResult geometry = pipeline.geometry();
 		RenderDelta delta = cached.document().updateFrom(geometry);
 		if (!delta.isEmpty() || cached.meshAsset().partIds().isEmpty()) {
@@ -56,15 +56,15 @@ public final class InstanceRenderCache {
 		}
 
 		ParameterSet mergedParameters = ParameterSet.mergeDefaults(
-			api.openingTypes().require(instance.typeId()).parameters(),
+			runtime.openingTypes().require(instance.typeId()).parameters(),
 			instance.parameters()
 		);
 		if (!mergedParameters.equals(cached.lastParameters)) {
 			cached.materialBindings = MaterialBindingBuilder.build(
-				api.openingTypes().require(instance.typeId()),
+				runtime.openingTypes().require(instance.typeId()),
 				instance,
 				geometry,
-				api.materials()
+				runtime.materials()
 			);
 			cached.lastParameters = mergedParameters;
 		}

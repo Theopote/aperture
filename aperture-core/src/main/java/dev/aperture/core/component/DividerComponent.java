@@ -16,8 +16,10 @@ public record DividerComponent(ComponentRef ref, Map<String, String> properties)
 		return property("source", "parameter:mullions");
 	}
 
+	/** @deprecated Use {@link MullionComponent#fromSource(String, String)}. */
+	@Deprecated
 	public static DividerComponent mullions(String id) {
-		return new DividerComponent(ComponentRef.of(id), ComponentProperties.of("source", "parameter:mullions"));
+		return fromSource(id, "parameter:mullions");
 	}
 
 	public static DividerComponent fromSource(String id, String source) {

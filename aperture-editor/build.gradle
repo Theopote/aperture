@@ -1,0 +1,7 @@
+dependencies {
+	api project(':aperture-runtime')
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

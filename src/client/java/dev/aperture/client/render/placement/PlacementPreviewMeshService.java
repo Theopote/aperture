@@ -1,8 +1,8 @@
 package dev.aperture.client.render.placement;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import dev.aperture.api.ApertureApi;
-import dev.aperture.api.material.MaterialBindingBuilder;
+import dev.aperture.runtime.ApertureRuntime;
+import dev.aperture.runtime.material.MaterialBindingBuilder;
 import dev.aperture.client.placement.ClientPlacementPreview;
 import dev.aperture.client.render.ClientMaterialPreview;
 import dev.aperture.client.render.FabricRenderBackend;
@@ -40,7 +40,7 @@ public final class PlacementPreviewMeshService {
 
 	public static void update(PlacementSession session) {
 		try {
-			ApertureApi api = ApertureApi.get();
+			ApertureRuntime runtime = ApertureRuntime.get();
 			String hostAnchor = session.targetHost().anchor();
 			if (context == null || !hostAnchor.equals(currentHostAnchor)) {
 				context = new PreviewRenderContext(previewToken(hostAnchor));
@@ -50,19 +50,19 @@ public final class PlacementPreviewMeshService {
 				currentHostAnchor = hostAnchor;
 			}
 
-			PipelineResult pipeline = api.generation().generatePipeline(session.previewInstance());
+			PipelineResult pipeline = runtime.generation().generatePipeline(session.previewInstance());
 			GeometryResult geometry = pipeline.geometry();
 			RenderDelta delta = context.updateGeometry(geometry);
 			meshAsset = BAKE_SERVICE.applyDeltaFromAssembly(context.document(), meshAsset, delta, pipeline, LODLevel.FULL);
 
-			var definition = api.openingTypes().require(session.selectedTypeId());
+			var definition = runtime.openingTypes().require(session.selectedTypeId());
 			ParameterSet mergedParameters = ParameterSet.mergeDefaults(definition.parameters(), session.parameterOverrides());
 			if (!mergedParameters.equals(lastParameters)) {
 				materialBindings = MaterialBindingBuilder.build(
 					definition,
 					session.previewInstance(),
 					geometry,
-					api.materials()
+					runtime.materials()
 				);
 				lastParameters = mergedParameters;
 			}

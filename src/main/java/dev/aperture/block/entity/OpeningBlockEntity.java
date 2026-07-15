@@ -1,6 +1,6 @@
 package dev.aperture.block.entity;
 
-import dev.aperture.api.ApertureApi;
+import dev.aperture.runtime.ApertureRuntime;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.registry.ApertureBlockEntities;
 import net.minecraft.core.BlockPos;
@@ -39,7 +39,7 @@ public final class OpeningBlockEntity extends BlockEntity {
 		}
 
 		try {
-			return ApertureApi.get().instances().findById(instanceId);
+			return ApertureRuntime.get().instances().findById(instanceId);
 		} catch (IllegalStateException notInitialized) {
 			return Optional.empty();
 		}

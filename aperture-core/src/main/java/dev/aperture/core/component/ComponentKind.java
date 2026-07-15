@@ -8,11 +8,13 @@ public enum ComponentKind {
 	FRAME("frame"),
 	PANEL("panel"),
 	GLASS("glass"),
+	MULLION("mullion"),
+	DIVIDER("divider"),
 	HARDWARE("hardware"),
+	HANDLE("handle"),
 	TRIM("trim"),
 	SILL("sill"),
 	HEADER("header"),
-	DIVIDER("divider"),
 	DECORATION("decoration");
 
 	private final String jsonKey;

@@ -1,6 +1,9 @@
 package dev.aperture.client;
 
 import dev.aperture.Aperture;
+import dev.aperture.editor.ApertureEditor;
+import dev.aperture.editor.service.EditorService;
+import dev.aperture.editor.service.ParametricService;
 import dev.aperture.client.editor.GizmoDragController;
 import dev.aperture.client.placement.ClientPlacementPreview;
 import dev.aperture.client.render.ApertureRenderers;
@@ -49,6 +52,7 @@ public class ApertureClient implements ClientModInitializer {
 			PlacementPreviewRenderer.emit();
 			EditorGizmoRenderer.emit();
 		});
+		ApertureEditor.init(new ApertureEditor(new EditorService(), new ParametricService()));
 		ApertureRenderers.registerAll();
 		Aperture.LOGGER.info("Aperture client initialized — crosshair placement preview active");
 	}

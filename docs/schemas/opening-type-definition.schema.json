@@ -61,11 +61,13 @@
             "frame",
             "panel",
             "glass",
+            "mullion",
+            "divider",
             "hardware",
+            "handle",
             "trim",
             "sill",
             "header",
-            "divider",
             "decoration"
           ]
         },

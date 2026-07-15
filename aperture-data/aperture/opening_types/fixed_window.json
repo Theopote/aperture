@@ -20,7 +20,7 @@
   "components": [
     { "kind": "frame", "id": "frame", "profile": "aperture:frame_l_50x80" },
     { "kind": "glass", "id": "glazing", "system": "aperture:single_glazed" },
-    { "kind": "divider", "id": "mullions", "source": "parameter:mullions" }
+    { "kind": "mullion", "id": "mullions", "source": "parameter:mullions" }
   ],
   "materialSlots": ["frame", "glazing"]
 }

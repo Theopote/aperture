@@ -1,7 +1,7 @@
 package dev.aperture.opening.component;
 
 import dev.aperture.core.component.ComponentAssemblyPresets;
-import dev.aperture.core.component.DividerComponent;
+import dev.aperture.core.component.MullionComponent;
 import dev.aperture.opening.geometry.pipeline.ComponentPipelineStep;
 import org.junit.jupiter.api.Test;
 
@@ -19,12 +19,12 @@ class ComponentPlanBuilderTest {
 		));
 
 		assertEquals(6, plan.steps().size());
-		long dividerSteps = plan.steps().stream()
+		long mullionSteps = plan.steps().stream()
 			.filter(ComponentPipelineStep.class::isInstance)
 			.map(ComponentPipelineStep.class::cast)
-			.filter(step -> step.component() instanceof DividerComponent)
+			.filter(step -> step.component() instanceof MullionComponent)
 			.count();
-		assertEquals(2, dividerSteps);
+		assertEquals(2, mullionSteps);
 	}
 
 	@Test

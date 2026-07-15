@@ -12,7 +12,7 @@ public final class ComponentAssemblyPresets {
 		return ComponentAssembly.of(
 			FrameComponent.of("frame", frameProfile),
 			GlassComponent.of("glazing", glazingSystem),
-			DividerComponent.mullions("mullions")
+			MullionComponent.fromSource("mullions", "parameter:mullions")
 		);
 	}
 
@@ -21,7 +21,7 @@ public final class ComponentAssemblyPresets {
 			FrameComponent.of("frame", frameProfile),
 			PanelComponent.of("panel", panelProfile, "left"),
 			GlassComponent.of("glazing", glazingSystem),
-			DividerComponent.mullions("mullions")
+			MullionComponent.fromSource("mullions", "parameter:mullions")
 		);
 	}
 
@@ -36,7 +36,7 @@ public final class ComponentAssemblyPresets {
 			PanelComponent.of("door_leaf", panelProfile, hingeSide),
 			GlassComponent.of("door_glass", glazingSystem),
 			HardwareComponent.of("hinges", "hinge_set"),
-			HardwareComponent.of("handle", "handle"),
+			HandleComponent.of("handle"),
 			SillComponent.of("threshold", frameProfile)
 		);
 	}
@@ -44,8 +44,8 @@ public final class ComponentAssemblyPresets {
 	public static ComponentAssembly curtainWall(String frameProfile, String glazingSystem) {
 		return ComponentAssembly.of(
 			FrameComponent.of("grid_frame", frameProfile),
-			DividerComponent.fromSource("vertical_mullions", "parameter:cols"),
-			DividerComponent.fromSource("horizontal_mullions", "parameter:rows"),
+			MullionComponent.fromSource("vertical_mullions", "parameter:cols"),
+			MullionComponent.fromSource("horizontal_mullions", "parameter:rows"),
 			GlassComponent.of("unit_glazing", glazingSystem),
 			HeaderComponent.of("head", frameProfile),
 			SillComponent.of("sill", frameProfile)

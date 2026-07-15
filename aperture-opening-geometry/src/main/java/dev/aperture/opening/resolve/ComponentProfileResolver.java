@@ -3,6 +3,7 @@ package dev.aperture.opening.resolve;
 import dev.aperture.core.component.DividerComponent;
 import dev.aperture.core.component.FrameComponent;
 import dev.aperture.core.component.HeaderComponent;
+import dev.aperture.core.component.MullionComponent;
 import dev.aperture.core.component.OpeningComponent;
 import dev.aperture.core.component.PanelComponent;
 import dev.aperture.core.component.SillComponent;
@@ -21,7 +22,7 @@ public final class ComponentProfileResolver {
 	public static ProfileDefinition resolve(GenerationContext context, OpeningComponent component) {
 		return switch (component.kind()) {
 			case PANEL -> context.scaledPanelProfile(profileId(context, component));
-			case FRAME, HEADER, SILL, TRIM, DIVIDER ->
+			case FRAME, HEADER, SILL, TRIM, MULLION, DIVIDER ->
 				context.scaledFrameProfile(profileId(context, component));
 			default -> throw new IllegalArgumentException(
 				"Component kind has no profile: " + component.kind()
@@ -40,6 +41,12 @@ public final class ComponentProfileResolver {
 			case HeaderComponent header -> requireProfileId(header.profileId(), header.ref().id());
 			case SillComponent sill -> requireProfileId(sill.profileId(), sill.ref().id());
 			case TrimComponent trim -> requireProfileId(trim.profileId(), trim.ref().id());
+			case MullionComponent mullion -> mullion.property(
+				"profile",
+				context.components().frame()
+					.map(FrameComponent::profileId)
+					.orElseThrow(() -> missingProfile(mullion.ref().id()))
+			);
 			case DividerComponent divider -> divider.property(
 				"profile",
 				context.components().frame()

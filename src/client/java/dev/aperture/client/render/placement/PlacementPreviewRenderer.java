@@ -1,6 +1,6 @@
 package dev.aperture.client.render.placement;
 
-import dev.aperture.api.ApertureApi;
+import dev.aperture.runtime.ApertureRuntime;
 import dev.aperture.client.placement.ClientPlacementPreview;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.math.BoundingBox;
@@ -41,8 +41,8 @@ public final class PlacementPreviewRenderer {
 
 	private static void emitOpeningFootprint(PlacementSession session) {
 		try {
-			ApertureApi api = ApertureApi.get();
-			OpeningTypeDefinition definition = api.openingTypes().require(session.selectedTypeId());
+			ApertureRuntime runtime = ApertureRuntime.get();
+			OpeningTypeDefinition definition = runtime.openingTypes().require(session.selectedTypeId());
 			OpeningFootprint.worldBounds(definition, session.previewInstance()).ifPresent(bounds -> {
 				int color = session.isValid() ? COLOR_VALID : COLOR_INVALID;
 				drawWireframe(McBoundsConverter.toAabb(bounds), color);

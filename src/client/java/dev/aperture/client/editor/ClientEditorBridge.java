@@ -1,6 +1,7 @@
 package dev.aperture.client.editor;
 
-import dev.aperture.api.ApertureApi;
+import dev.aperture.editor.ApertureEditor;
+import dev.aperture.runtime.ApertureRuntime;
 import dev.aperture.core.editor.EditorObject;
 import dev.aperture.core.editor.EditorObjectId;
 import dev.aperture.core.editor.session.EditorSession;
@@ -15,8 +16,11 @@ public final class ClientEditorBridge {
 	private EditorSession editorSession;
 	private EditorObjectId objectId;
 
-	public void syncFromPreview(ApertureApi api, PlacementSession session) {
-		this.editorSession = api.editor().sessionWithInstance(api.openingTypes(), session.previewInstance());
+	public void syncFromPreview(PlacementSession session) {
+		this.editorSession = ApertureEditor.get().editor().sessionWithInstance(
+			ApertureRuntime.get().openingTypes(),
+			session.previewInstance()
+		);
 		this.objectId = editorSession.selection().primary().orElseThrow();
 	}
 

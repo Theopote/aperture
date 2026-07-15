@@ -74,8 +74,8 @@
   "materialSlots": ["frame", "glazing"],
   "components": [
     { "kind": "frame", "id": "grid_frame", "profile": "aperture:frame_l_50x80" },
-    { "kind": "divider", "id": "vertical_mullions", "source": "parameter:cols" },
-    { "kind": "divider", "id": "horizontal_mullions", "source": "parameter:rows" },
+    { "kind": "mullion", "id": "vertical_mullions", "source": "parameter:cols" },
+    { "kind": "mullion", "id": "horizontal_mullions", "source": "parameter:rows" },
     { "kind": "glass", "id": "unit_glazing", "system": "aperture:single_glazed" },
     { "kind": "header", "id": "head", "profile": "aperture:frame_l_50x80" },
     { "kind": "sill", "id": "sill", "profile": "aperture:frame_l_50x80" }

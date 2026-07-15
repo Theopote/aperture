@@ -38,8 +38,8 @@ class OpeningTypeDefinitionReaderTest {
 
 			assertTrue(definition.components().has(ComponentKind.FRAME));
 			assertTrue(definition.components().has(ComponentKind.GLASS));
-			assertTrue(definition.components().has(ComponentKind.DIVIDER));
-			assertEquals("mullions", definition.components().divider().orElseThrow().ref().id());
+			assertTrue(definition.components().has(ComponentKind.MULLION));
+			assertEquals("mullions", definition.components().mullion().orElseThrow().ref().id());
 		}
 	}
 }

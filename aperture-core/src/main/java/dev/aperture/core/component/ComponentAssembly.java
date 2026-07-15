@@ -74,6 +74,14 @@ public final class ComponentAssembly {
 		return firstOfKind(ComponentKind.DIVIDER, DividerComponent.class);
 	}
 
+	public Optional<MullionComponent> mullion() {
+		return firstOfKind(ComponentKind.MULLION, MullionComponent.class);
+	}
+
+	public Optional<HandleComponent> handle() {
+		return firstOfKind(ComponentKind.HANDLE, HandleComponent.class);
+	}
+
 	public Optional<HeaderComponent> header() {
 		return firstOfKind(ComponentKind.HEADER, HeaderComponent.class);
 	}
@@ -134,6 +142,8 @@ public final class ComponentAssembly {
 				props.getOrDefault("hinge", "left")
 			);
 			case GLASS -> GlassComponent.of(id, props.getOrDefault("system", ""));
+			case MULLION -> new MullionComponent(ComponentRef.of(id), props);
+			case HANDLE -> new HandleComponent(ComponentRef.of(id), props);
 			case HARDWARE -> HardwareComponent.of(id, props.getOrDefault("type", "generic"));
 			case TRIM -> TrimComponent.of(id, props.getOrDefault("profile", ""));
 			case SILL -> SillComponent.of(id, props.getOrDefault("profile", ""));

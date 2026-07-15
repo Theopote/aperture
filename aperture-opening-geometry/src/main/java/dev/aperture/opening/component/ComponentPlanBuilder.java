@@ -6,20 +6,24 @@ import dev.aperture.core.component.DecorationComponent;
 import dev.aperture.core.component.DividerComponent;
 import dev.aperture.core.component.FrameComponent;
 import dev.aperture.core.component.GlassComponent;
+import dev.aperture.core.component.HandleComponent;
 import dev.aperture.core.component.HardwareComponent;
 import dev.aperture.core.component.HeaderComponent;
+import dev.aperture.core.component.MullionComponent;
 import dev.aperture.core.component.OpeningComponent;
 import dev.aperture.core.component.PanelComponent;
 import dev.aperture.core.component.SillComponent;
 import dev.aperture.core.component.TrimComponent;
 import dev.aperture.opening.geometry.pipeline.ComponentPipelineStep;
 import dev.aperture.opening.geometry.pipeline.PipelineStep;
-import dev.aperture.opening.geometry.pipeline.accessory.AccessoryGenerator;
 import dev.aperture.opening.geometry.pipeline.decoration.DecorationGenerator;
+import dev.aperture.opening.geometry.pipeline.divider.DividerGenerator;
 import dev.aperture.opening.geometry.pipeline.frame.FrameGenerator;
 import dev.aperture.opening.geometry.pipeline.glass.GlassGenerator;
+import dev.aperture.opening.geometry.pipeline.handle.HandleGenerator;
 import dev.aperture.opening.geometry.pipeline.hardware.HardwareGenerator;
 import dev.aperture.opening.geometry.pipeline.header.HeaderGenerator;
+import dev.aperture.opening.geometry.pipeline.mullion.MullionGenerator;
 import dev.aperture.opening.geometry.pipeline.panel.PanelGenerator;
 import dev.aperture.opening.geometry.pipeline.sill.SillGenerator;
 import dev.aperture.opening.geometry.pipeline.trim.TrimGenerator;
@@ -37,10 +41,12 @@ public final class ComponentPlanBuilder {
 		ComponentKind.HEADER,
 		ComponentKind.PANEL,
 		ComponentKind.GLASS,
+		ComponentKind.MULLION,
 		ComponentKind.DIVIDER,
 		ComponentKind.SILL,
 		ComponentKind.TRIM,
 		ComponentKind.HARDWARE,
+		ComponentKind.HANDLE,
 		ComponentKind.DECORATION
 	);
 
@@ -54,8 +60,8 @@ public final class ComponentPlanBuilder {
 		for (OpeningComponent component : ordered) {
 			steps.add(createStep(component));
 		}
-		if (!assembly.has(ComponentKind.DIVIDER)) {
-			steps.add(new AccessoryGenerator(DividerComponent.mullions("_mullions")));
+		if (!assembly.has(ComponentKind.MULLION) && !assembly.has(ComponentKind.DIVIDER)) {
+			steps.add(new MullionGenerator(MullionComponent.fromSource("_mullions", "parameter:mullions")));
 		}
 		if (steps.isEmpty()) {
 			throw new IllegalArgumentException("component assembly produced no geometry steps");
@@ -84,10 +90,12 @@ public final class ComponentPlanBuilder {
 			case HEADER -> new HeaderGenerator((HeaderComponent) component);
 			case PANEL -> new PanelGenerator((PanelComponent) component);
 			case GLASS -> new GlassGenerator((GlassComponent) component);
-			case DIVIDER -> new AccessoryGenerator((DividerComponent) component);
+			case MULLION -> new MullionGenerator((MullionComponent) component);
+			case DIVIDER -> new DividerGenerator((DividerComponent) component);
 			case SILL -> new SillGenerator((SillComponent) component);
 			case TRIM -> new TrimGenerator((TrimComponent) component);
 			case HARDWARE -> new HardwareGenerator((HardwareComponent) component);
+			case HANDLE -> new HandleGenerator((HandleComponent) component);
 			case DECORATION -> new DecorationGenerator((DecorationComponent) component);
 		};
 	}

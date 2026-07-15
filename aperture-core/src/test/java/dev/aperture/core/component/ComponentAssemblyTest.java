@@ -17,7 +17,7 @@ class ComponentAssemblyTest {
 		);
 		assertTrue(window.has(ComponentKind.FRAME));
 		assertTrue(window.has(ComponentKind.GLASS));
-		assertTrue(window.has(ComponentKind.DIVIDER));
+		assertTrue(window.has(ComponentKind.MULLION));
 		assertFalse(window.has(ComponentKind.PANEL));
 
 		ComponentAssembly door = ComponentAssemblyPresets.door(
@@ -28,6 +28,7 @@ class ComponentAssemblyTest {
 		);
 		assertTrue(door.has(ComponentKind.PANEL));
 		assertTrue(door.has(ComponentKind.HARDWARE));
+		assertTrue(door.has(ComponentKind.HANDLE));
 		assertTrue(door.has(ComponentKind.SILL));
 	}
 
@@ -53,7 +54,7 @@ class ComponentAssemblyTest {
 		);
 
 		assertTrue(curtainWall.has(ComponentKind.FRAME));
-		assertEquals(2, curtainWall.ofKind(ComponentKind.DIVIDER).size());
+		assertEquals(2, curtainWall.ofKind(ComponentKind.MULLION).size());
 		assertTrue(curtainWall.has(ComponentKind.HEADER));
 		assertTrue(curtainWall.has(ComponentKind.SILL));
 	}

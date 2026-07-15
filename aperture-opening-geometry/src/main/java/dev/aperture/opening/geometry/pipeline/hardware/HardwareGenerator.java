@@ -17,15 +17,12 @@ import dev.aperture.opening.geometry.pipeline.panel.PanelLayoutPlanner;
 import java.util.List;
 
 /**
- * Generates hinge plates, handles, and other mount hardware for one hardware component instance.
+ * Generates hinge plates and mount hardware for one hardware component instance.
  */
 public final class HardwareGenerator implements ComponentPipelineStep {
 	private static final double HINGE_WIDTH = 18;
 	private static final double HINGE_HEIGHT = 90;
 	private static final double HINGE_DEPTH = 12;
-	private static final double HANDLE_WIDTH = 24;
-	private static final double HANDLE_HEIGHT = 120;
-	private static final double HANDLE_DEPTH = 16;
 	private final HardwareComponent component;
 
 	public HardwareGenerator(HardwareComponent component) {
@@ -52,12 +49,8 @@ public final class HardwareGenerator implements ComponentPipelineStep {
 
 		PanelCellLayout primary = PanelLayoutPlanner.primaryLeaf(cells, parameters.panelHinge());
 		switch (component.hardwareType()) {
-			case "hinge_set" -> emitHingeSet(target, primary, layout);
-			case "handle" -> emitHandle(target, primary, layout);
-			default -> {
-				emitHingeSet(target, primary, layout);
-				emitHandle(target, primary, layout);
-			}
+			case "hinge_set", "hinges" -> emitHingeSet(target, primary, layout);
+			default -> emitHingeSet(target, primary, layout);
 		}
 	}
 
@@ -87,28 +80,5 @@ public final class HardwareGenerator implements ComponentPipelineStep {
 				))
 			);
 		}
-	}
-
-	private void emitHandle(
-		GeometryCompilationTarget target,
-		PanelCellLayout leaf,
-		OpeningLayout layout
-	) {
-		String root = component.ref().id();
-		double latchX = leaf.latchX();
-		double centerY = leaf.originY() + leaf.height() * 0.48;
-		double offsetX = switch (leaf.hingeSide().toLowerCase()) {
-			case "right" -> layout.sashFace() * 0.2;
-			default -> -HANDLE_WIDTH - layout.sashFace() * 0.2;
-		};
-		target.emitSolid(
-			ComponentPaths.join(root, "main"),
-			"hardware",
-			GeometryLayer.CUTOUT,
-			ShapeRecipes.box(new BoundingBox(
-				new Vec3d(latchX + offsetX, centerY - HANDLE_HEIGHT / 2.0, layout.frameDepth() * 0.35),
-				new Vec3d(latchX + offsetX + HANDLE_WIDTH, centerY + HANDLE_HEIGHT / 2.0, layout.frameDepth() * 0.35 + HANDLE_DEPTH)
-			))
-		);
 	}
 }

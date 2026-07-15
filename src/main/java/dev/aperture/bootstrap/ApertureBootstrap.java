@@ -1,13 +1,5 @@
 package dev.aperture.bootstrap;
 
-import dev.aperture.api.ApertureApi;
-import dev.aperture.api.catalog.MaterialCatalogLoader;
-import dev.aperture.api.catalog.MaterialCatalogRegistry;
-import dev.aperture.api.material.CatalogMaterialResolver;
-import dev.aperture.api.material.VanillaMaterialResolver;
-import dev.aperture.api.registry.GeneratorRegistry;
-import dev.aperture.api.registry.MaterialResolverRegistry;
-import dev.aperture.api.service.OpeningGenerationService;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.catalog.OpeningTypeCatalogLoader;
 import dev.aperture.core.catalog.OpeningTypeRegistry;
@@ -18,18 +10,27 @@ import dev.aperture.core.instance.OpeningInstanceStore;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.placement.PlacementService;
 import dev.aperture.fabric.placement.FabricPlacementAdapter;
-import dev.aperture.opening.geometry.generator.RectangularWindowGenerator;
 import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 import dev.aperture.geometry.profile.ProfileDefinition;
+import dev.aperture.opening.geometry.generator.RectangularWindowGenerator;
 import dev.aperture.registry.ApertureBlockEntities;
 import dev.aperture.registry.ApertureBlocks;
+import dev.aperture.runtime.ApertureRuntime;
+import dev.aperture.runtime.catalog.MaterialCatalogLoader;
+import dev.aperture.runtime.catalog.MaterialCatalogRegistry;
+import dev.aperture.runtime.material.CatalogMaterialResolver;
+import dev.aperture.runtime.material.VanillaMaterialResolver;
+import dev.aperture.runtime.registry.GeneratorRegistry;
+import dev.aperture.runtime.registry.MaterialResolverRegistry;
+import dev.aperture.runtime.service.OpeningGenerationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Wires core registries, data packs, generators, and services at mod startup.
+ * Wires runtime registries, data packs, generators, and services at mod startup.
+ * Editor services are initialized separately on the client via {@link dev.aperture.editor.ApertureEditor}.
  */
 public final class ApertureBootstrap {
 	private static final Logger LOGGER = LoggerFactory.getLogger("aperture");
@@ -51,9 +52,18 @@ public final class ApertureBootstrap {
 		loadOpeningTypes();
 		loadProfileCatalog();
 		loadMaterialCatalog();
-		ApertureApi.init(new ApertureApi(openingTypes, generators, profileCatalog, materialCatalog, materials, instances, generation, placement));
+		ApertureRuntime.init(new ApertureRuntime(
+			openingTypes,
+			generators,
+			profileCatalog,
+			materialCatalog,
+			materials,
+			instances,
+			generation,
+			placement
+		));
 		verifyReferencePipeline();
-		LOGGER.info("Aperture bootstrap complete - {} opening types, {} generators",
+		LOGGER.info("Aperture runtime bootstrap complete - {} opening types, {} generators",
 			openingTypes.all().size(), 1);
 	}
 

@@ -1,6 +1,6 @@
 package dev.aperture.client.parameter;
 
-import dev.aperture.api.ApertureApi;
+import dev.aperture.editor.ApertureEditor;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.parametric.ParametricEditResult;
 import dev.aperture.core.parametric.ParametricEditor;
@@ -61,7 +61,7 @@ public final class ParameterEditorScreen extends Screen {
 			return;
 		}
 
-		ValidationResult validation = ApertureApi.get().parametrics().validate(definition, editor.overridesOnly());
+		ValidationResult validation = ApertureEditor.get().parametrics().validate(definition, editor.overridesOnly());
 		if (!validation.isValid()) {
 			statusMessage = validation.issues().getFirst().message();
 			return;

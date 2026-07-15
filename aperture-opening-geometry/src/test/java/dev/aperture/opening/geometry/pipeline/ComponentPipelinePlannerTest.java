@@ -36,7 +36,7 @@ class ComponentPipelinePlannerTest {
 	}
 
 	@Test
-	void curtainWallPipelinePlansSeparateDividerInstances() {
+	void curtainWallPipelinePlansSeparateMullionInstances() {
 		var steps = ComponentPipelinePlanner.plannedStepIds(ComponentAssemblyPresets.curtainWall(
 			"aperture:frame_l_50x80",
 			"aperture:single_glazed"
