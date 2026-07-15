@@ -1,5 +1,9 @@
 package dev.aperture.geometry.generator.pipeline;
 
+import dev.aperture.core.component.ComponentAssembly;
+import dev.aperture.core.component.ComponentKind;
+import dev.aperture.core.component.FrameComponent;
+import dev.aperture.core.component.PanelComponent;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.parameter.ParameterType;
@@ -8,7 +12,6 @@ import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 import dev.aperture.geometry.profile.ProfileDefinition;
 import dev.aperture.geometry.profile.ProfileScaler;
 
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -41,6 +44,10 @@ public final class GenerationContext {
 		return profiles;
 	}
 
+	public ComponentAssembly components() {
+		return definition.components();
+	}
+
 	public double requireLength(String name) {
 		return parameters.requireLength(name);
 	}
@@ -56,37 +63,57 @@ public final class GenerationContext {
 			.orElse(defaultDegrees);
 	}
 
-	public boolean hasComponent(String componentName) {
-		return definition.components().containsKey(componentName);
+	public boolean hasComponent(ComponentKind kind) {
+		return components().has(kind);
 	}
 
-	public String componentProfileId(String componentName) {
-		Object raw = definition.components().get(componentName);
-		if (!(raw instanceof Map<?, ?> component)) {
-			throw new IllegalStateException("Missing component definition: " + componentName);
-		}
-		Object profileId = component.get("profile");
-		if (profileId == null) {
-			throw new IllegalStateException("Component '" + componentName + "' has no profile binding");
-		}
-		return profileId.toString();
+	public boolean hasComponent(String legacyKey) {
+		return components().hasLegacyKey(legacyKey);
 	}
 
-	public String componentString(String componentName, String key, String defaultValue) {
-		Object raw = definition.components().get(componentName);
-		if (!(raw instanceof Map<?, ?> component)) {
-			return defaultValue;
+	public String componentProfileId(String legacyKey) {
+		return switch (legacyKey) {
+			case "frame" -> components().frame()
+				.map(FrameComponent::profileId)
+				.orElseThrow(() -> missingComponent("frame"));
+			case "panel" -> components().panel()
+				.map(PanelComponent::profileId)
+				.orElseThrow(() -> missingComponent("panel"));
+			default -> components().findById(legacyKey)
+				.map(component -> component.property("profile", ""))
+				.filter(profile -> !profile.isBlank())
+				.orElseThrow(() -> missingComponent(legacyKey));
+		};
+	}
+
+	public String componentString(String legacyKey, String key, String defaultValue) {
+		Optional<PanelComponent> panel = components().panel();
+		if ("panel".equals(legacyKey) && "hinge".equals(key) && panel.isPresent()) {
+			String hingeSide = parameters.get("hinge_side")
+				.filter(value -> value.type() == ParameterType.ENUM)
+				.map(value -> ((ParameterValue.EnumValue) value).value())
+				.orElse(panel.get().hinge());
+			return hingeSide;
 		}
-		Object value = component.get(key);
-		return value == null ? defaultValue : value.toString();
+		return switch (legacyKey) {
+			case "panel" -> components().panel()
+				.map(panelComponent -> panelComponent.property(key, defaultValue))
+				.orElse(defaultValue);
+			case "glazing" -> components().glass()
+				.map(glass -> glass.property(key, defaultValue))
+				.orElse(defaultValue);
+			default -> components().findById(legacyKey)
+				.map(component -> component.property(key, defaultValue))
+				.orElse(defaultValue);
+		};
 	}
 
 	public ProfileDefinition requireProfile(String profileId) {
 		return profiles.requireById(profileId);
 	}
 
-	public ProfileDefinition requireComponentProfile(String componentName) {
-		return requireProfile(componentProfileId(componentName));
+	public ProfileDefinition requireComponentProfile(String legacyKey) {
+		return requireProfile(componentProfileId(legacyKey));
 	}
 
 	public Optional<Double> optionalLength(String name) {
@@ -109,7 +136,12 @@ public final class GenerationContext {
 	private ProfileDefinition scaleProfile(ProfileDefinition base) {
 		double targetWidth = requireLength("frame_width");
 		double targetDepth = optionalLength("frame_depth")
-			.orElse(base.bounds().depth() * (targetWidth / base.bounds().width()));
+			.orElse(optionalLength("thickness")
+				.orElse(base.bounds().depth() * (targetWidth / base.bounds().width())));
 		return ProfileScaler.scaleToFrameSize(base, targetWidth, targetDepth);
+	}
+
+	private static IllegalStateException missingComponent(String name) {
+		return new IllegalStateException("Missing component definition: " + name);
 	}
 }

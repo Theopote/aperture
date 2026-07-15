@@ -1,5 +1,7 @@
 package dev.aperture.core.definition;
 
+import dev.aperture.core.component.ComponentAssembly;
+import dev.aperture.core.component.OpeningComponent;
 import dev.aperture.core.opening.GeneratorId;
 import dev.aperture.core.opening.OpeningCategory;
 import dev.aperture.core.opening.OpeningId;
@@ -7,6 +9,7 @@ import dev.aperture.core.parameter.ParameterDefinition;
 import dev.aperture.core.parametric.ParametricSchema;
 import dev.aperture.core.parametric.Parameter;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +17,8 @@ import java.util.Objects;
 
 /**
  * Immutable procedural recipe for an opening family (Revit "family").
+ * Opening types are defined as a {@link ComponentAssembly} — window, door, and curtain wall
+ * differ only by which components are included.
  */
 public record OpeningTypeDefinition(
 	int schemaVersion,
@@ -22,7 +27,7 @@ public record OpeningTypeDefinition(
 	ParametricSchema parametricSchema,
 	List<ConstraintRule> constraints,
 	GeneratorId generator,
-	Map<String, Object> components,
+	ComponentAssembly components,
 	List<String> materialSlots
 ) {
 	public OpeningTypeDefinition {
@@ -33,8 +38,8 @@ public record OpeningTypeDefinition(
 		Objects.requireNonNull(category, "category");
 		Objects.requireNonNull(parametricSchema, "parametricSchema");
 		Objects.requireNonNull(generator, "generator");
+		Objects.requireNonNull(components, "components");
 		constraints = List.copyOf(constraints);
-		components = Map.copyOf(components);
 		materialSlots = List.copyOf(materialSlots);
 	}
 
@@ -52,9 +57,9 @@ public record OpeningTypeDefinition(
 		private final GeneratorId generator;
 		private int schemaVersion = 1;
 		private final ParametricSchema.Builder parametricSchema = ParametricSchema.builder();
-		private final List<ConstraintRule> constraints = new java.util.ArrayList<>();
-		private final Map<String, Object> components = new LinkedHashMap<>();
-		private final List<String> materialSlots = new java.util.ArrayList<>();
+		private final List<ConstraintRule> constraints = new ArrayList<>();
+		private final List<OpeningComponent> components = new ArrayList<>();
+		private final List<String> materialSlots = new ArrayList<>();
 
 		private Builder(OpeningId id, OpeningCategory category, GeneratorId generator) {
 			this.id = id;
@@ -77,8 +82,22 @@ public record OpeningTypeDefinition(
 			return this;
 		}
 
+		public Builder component(OpeningComponent component) {
+			components.add(component);
+			return this;
+		}
+
+		public Builder components(ComponentAssembly assembly) {
+			components.addAll(assembly.all());
+			return this;
+		}
+
+		/** @deprecated Prefer {@link #component(OpeningComponent)} or {@link #components(ComponentAssembly)} */
+		@Deprecated
 		public Builder component(String name, Object value) {
-			components.put(name, value);
+			Map<String, Object> legacy = new LinkedHashMap<>();
+			legacy.put(name, value);
+			components.addAll(ComponentAssembly.fromLegacyMap(legacy).all());
 			return this;
 		}
 
@@ -95,7 +114,7 @@ public record OpeningTypeDefinition(
 				parametricSchema.build(),
 				constraints,
 				generator,
-				components,
+				ComponentAssembly.of(components),
 				materialSlots
 			);
 		}

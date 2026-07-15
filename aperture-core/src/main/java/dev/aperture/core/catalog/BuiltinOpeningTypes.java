@@ -1,5 +1,6 @@
 package dev.aperture.core.catalog;
 
+import dev.aperture.core.component.ComponentAssemblyPresets;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.opening.GeneratorId;
 import dev.aperture.core.opening.OpeningCategory;
@@ -13,7 +14,6 @@ import dev.aperture.core.parametric.ParameterMetadata;
 import dev.aperture.core.parametric.RangeParameter;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Built-in reference opening types for Phase 0 development and testing.
@@ -53,8 +53,10 @@ public final class BuiltinOpeningTypes {
 				.build())
 			.materialSlot("frame")
 			.materialSlot("glazing")
-			.component("frame", Map.of("profile", "aperture:frame_l_50x80"))
-			.component("glazing", Map.of("system", "aperture:single_glazed"))
+			.components(ComponentAssemblyPresets.fixedWindow(
+				"aperture:frame_l_50x80",
+				"aperture:single_glazed"
+			))
 			.build();
 	}
 
@@ -92,14 +94,16 @@ public final class BuiltinOpeningTypes {
 				.build())
 			.materialSlot("frame")
 			.materialSlot("glazing")
-			.component("frame", Map.of("profile", "aperture:frame_l_50x80"))
-			.component("panel", Map.of("profile", "aperture:frame_standard_50", "hinge", "left"))
-			.component("glazing", Map.of("system", "aperture:single_glazed"))
+			.components(ComponentAssemblyPresets.casementWindow(
+				"aperture:frame_l_50x80",
+				"aperture:frame_standard_50",
+				"aperture:single_glazed"
+			))
 			.build();
 	}
 
 	/**
-	 * Parametric door family — dimensions and layout are data, not separate opening types.
+	 * Parametric door family — a component composition, not a separate generator.
 	 */
 	public static OpeningTypeDefinition door() {
 		return OpeningTypeDefinition.builder(DOOR_ID, OpeningCategory.DOOR, RECTANGULAR_WINDOW_GENERATOR)
@@ -159,8 +163,12 @@ public final class BuiltinOpeningTypes {
 			.constraint("glass_ratio >= 0 and glass_ratio <= 1", "Glass ratio must stay between 0 and 1")
 			.materialSlot("frame")
 			.materialSlot("glazing")
-			.component("frame", Map.of("profile", "aperture:frame_standard_50"))
-			.component("glazing", Map.of("system", "aperture:single_glazed"))
+			.components(ComponentAssemblyPresets.door(
+				"aperture:frame_standard_50",
+				"aperture:frame_standard_50",
+				"aperture:single_glazed",
+				"left"
+			))
 			.build();
 	}
 

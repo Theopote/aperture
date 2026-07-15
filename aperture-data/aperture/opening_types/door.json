@@ -97,8 +97,11 @@
     }
   ],
   "materialSlots": ["frame", "glazing"],
-  "components": {
-    "frame": { "profile": "aperture:frame_standard_50" },
-    "glazing": { "system": "aperture:single_glazed" }
-  }
+  "components": [
+    { "kind": "frame", "id": "door_frame", "profile": "aperture:frame_standard_50" },
+    { "kind": "panel", "id": "door_leaf", "profile": "aperture:frame_standard_50", "hinge": "left" },
+    { "kind": "glass", "id": "door_glass", "system": "aperture:single_glazed" },
+    { "kind": "hardware", "id": "hinges", "type": "hinge_set" },
+    { "kind": "sill", "id": "threshold", "profile": "aperture:frame_standard_50" }
+  ]
 }

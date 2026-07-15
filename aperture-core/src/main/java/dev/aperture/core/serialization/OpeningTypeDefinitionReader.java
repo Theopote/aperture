@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import dev.aperture.core.component.ComponentAssembly;
 import dev.aperture.core.definition.ConstraintRule;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.opening.GeneratorId;
@@ -40,6 +41,8 @@ import java.util.Map;
  * Loads {@link OpeningTypeDefinition} from JSON data packs.
  */
 public final class OpeningTypeDefinitionReader {
+	private final ComponentAssemblyReader componentReader = new ComponentAssemblyReader();
+
 	public OpeningTypeDefinition read(Path path) throws IOException {
 		try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
 			return parse(JsonParser.parseReader(reader).getAsJsonObject());
@@ -78,10 +81,9 @@ public final class OpeningTypeDefinitionReader {
 			}
 		}
 
-		Map<String, Object> components = new LinkedHashMap<>();
-		if (root.has("components")) {
-			components.putAll(parseComponents(root.getAsJsonObject("components")));
-		}
+		ComponentAssembly components = root.has("components")
+			? componentReader.read(root.get("components"))
+			: ComponentAssembly.empty();
 
 		List<String> materialSlots = new ArrayList<>();
 		if (root.has("materialSlots")) {
@@ -253,22 +255,5 @@ public final class OpeningTypeDefinitionReader {
 			case BOOL -> ParameterValue.bool(element.getAsBoolean());
 			case MATERIAL_REF -> ParameterValue.materialRef(element.getAsString());
 		};
-	}
-
-	@SuppressWarnings("unchecked")
-	private static Map<String, Object> parseComponents(JsonObject object) {
-		Map<String, Object> components = new LinkedHashMap<>();
-		for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
-			if (entry.getValue().isJsonObject()) {
-				Map<String, String> nested = new LinkedHashMap<>();
-				for (Map.Entry<String, JsonElement> nestedEntry : entry.getValue().getAsJsonObject().entrySet()) {
-					nested.put(nestedEntry.getKey(), nestedEntry.getValue().getAsString());
-				}
-				components.put(entry.getKey(), nested);
-			} else {
-				components.put(entry.getKey(), entry.getValue().getAsString());
-			}
-		}
-		return components;
 	}
 }

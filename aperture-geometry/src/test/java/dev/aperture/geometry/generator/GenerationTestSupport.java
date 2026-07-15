@@ -46,6 +46,10 @@ public final class GenerationTestSupport {
 		return new RectangularWindowGenerator().generate(context(BuiltinOpeningTypes.casementWindow(), overrides));
 	}
 
+	public static PipelineResult generateDoorPipeline(ParameterSet overrides) {
+		return new RectangularWindowGenerator().generate(context(BuiltinOpeningTypes.door(), overrides));
+	}
+
 	public static GeometryResult generateCasementWindow(ParameterSet overrides) {
 		return generateCasementWindowPipeline(overrides).geometry();
 	}

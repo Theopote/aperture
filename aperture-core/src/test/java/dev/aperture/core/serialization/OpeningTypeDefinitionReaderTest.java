@@ -1,6 +1,7 @@
 package dev.aperture.core.serialization;
 
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
+import dev.aperture.core.component.ComponentKind;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.opening.OpeningCategory;
 import dev.aperture.core.parameter.ParameterType;
@@ -26,6 +27,18 @@ class OpeningTypeDefinitionReaderTest {
 			assertTrue(definition.parameters().containsKey("width"));
 			assertEquals(ParameterType.LENGTH, definition.parameters().get("width").type());
 			assertEquals(2, definition.materialSlots().size());
+		}
+	}
+
+	@Test
+	void readsFixedWindowComponentsFromArrayFormat() throws Exception {
+		try (InputStream stream = getClass().getClassLoader()
+			.getResourceAsStream("opening_types/fixed_window.json")) {
+			OpeningTypeDefinition definition = reader.read(stream);
+
+			assertTrue(definition.components().has(ComponentKind.FRAME));
+			assertTrue(definition.components().has(ComponentKind.PANEL));
+			assertTrue(definition.components().has(ComponentKind.GLASS));
 		}
 	}
 }

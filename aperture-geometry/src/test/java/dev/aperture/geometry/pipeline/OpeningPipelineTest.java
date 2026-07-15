@@ -13,10 +13,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OpeningPipelineTest {
 	@Test
-	void standardPipelineRunsStepsInCanonicalOrder() {
-		var pipeline = new RectangularWindowGenerator().pipeline();
+	void componentPipelineRunsStepsInPlannedOrderForFixedWindow() {
+		var pipeline = new RectangularWindowGenerator().pipelineFor(
+			GenerationTestSupport.context(BuiltinOpeningTypes.fixedWindow(), ParameterSet.empty())
+		);
 
-		assertEquals(OpeningPipeline.STEP_ORDER, pipeline.stepIds());
+		assertEquals(
+			ComponentPipelinePlanner.plannedStepIds(BuiltinOpeningTypes.fixedWindow().components()),
+			pipeline.stepIds()
+		);
 	}
 
 	@Test
@@ -37,5 +42,13 @@ class OpeningPipelineTest {
 
 		assertFalse(result.geometry().solids().stream().anyMatch(s -> s.componentPath().equals("glazing")));
 		assertTrue(result.meshes().partsByPath().containsKey("panel.glazing"));
+	}
+
+	@Test
+	void doorPipelineBuildsPanelAndSillGeometry() {
+		var result = GenerationTestSupport.generateDoorPipeline(ParameterSet.empty());
+
+		assertTrue(result.meshes().partsByPath().containsKey("panel.bottom"));
+		assertTrue(result.meshes().partsByPath().containsKey("sill.main"));
 	}
 }

@@ -1,5 +1,8 @@
 package dev.aperture.geometry.pipeline;
 
+import dev.aperture.core.component.ComponentKind;
+import dev.aperture.core.parameter.ParameterType;
+import dev.aperture.core.parameter.ParameterValue;
 import dev.aperture.geometry.generator.pipeline.GenerationContext;
 
 /**
@@ -14,13 +17,17 @@ public record OpeningParameters(
 	boolean hasPanel
 ) {
 	public static OpeningParameters from(GenerationContext context) {
+		int mullions = context.parameters().get("mullions")
+			.filter(value -> value.type() == ParameterType.COUNT)
+			.map(value -> ((ParameterValue.CountValue) value).value())
+			.orElse(0);
 		return new OpeningParameters(
 			context.requireLength("width"),
 			context.requireLength("height"),
-			context.requireCount("mullions"),
+			mullions,
 			context.angleDegrees("open_angle", 0),
 			context.componentString("panel", "hinge", "left"),
-			context.hasComponent("panel")
+			context.hasComponent(ComponentKind.PANEL)
 		);
 	}
 }
