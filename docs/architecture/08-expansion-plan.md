@@ -1,6 +1,10 @@
 # 08 — Expansion Plan
 
-> **Canonical product roadmap:** see [12-phase-roadmap.md](12-phase-roadmap.md) for the full twelve-phase breakdown (Architecture → AI + NodeCraft). This document retains the original time-horizon view (Phase 0–5).
+> **Product decision framework:** [13-platform-roadmap-af.md](13-platform-roadmap-af.md) — Phase A–F + **族库冻结策略**（Door/Window/Curtain Wall 族库在 Opening Pipeline + Editor 2.0 封板前暂停）。
+>
+> **Engineering breakdown:** [12-phase-roadmap.md](12-phase-roadmap.md) — twelve-phase deliverable split (Architecture → AI + NodeCraft).
+>
+> This document retains the original time-horizon view (Phase 0–5).
 
 ## Phase 0 — Foundation (Months 1–3) ← **Current**
 

@@ -16,7 +16,8 @@ Every door, window, curtain wall, skylight, and façade element is a single kind
 | [06-placement.md](06-placement.md) | Placement workflow and validation |
 | [07-serialization.md](07-serialization.md) | Persistence, networking, and migration |
 | [08-expansion-plan.md](08-expansion-plan.md) | Phased roadmap (Phase 0–5) |
-| [12-phase-roadmap.md](12-phase-roadmap.md) | **Twelve-phase product roadmap** (Architecture → AI/NodeCraft) |
+| [13-platform-roadmap-af.md](13-platform-roadmap-af.md) | **Platform roadmap A–F** — 决策框架 + **族库冻结策略** |
+| [12-phase-roadmap.md](12-phase-roadmap.md) | Twelve-phase engineering breakdown (Architecture → AI/NodeCraft) |
 | [09-folder-structure.md](09-folder-structure.md) | Repository layout |
 | [10-fabric-placement-adapter.md](10-fabric-placement-adapter.md) | Fabric raycast → PlacementContext adapter |
 
