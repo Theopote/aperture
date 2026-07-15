@@ -1,4 +1,4 @@
-package dev.aperture.geometry.generators;
+package dev.aperture.geometry.generator;
 
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.definition.OpeningTypeDefinition;
