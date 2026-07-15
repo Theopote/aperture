@@ -57,7 +57,7 @@ public final class PlacementPreviewMeshService {
 			meshAsset = BAKE_SERVICE.applyDeltaFromAssembly(context.document(), meshAsset, delta, pipeline, LODLevel.FULL);
 
 			var definition = runtime.openingTypes().require(session.selectedTypeId());
-			ParameterSet mergedParameters = ParameterSet.mergeDefaults(definition.parameters(), session.parameterOverrides());
+			ParameterSet mergedParameters = definition.resolveParameters(session.parameterOverrides());
 			if (!mergedParameters.equals(lastParameters)) {
 				materialBindings = MaterialBindingBuilder.build(
 					definition,

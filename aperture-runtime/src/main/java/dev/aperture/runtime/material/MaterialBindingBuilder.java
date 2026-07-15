@@ -29,7 +29,7 @@ public final class MaterialBindingBuilder {
 		GeometryResult geometry,
 		MaterialResolverRegistry materials
 	) {
-		ParameterSet parameters = ParameterSet.mergeDefaults(definition.parameters(), instance.parameters());
+		ParameterSet parameters = definition.resolveParameters(instance.parameters());
 		Map<PartId, MaterialBinding> bindings = new LinkedHashMap<>();
 
 		for (GeometrySolid solid : geometry.solids()) {

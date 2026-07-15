@@ -20,7 +20,7 @@ public final class OpeningFootprint {
 	}
 
 	public static Optional<BoundingBox> worldBounds(OpeningTypeDefinition definition, OpeningInstance instance) {
-		ParameterSet parameters = ParameterSet.mergeDefaults(definition.parameters(), instance.parameters());
+		ParameterSet parameters = definition.resolveParameters(instance.parameters());
 		Optional<Double> width = length(parameters, "width");
 		Optional<Double> height = length(parameters, "height");
 		if (width.isEmpty() || height.isEmpty()) {

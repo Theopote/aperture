@@ -6,12 +6,11 @@ import dev.aperture.client.editor.GizmoDragController;
 import dev.aperture.client.parameter.ParameterEditorScreen;
 import dev.aperture.client.render.placement.PlacementPreviewMeshService;
 import dev.aperture.core.definition.OpeningTypeDefinition;
-import dev.aperture.math.Transform3d;
-import dev.aperture.core.instance.OpeningInstance;
-import dev.aperture.core.parameter.ParameterDefinition;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.core.parametric.InstanceParameters;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.opening.OpeningId;
+import dev.aperture.math.Transform3d;
+import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.placement.PlacementSession;
 import dev.aperture.fabric.placement.FabricPlacementAdapter;
@@ -124,19 +123,7 @@ public final class ClientPlacementPreview {
 	}
 
 	private static ParameterSet overridesFromInstance(OpeningTypeDefinition definition, OpeningInstance instance) {
-		ParameterSet.Builder builder = ParameterSet.builder();
-		for (var entry : instance.parameters().asMap().entrySet()) {
-			ParameterDefinition schema = definition.parameters().get(entry.getKey());
-			if (schema == null) {
-				builder.put(entry.getKey(), entry.getValue());
-				continue;
-			}
-			ParameterValue defaultValue = schema.defaultValue();
-			if (!defaultValue.equals(entry.getValue())) {
-				builder.put(entry.getKey(), entry.getValue());
-			}
-		}
-		return builder.build();
+		return InstanceParameters.extractOverrides(definition, instance.parameters());
 	}
 
 	public static java.util.Optional<ClientEditorBridge> editorBridge() {

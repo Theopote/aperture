@@ -32,7 +32,7 @@ import java.util.UUID;
 
 /**
  * JSON codec for {@link OpeningInstance}, aligned with {@code opening-instance.schema.json}.
- * Parameter types are resolved from the opening type definition on read.
+ * The {@code parameters} object stores sparse overrides only; defaults come from the opening type.
  */
 public final class OpeningInstanceCodec implements JsonCodec<OpeningInstance> {
 	private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -91,7 +91,7 @@ public final class OpeningInstanceCodec implements JsonCodec<OpeningInstance> {
 		}
 
 		ParameterSet parameters = root.has("parameters")
-			? readParameters(root.getAsJsonObject("parameters"), definition.parameters())
+			? readParameters(root.getAsJsonObject("parameters"), definition.parametricSchema().toLegacyMap())
 			: ParameterSet.empty();
 
 		Transform3d transform = root.has("transform")

@@ -1,6 +1,7 @@
 package dev.aperture.opening.geometry.pipeline.mullion;
 
 import dev.aperture.core.component.MullionComponent;
+import dev.aperture.core.parametric.ParameterRef;
 import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 import dev.aperture.geometry.profile.ProfileCurve;
@@ -51,6 +52,14 @@ public final class MullionGenerator implements ComponentPipelineStep {
 	private static MullionSource resolveSource(String source) {
 		if (source == null || source.isBlank()) {
 			return MullionSource.MULLIONS;
+		}
+		if (ParameterRef.isReference(source)) {
+			return switch (ParameterRef.parse(source).name()) {
+				case "cols" -> MullionSource.COLS;
+				case "rows" -> MullionSource.ROWS;
+				case "mullions" -> MullionSource.MULLIONS;
+				default -> MullionSource.ALL;
+			};
 		}
 		return switch (source) {
 			case String value when value.endsWith(":cols") -> MullionSource.COLS;

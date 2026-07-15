@@ -55,10 +55,8 @@ public final class InstanceRenderCache {
 			);
 		}
 
-		ParameterSet mergedParameters = ParameterSet.mergeDefaults(
-			runtime.openingTypes().require(instance.typeId()).parameters(),
-			instance.parameters()
-		);
+		var definition = runtime.openingTypes().require(instance.typeId());
+		ParameterSet mergedParameters = definition.resolveParameters(instance.parameters());
 		if (!mergedParameters.equals(cached.lastParameters)) {
 			cached.materialBindings = MaterialBindingBuilder.build(
 				runtime.openingTypes().require(instance.typeId()),
