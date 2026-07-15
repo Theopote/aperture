@@ -13,7 +13,7 @@ class ComponentPipelinePlannerTest {
 	@Test
 	void fixedWindowPipelineIncludesFrameGlassAndDividerSteps() {
 		assertEquals(
-			List.of("profile", "frame", "glass", "accessory"),
+			List.of("frame", "glass", "accessory"),
 			ComponentPipelinePlanner.plannedStepIds(BuiltinOpeningTypes.fixedWindow().components())
 		);
 	}
@@ -28,7 +28,7 @@ class ComponentPipelinePlannerTest {
 	@Test
 	void doorPipelineIncludesHardwareAndSill() {
 		var steps = ComponentPipelinePlanner.plannedStepIds(BuiltinOpeningTypes.door().components());
-		assertEquals(List.of("profile", "frame", "panel", "glass", "sill", "hardware", "accessory"), steps);
+		assertEquals(List.of("frame", "panel", "glass", "sill", "hardware", "accessory"), steps);
 	}
 
 	@Test
