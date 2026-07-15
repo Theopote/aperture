@@ -1,6 +1,6 @@
 package dev.aperture.geometry.model;
 
-import dev.aperture.geometry.primitives.BoundingBox;
+import dev.aperture.core.geometry.BoundingBox;
 
 /**
  * A single generated solid belonging to a material slot and render layer.

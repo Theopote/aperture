@@ -5,8 +5,8 @@ import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.geometry.model.GeometrySolid;
-import dev.aperture.geometry.primitives.BoundingBox;
-import dev.aperture.geometry.primitives.Vec3d;
+import dev.aperture.core.geometry.BoundingBox;
+import dev.aperture.core.geometry.Vec3d;
 
 import java.util.ArrayList;
 import java.util.List;

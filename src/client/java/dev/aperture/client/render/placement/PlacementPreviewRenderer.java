@@ -3,7 +3,7 @@ package dev.aperture.client.render.placement;
 import dev.aperture.api.ApertureApi;
 import dev.aperture.client.placement.ClientPlacementPreview;
 import dev.aperture.core.definition.OpeningTypeDefinition;
-import dev.aperture.geometry.primitives.BoundingBox;
+import dev.aperture.core.geometry.BoundingBox;
 import dev.aperture.core.placement.OpeningFootprint;
 import dev.aperture.core.placement.PlacementSession;
 import dev.aperture.fabric.placement.FabricPlacementTarget;

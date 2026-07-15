@@ -1,6 +1,6 @@
 package dev.aperture.core.placement;
 
-import dev.aperture.geometry.primitives.BoundingBox;
+import dev.aperture.core.geometry.BoundingBox;
 import dev.aperture.core.instance.HostBinding;
 import dev.aperture.core.instance.OpeningInstance;
 

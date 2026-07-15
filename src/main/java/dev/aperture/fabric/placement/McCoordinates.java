@@ -1,7 +1,7 @@
 package dev.aperture.fabric.placement;
 
-import dev.aperture.geometry.primitives.BoundingBox;
-import dev.aperture.geometry.primitives.Vec3d;
+import dev.aperture.core.geometry.BoundingBox;
+import dev.aperture.core.geometry.Vec3d;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 

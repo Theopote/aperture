@@ -1,9 +1,9 @@
 package dev.aperture.fabric.placement;
 
-import dev.aperture.geometry.primitives.BoundingBox;
-import dev.aperture.geometry.primitives.Facing;
-import dev.aperture.geometry.primitives.Transform3d;
-import dev.aperture.geometry.primitives.Vec3d;
+import dev.aperture.core.geometry.BoundingBox;
+import dev.aperture.core.geometry.Facing;
+import dev.aperture.core.geometry.Transform3d;
+import dev.aperture.core.geometry.Vec3d;
 import dev.aperture.core.instance.HostBinding;
 import dev.aperture.core.placement.PlacementContext;
 import net.minecraft.core.BlockPos;

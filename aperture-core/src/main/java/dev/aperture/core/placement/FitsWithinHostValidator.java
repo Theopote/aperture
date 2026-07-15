@@ -1,7 +1,7 @@
 package dev.aperture.core.placement;
 
 import dev.aperture.core.definition.OpeningTypeDefinition;
-import dev.aperture.geometry.primitives.BoundingBox;
+import dev.aperture.core.geometry.BoundingBox;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.validation.ValidationIssue;
 import dev.aperture.core.validation.ValidationResult;
