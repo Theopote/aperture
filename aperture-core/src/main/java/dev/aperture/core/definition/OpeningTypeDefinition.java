@@ -44,6 +44,10 @@ public record OpeningTypeDefinition(
 		materialSlots = List.copyOf(materialSlots);
 	}
 
+	/**
+	 * @deprecated Use {@link #parametricSchema()}.
+	 */
+	@Deprecated
 	public Map<String, ParameterDefinition> parameters() {
 		return parametricSchema.toLegacyMap();
 	}
@@ -83,6 +87,10 @@ public record OpeningTypeDefinition(
 			return this;
 		}
 
+		/**
+		 * @deprecated Use {@link #parameter(String, Parameter)} with typed parametric schema entries.
+		 */
+		@Deprecated
 		public Builder parameter(String name, ParameterDefinition definition) {
 			parametricSchema.put(name, dev.aperture.core.parametric.ParameterBridge.fromDefinition(definition));
 			return this;

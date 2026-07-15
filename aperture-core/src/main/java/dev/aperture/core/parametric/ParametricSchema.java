@@ -28,8 +28,20 @@ public final class ParametricSchema {
 		return new ParametricSchema(parameters);
 	}
 
+	/**
+	 * @deprecated Use {@link ParametricSchema#builder()} with typed {@link Parameter} entries.
+	 */
+	@Deprecated
 	public static ParametricSchema fromLegacy(Map<String, ParameterDefinition> legacy) {
 		return new ParametricSchema(ParameterBridge.fromLegacyMap(legacy));
+	}
+
+	/**
+	 * @deprecated Prefer {@link #parameters()} and typed {@link Parameter} schema entries.
+	 */
+	@Deprecated
+	public Map<String, ParameterDefinition> toLegacyMap() {
+		return ParameterBridge.toLegacyMap(parameters);
 	}
 
 	public Map<String, Parameter> parameters() {
@@ -48,13 +60,14 @@ public final class ParametricSchema {
 		return get(name).orElseThrow(() -> new IllegalArgumentException("Unknown parameter: " + name));
 	}
 
-	public Map<String, ParameterDefinition> toLegacyMap() {
-		return ParameterBridge.toLegacyMap(parameters);
-	}
-
 	public ParameterSet mergeDefaults(ParameterSet overrides) {
 		Objects.requireNonNull(overrides, "overrides");
-		return ParameterSet.mergeDefaults(toLegacyMap(), overrides);
+		ParameterSet.Builder builder = ParameterSet.builder();
+		for (Map.Entry<String, Parameter> entry : parameters.entrySet()) {
+			builder.put(entry.getKey(), entry.getValue().defaultValue());
+		}
+		builder.putAll(overrides.asMap());
+		return builder.build();
 	}
 
 	/**

@@ -17,7 +17,7 @@ import java.util.List;
 public final class ParametricValidator implements OpeningValidator {
 	@Override
 	public ValidationResult validate(OpeningTypeDefinition definition, OpeningInstance instance) {
-		ParameterSet resolved = definition.parametricSchema().mergeDefaults(instance.parameters());
+		ParameterSet resolved = definition.resolveParameters(instance.parameters());
 		List<ValidationIssue> issues = new ArrayList<>();
 
 		for (String name : definition.parametricSchema().names()) {

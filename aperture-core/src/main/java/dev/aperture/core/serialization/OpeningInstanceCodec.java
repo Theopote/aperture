@@ -14,7 +14,8 @@ import dev.aperture.core.instance.HostType;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.instance.OpeningState;
 import dev.aperture.core.opening.OpeningId;
-import dev.aperture.core.parameter.ParameterDefinition;
+import dev.aperture.core.parametric.ParametricSchema;
+import dev.aperture.core.parametric.Parameter;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.parameter.ParameterType;
 import dev.aperture.core.parameter.ParameterValue;
@@ -91,7 +92,7 @@ public final class OpeningInstanceCodec implements JsonCodec<OpeningInstance> {
 		}
 
 		ParameterSet parameters = root.has("parameters")
-			? readParameters(root.getAsJsonObject("parameters"), definition.parametricSchema().toLegacyMap())
+			? readParameters(root.getAsJsonObject("parameters"), definition.parametricSchema())
 			: ParameterSet.empty();
 
 		Transform3d transform = root.has("transform")
@@ -154,17 +155,12 @@ public final class OpeningInstanceCodec implements JsonCodec<OpeningInstance> {
 		return new com.google.gson.JsonPrimitive(value);
 	}
 
-	private static ParameterSet readParameters(
-		JsonObject object,
-		Map<String, ParameterDefinition> schema
-	) {
+	private static ParameterSet readParameters(JsonObject object, ParametricSchema schema) {
 		ParameterSet.Builder builder = ParameterSet.builder();
 		for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
-			ParameterDefinition definition = schema.get(entry.getKey());
-			if (definition == null) {
-				throw new IllegalArgumentException("Unknown parameter in instance: " + entry.getKey());
-			}
-			builder.put(entry.getKey(), readParameterValue(definition.type(), entry.getValue()));
+			Parameter parameter = schema.get(entry.getKey())
+				.orElseThrow(() -> new IllegalArgumentException("Unknown parameter in instance: " + entry.getKey()));
+			builder.put(entry.getKey(), readParameterValue(parameter.storageType(), entry.getValue()));
 		}
 		return builder.build();
 	}

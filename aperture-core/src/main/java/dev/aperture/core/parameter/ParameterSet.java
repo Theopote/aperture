@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 
+import dev.aperture.core.parametric.ParametricSchema;
+
 /**
  * Resolved parameter values for an opening instance or generation request.
  * <p>
@@ -33,13 +35,18 @@ public final class ParameterSet {
 		return new Builder();
 	}
 
+	public static ParameterSet mergeDefaults(ParametricSchema schema, ParameterSet overrides) {
+		Objects.requireNonNull(schema, "schema");
+		Objects.requireNonNull(overrides, "overrides");
+		return schema.mergeDefaults(overrides);
+	}
+
+	/**
+	 * @deprecated Use {@link ParametricSchema#mergeDefaults(ParameterSet)} instead.
+	 */
+	@Deprecated
 	public static ParameterSet mergeDefaults(Map<String, ParameterDefinition> schema, ParameterSet overrides) {
-		Builder builder = builder();
-		for (Map.Entry<String, ParameterDefinition> entry : schema.entrySet()) {
-			builder.put(entry.getKey(), entry.getValue().defaultValue());
-		}
-		builder.putAll(overrides.values);
-		return builder.build();
+		return ParametricSchema.fromLegacy(schema).mergeDefaults(overrides);
 	}
 
 	public Map<String, ParameterValue> asMap() {

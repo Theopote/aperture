@@ -8,7 +8,10 @@ import java.util.OptionalInt;
 
 /**
  * Schema entry describing a single parametric dimension on an opening type.
+ *
+ * @deprecated Use typed {@link dev.aperture.core.parametric.Parameter} entries in {@link ParametricSchema}.
  */
+@Deprecated
 public record ParameterDefinition(
 	ParameterType type,
 	ParameterValue defaultValue,

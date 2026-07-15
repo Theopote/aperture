@@ -19,7 +19,7 @@ public final class ExpressionConstraintValidator implements OpeningValidator {
 
 	@Override
 	public ValidationResult validate(OpeningTypeDefinition definition, OpeningInstance instance) {
-		ParameterSet resolved = definition.parametricSchema().mergeDefaults(instance.parameters());
+		ParameterSet resolved = definition.resolveParameters(instance.parameters());
 		return validateResolved(definition, resolved);
 	}
 

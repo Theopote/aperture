@@ -28,6 +28,10 @@ public sealed interface Parameter permits
 
 	ParameterType storageType();
 
+	/**
+	 * @deprecated Legacy bridge for {@link ParameterDefinition}. Prefer {@link ParametricSchema}.
+	 */
+	@Deprecated
 	ParameterDefinition toDefinition();
 
 	void validateValue(String name, ParameterValue value, List<ValidationIssue> issues);
