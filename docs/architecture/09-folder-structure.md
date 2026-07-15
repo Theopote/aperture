@@ -31,12 +31,13 @@ aperture/
 │       ├── Generator.java
 │       └── registry/
 │
-├── src/                             # Fabric mod (common + client)
-│   ├── main/java/dev/aperture/
-│   │   ├── Aperture.java
-│   │   └── bootstrap/
-│   └── client/java/dev/aperture/client/
-│       └── ApertureClient.java
+├── src/                             # Fabric mod (single source set)
+│   └── main/
+│       ├── java/dev/aperture/
+│       │   ├── Aperture.java
+│       │   ├── bootstrap/
+│       │   └── client/
+│       └── resources/
 │
 ├── aperture-data/                   # Pack-driven content
 │   └── aperture/
@@ -51,6 +52,6 @@ aperture/
 
 ## Current vs Target
 
-Phase 0 establishes `aperture-core`, `aperture-geometry`, and `aperture-api` as Gradle subprojects. The root project remains the Fabric mod with `src/main` and `src/client` source sets (Loom split environment).
+Phase 0 establishes `aperture-core`, `aperture-geometry`, and `aperture-api` as Gradle subprojects. The root project is the Fabric mod with a single `src/main` source set (no split client environment).
 
 Future phases may extract `aperture-common` and `aperture-client` into separate Gradle modules if the codebase warrants it.

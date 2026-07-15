@@ -22,11 +22,7 @@
 		]
 	},
 	"mixins": [
-		"aperture.mixins.json",
-		{
-			"config": "aperture.client.mixins.json",
-			"environment": "client"
-		}
+		"aperture.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.19.3",

@@ -2,7 +2,6 @@ package dev.aperture;
 
 import dev.aperture.bootstrap.ApertureBootstrap;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +22,8 @@ public class Aperture implements ModInitializer {
 		return bootstrap;
 	}
 
-	public static Identifier id(String path) {
-		return Identifier.fromNamespaceAndPath(MOD_ID, path);
+	/** Namespaced resource id string, e.g. {@code aperture:fixed_window}. */
+	public static String id(String path) {
+		return MOD_ID + ":" + path;
 	}
 }
