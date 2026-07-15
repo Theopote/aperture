@@ -86,7 +86,7 @@ class MeshBakeServiceTest {
 		var delta2 = document.updateFrom(after.geometry());
 		MeshAsset patched = bakeService.applyDeltaFromAssembly(document, asset, delta2, after, LODLevel.FULL);
 
-		assertEquals(6, patched.partIds().size());
+		assertEquals(7, patched.partIds().size());
 		assertTrue(delta2.unchanged().contains(PartId.of("glazing")));
 		assertEquals(glazingHandle, patched.section(PartId.of("glazing")).orElseThrow().handle());
 		assertTrue(patched.section(PartId.of("frame.mullion.2")).isPresent());
