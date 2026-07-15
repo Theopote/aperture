@@ -96,7 +96,7 @@ class MeshBakeServiceTest {
 		var definition = BuiltinOpeningTypes.fixedWindow();
 		GenerationContext context = new GenerationContext(
 			definition,
-			ParameterSet.mergeDefaults(definition.parameters(), ParameterSet.builder()
+			definition.resolveParameters(, ParameterSet.builder()
 				.put("width", ParameterValue.length(width))
 				.put("height", ParameterValue.length(height))
 				.put("mullions", ParameterValue.count(mullions))

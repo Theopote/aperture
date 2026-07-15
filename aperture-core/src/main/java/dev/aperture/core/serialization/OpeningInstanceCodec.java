@@ -14,11 +14,8 @@ import dev.aperture.core.instance.HostType;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.instance.OpeningState;
 import dev.aperture.core.opening.OpeningId;
-import dev.aperture.core.parametric.ParametricSchema;
-import dev.aperture.core.parametric.Parameter;
+import dev.aperture.core.parametric.ParameterSetJson;
 import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterType;
-import dev.aperture.core.parameter.ParameterValue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,7 +69,7 @@ public final class OpeningInstanceCodec implements JsonCodec<OpeningInstance> {
 		root.addProperty("schemaVersion", instance.schemaVersion());
 		root.addProperty("instanceId", instance.instanceId().toString());
 		root.addProperty("typeId", instance.typeId().toString());
-		root.add("parameters", writeParameters(instance.parameters()));
+		root.add("parameters", ParameterSetJson.writeOverrides(instance.parameters()));
 		root.add("transform", writeTransform(instance.transform()));
 		root.add("host", writeHost(instance.host()));
 		root.add("state", writeState(instance.state()));
@@ -92,7 +89,7 @@ public final class OpeningInstanceCodec implements JsonCodec<OpeningInstance> {
 		}
 
 		ParameterSet parameters = root.has("parameters")
-			? readParameters(root.getAsJsonObject("parameters"), definition.parametricSchema())
+			? ParameterSetJson.readOverrides(definition.parametricSchema(), root.getAsJsonObject("parameters"))
 			: ParameterSet.empty();
 
 		Transform3d transform = root.has("transform")
@@ -117,64 +114,6 @@ public final class OpeningInstanceCodec implements JsonCodec<OpeningInstance> {
 			.state(state)
 			.revision(revision)
 			.build();
-	}
-
-	private static JsonObject writeParameters(ParameterSet parameters) {
-		JsonObject object = new JsonObject();
-		for (Map.Entry<String, ParameterValue> entry : parameters.asMap().entrySet()) {
-			object.add(entry.getKey(), writeParameterValue(entry.getValue()));
-		}
-		return object;
-	}
-
-	private static JsonElement writeParameterValue(ParameterValue value) {
-		return switch (value) {
-			case ParameterValue.LengthValue length -> gsonNumber(length.millimeters());
-			case ParameterValue.AngleValue angle -> gsonNumber(angle.degrees());
-			case ParameterValue.CountValue count -> gsonNumber(count.value());
-			case ParameterValue.NumberValue number -> gsonNumber(number.value());
-			case ParameterValue.EnumValue enumValue -> gsonString(enumValue.value());
-			case ParameterValue.BoolValue bool -> gsonBool(bool.value());
-			case ParameterValue.MaterialRefValue materialRef -> gsonString(materialRef.raw());
-		};
-	}
-
-	private static com.google.gson.JsonPrimitive gsonNumber(double value) {
-		return new com.google.gson.JsonPrimitive(value);
-	}
-
-	private static com.google.gson.JsonPrimitive gsonNumber(int value) {
-		return new com.google.gson.JsonPrimitive(value);
-	}
-
-	private static com.google.gson.JsonPrimitive gsonString(String value) {
-		return new com.google.gson.JsonPrimitive(value);
-	}
-
-	private static com.google.gson.JsonPrimitive gsonBool(boolean value) {
-		return new com.google.gson.JsonPrimitive(value);
-	}
-
-	private static ParameterSet readParameters(JsonObject object, ParametricSchema schema) {
-		ParameterSet.Builder builder = ParameterSet.builder();
-		for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
-			Parameter parameter = schema.get(entry.getKey())
-				.orElseThrow(() -> new IllegalArgumentException("Unknown parameter in instance: " + entry.getKey()));
-			builder.put(entry.getKey(), readParameterValue(parameter.storageType(), entry.getValue()));
-		}
-		return builder.build();
-	}
-
-	private static ParameterValue readParameterValue(ParameterType type, JsonElement element) {
-		return switch (type) {
-			case LENGTH -> ParameterValue.length(element.getAsDouble());
-			case ANGLE -> ParameterValue.angle(element.getAsDouble());
-			case COUNT -> ParameterValue.count(element.getAsInt());
-			case NUMBER -> ParameterValue.number(element.getAsDouble());
-			case ENUM -> ParameterValue.enumValue(element.getAsString());
-			case BOOL -> ParameterValue.bool(element.getAsBoolean());
-			case MATERIAL_REF -> ParameterValue.materialRef(element.getAsString());
-		};
 	}
 
 	private static JsonObject writeTransform(Transform3d transform) {

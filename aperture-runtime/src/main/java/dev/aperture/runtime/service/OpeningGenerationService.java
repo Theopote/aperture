@@ -4,6 +4,7 @@ import dev.aperture.runtime.registry.GeneratorRegistry;
 import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.instance.OpeningInstance;
+import dev.aperture.core.parametric.InstanceParameters;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.validation.CompositeOpeningValidator;
 import dev.aperture.core.validation.OpeningValidator;
@@ -93,7 +94,7 @@ public final class OpeningGenerationService {
 
 	private GenerationContext validatedContext(OpeningInstance instance) {
 		OpeningTypeDefinition definition = openingTypes.require(instance.typeId());
-		ParameterSet resolved = definition.resolveParameters(instance.parameters());
+		ParameterSet resolved = InstanceParameters.forGeneration(definition, instance);
 
 		ValidationResult validation = parameterValidator.validate(definition, instance);
 		if (!validation.isValid()) {

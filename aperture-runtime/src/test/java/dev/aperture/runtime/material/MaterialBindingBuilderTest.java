@@ -23,7 +23,7 @@ class MaterialBindingBuilderTest {
 			.build();
 		var geometry = new RectangularWindowGenerator().generate(new GenerationContext(
 			definition,
-			ParameterSet.mergeDefaults(definition.parameters(), instance.parameters()),
+			definition.resolveParameters(, instance.parameters()),
 			new ProfileCatalogLoader().loadClasspathCatalog()
 		)).geometry();
 		var materials = new MaterialResolverRegistry(VanillaMaterialResolver.INSTANCE);

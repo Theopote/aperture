@@ -1,7 +1,9 @@
 package dev.aperture.core.parametric;
 
+import com.google.gson.JsonObject;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.instance.OpeningInstance;
+import dev.aperture.core.instance.OpeningState;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.parameter.ParameterValue;
 import dev.aperture.core.validation.ValidationResult;
@@ -34,6 +36,29 @@ public final class InstanceParameters {
 
 	public static ParameterSet resolve(OpeningTypeDefinition definition, OpeningInstance instance) {
 		return resolve(definition, instance.parameters());
+	}
+
+	/**
+	 * Resolves parameters for geometry generation, applying runtime {@link OpeningState} when
+	 * {@code open_angle} is not explicitly overridden on the instance.
+	 */
+	public static ParameterSet forGeneration(OpeningTypeDefinition definition, OpeningInstance instance) {
+		ParameterSet resolved = resolve(definition, instance.parameters());
+		if (instance.parameters().get("open_angle").isPresent()) {
+			return resolved;
+		}
+		return OpeningStateParameters.apply(definition, resolved, instance.state());
+	}
+
+	/**
+	 * Applies a JSON object patch (NodeCraft / AI) onto sparse overrides.
+	 */
+	public static ParametricEditResult patchJson(
+		OpeningTypeDefinition definition,
+		ParameterSet currentOverrides,
+		JsonObject json
+	) {
+		return patch(definition, currentOverrides, ParameterSetJson.readPatchMap(json));
 	}
 
 	/**
