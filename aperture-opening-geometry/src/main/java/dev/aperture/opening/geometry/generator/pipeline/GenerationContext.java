@@ -67,53 +67,8 @@ public final class GenerationContext {
 		return components().has(kind);
 	}
 
-	public boolean hasComponent(String legacyKey) {
-		return components().hasLegacyKey(legacyKey);
-	}
-
-	public String componentProfileId(String legacyKey) {
-		return switch (legacyKey) {
-			case "frame" -> components().frame()
-				.map(FrameComponent::profileId)
-				.orElseThrow(() -> missingComponent("frame"));
-			case "panel" -> components().panel()
-				.map(PanelComponent::profileId)
-				.orElseThrow(() -> missingComponent("panel"));
-			default -> components().findById(legacyKey)
-				.map(component -> component.property("profile", ""))
-				.filter(profile -> !profile.isBlank())
-				.orElseThrow(() -> missingComponent(legacyKey));
-		};
-	}
-
-	public String componentString(String legacyKey, String key, String defaultValue) {
-		Optional<PanelComponent> panel = components().panel();
-		if ("panel".equals(legacyKey) && "hinge".equals(key) && panel.isPresent()) {
-			String hingeSide = parameters.get("hinge_side")
-				.filter(value -> value.type() == ParameterType.ENUM)
-				.map(value -> ((ParameterValue.EnumValue) value).value())
-				.orElse(panel.get().hinge());
-			return hingeSide;
-		}
-		return switch (legacyKey) {
-			case "panel" -> components().panel()
-				.map(panelComponent -> panelComponent.property(key, defaultValue))
-				.orElse(defaultValue);
-			case "glazing" -> components().glass()
-				.map(glass -> glass.property(key, defaultValue))
-				.orElse(defaultValue);
-			default -> components().findById(legacyKey)
-				.map(component -> component.property(key, defaultValue))
-				.orElse(defaultValue);
-		};
-	}
-
 	public ProfileDefinition requireProfile(String profileId) {
 		return profiles.requireById(profileId);
-	}
-
-	public ProfileDefinition requireComponentProfile(String legacyKey) {
-		return requireProfile(componentProfileId(legacyKey));
 	}
 
 	public Optional<Double> optionalLength(String name) {
@@ -123,7 +78,7 @@ public final class GenerationContext {
 	}
 
 	public ProfileDefinition scaledFrameProfile() {
-		return scaledFrameProfile(requireComponentProfile("frame").id());
+		return scaledFrameProfile(requireFrameProfileId());
 	}
 
 	public ProfileDefinition scaledFrameProfile(String profileId) {
@@ -131,7 +86,7 @@ public final class GenerationContext {
 	}
 
 	public ProfileDefinition scaledPanelProfile() {
-		return scaledPanelProfile(requireComponentProfile("panel").id());
+		return scaledPanelProfile(requirePanelProfileId());
 	}
 
 	public ProfileDefinition scaledPanelProfile(String profileId) {
@@ -139,6 +94,20 @@ public final class GenerationContext {
 		double sashWidth = optionalLength("panel_width")
 			.orElse(requireLength("frame_width") * 0.75);
 		return ProfileScaler.scaleToFrameWidth(base, sashWidth);
+	}
+
+	private String requireFrameProfileId() {
+		return components().frame()
+			.map(FrameComponent::profileId)
+			.filter(profileId -> !profileId.isBlank())
+			.orElseThrow(() -> missingComponent(ComponentKind.FRAME));
+	}
+
+	private String requirePanelProfileId() {
+		return components().panel()
+			.map(PanelComponent::profileId)
+			.filter(profileId -> !profileId.isBlank())
+			.orElseThrow(() -> missingComponent(ComponentKind.PANEL));
 	}
 
 	private ProfileDefinition scaleProfile(ProfileDefinition base) {
@@ -149,7 +118,7 @@ public final class GenerationContext {
 		return ProfileScaler.scaleToFrameSize(base, targetWidth, targetDepth);
 	}
 
-	private static IllegalStateException missingComponent(String name) {
-		return new IllegalStateException("Missing component definition: " + name);
+	private static IllegalStateException missingComponent(ComponentKind kind) {
+		return new IllegalStateException("Missing component definition: " + kind.jsonKey());
 	}
 }

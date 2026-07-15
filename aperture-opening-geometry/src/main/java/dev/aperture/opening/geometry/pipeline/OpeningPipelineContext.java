@@ -2,6 +2,7 @@ package dev.aperture.opening.geometry.pipeline;
 
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
+import dev.aperture.core.component.ComponentKind;
 import dev.aperture.core.component.OpeningComponent;
 import dev.aperture.geometry.profile.ProfileCurve;
 import dev.aperture.geometry.profile.ProfileDefinition;
@@ -65,8 +66,12 @@ public final class OpeningPipelineContext {
 		return resolved.context().scaledPanelProfile();
 	}
 
-	public boolean hasComponent(String componentName) {
-		return resolved.context().hasComponent(componentName);
+	public boolean hasComponent(ComponentKind kind) {
+		return resolved.context().hasComponent(kind);
+	}
+
+	public boolean hasComponentId(String componentId) {
+		return resolved.context().components().findById(componentId).isPresent();
 	}
 
 	public ProfileDefinition profileFor(OpeningComponent component) {

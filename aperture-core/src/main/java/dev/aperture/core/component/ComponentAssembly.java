@@ -86,6 +86,8 @@ public final class ComponentAssembly {
 		return firstOfKind(ComponentKind.HARDWARE, HardwareComponent.class);
 	}
 
+	/** @deprecated Use {@link ComponentKind} checks or {@link #findById(String)}. */
+	@Deprecated
 	public boolean hasLegacyKey(String legacyKey) {
 		return switch (legacyKey) {
 			case "frame" -> has(ComponentKind.FRAME);
@@ -96,8 +98,9 @@ public final class ComponentAssembly {
 	}
 
 	/**
-	 * Converts the pre-component-system JSON map into a typed assembly.
+	 * @deprecated Use typed {@link OpeningComponent} records and JSON array format.
 	 */
+	@Deprecated
 	@SuppressWarnings("unchecked")
 	public static ComponentAssembly fromLegacyMap(Map<String, Object> legacy) {
 		if (legacy == null || legacy.isEmpty()) {

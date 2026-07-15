@@ -3,7 +3,7 @@
   "$id": "https://aperture.dev/schemas/opening-type-definition.schema.json",
   "title": "OpeningTypeDefinition",
   "type": "object",
-  "required": ["schemaVersion", "id", "category", "generator"],
+  "required": ["schemaVersion", "id", "category", "generator", "components"],
   "properties": {
     "schemaVersion": {
       "type": "integer",
@@ -39,7 +39,11 @@
       "pattern": "^[a-z][a-z0-9_]*:[a-z][a-z0-9_/]*$"
     },
     "components": {
-      "type": "object"
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/componentDefinition"
+      }
     },
     "materialSlots": {
       "type": "array",
@@ -47,6 +51,34 @@
     }
   },
   "$defs": {
+    "componentDefinition": {
+      "type": "object",
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "frame",
+            "panel",
+            "glass",
+            "hardware",
+            "trim",
+            "sill",
+            "header",
+            "divider",
+            "decoration"
+          ]
+        },
+        "id": { "type": "string", "minLength": 1 },
+        "profile": { "type": "string" },
+        "system": { "type": "string" },
+        "hinge": { "type": "string" },
+        "type": { "type": "string" },
+        "source": { "type": "string" },
+        "style": { "type": "string" }
+      },
+      "additionalProperties": { "type": "string" }
+    },
     "parameterDefinition": {
       "type": "object",
       "required": ["type"],

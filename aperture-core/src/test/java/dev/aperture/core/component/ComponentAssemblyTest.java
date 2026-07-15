@@ -32,6 +32,7 @@ class ComponentAssemblyTest {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	void convertsLegacyMapIntoTypedComponents() {
 		ComponentAssembly assembly = ComponentAssembly.fromLegacyMap(Map.of(
 			"frame", Map.of("profile", "aperture:frame_l_50x80"),

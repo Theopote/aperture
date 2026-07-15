@@ -34,9 +34,11 @@ public final class ComponentAssemblyReader {
 			return readArray(element.getAsJsonArray());
 		}
 		if (element.isJsonObject()) {
-			return readLegacyObject(element.getAsJsonObject());
+			throw new IllegalArgumentException(
+				"components must be a typed array; legacy object-map format is no longer supported"
+			);
 		}
-		throw new IllegalArgumentException("components must be an array or object");
+		throw new IllegalArgumentException("components must be an array");
 	}
 
 	private static ComponentAssembly readArray(JsonArray array) {
@@ -45,22 +47,6 @@ public final class ComponentAssemblyReader {
 			components.add(readComponent(element.getAsJsonObject()));
 		}
 		return ComponentAssembly.of(components);
-	}
-
-	private static ComponentAssembly readLegacyObject(JsonObject object) {
-		Map<String, Object> legacy = new LinkedHashMap<>();
-		for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
-			if (entry.getValue().isJsonObject()) {
-				Map<String, String> nested = new LinkedHashMap<>();
-				for (Map.Entry<String, JsonElement> nestedEntry : entry.getValue().getAsJsonObject().entrySet()) {
-					nested.put(nestedEntry.getKey(), nestedEntry.getValue().getAsString());
-				}
-				legacy.put(entry.getKey(), nested);
-			} else {
-				legacy.put(entry.getKey(), entry.getValue().getAsString());
-			}
-		}
-		return ComponentAssembly.fromLegacyMap(legacy);
 	}
 
 	private static OpeningComponent readComponent(JsonObject object) {

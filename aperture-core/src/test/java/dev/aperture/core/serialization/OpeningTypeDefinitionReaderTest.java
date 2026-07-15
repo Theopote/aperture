@@ -37,8 +37,9 @@ class OpeningTypeDefinitionReaderTest {
 			OpeningTypeDefinition definition = reader.read(stream);
 
 			assertTrue(definition.components().has(ComponentKind.FRAME));
-			assertTrue(definition.components().has(ComponentKind.PANEL));
 			assertTrue(definition.components().has(ComponentKind.GLASS));
+			assertTrue(definition.components().has(ComponentKind.DIVIDER));
+			assertEquals("mullions", definition.components().divider().orElseThrow().ref().id());
 		}
 	}
 }

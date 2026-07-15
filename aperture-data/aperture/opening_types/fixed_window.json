@@ -19,7 +19,6 @@
   "generator": "aperture:rectangular_window_v1",
   "components": [
     { "kind": "frame", "id": "frame", "profile": "aperture:frame_l_50x80" },
-    { "kind": "panel", "id": "panel", "profile": "aperture:frame_standard_50", "hinge": "left" },
     { "kind": "glass", "id": "glazing", "system": "aperture:single_glazed" },
     { "kind": "divider", "id": "mullions", "source": "parameter:mullions" }
   ],

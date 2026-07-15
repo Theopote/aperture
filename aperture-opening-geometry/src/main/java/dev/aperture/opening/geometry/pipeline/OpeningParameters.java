@@ -4,6 +4,7 @@ import dev.aperture.core.component.ComponentKind;
 import dev.aperture.core.parameter.ParameterType;
 import dev.aperture.core.parameter.ParameterValue;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
+import dev.aperture.opening.resolve.ComponentPropertyResolver;
 
 /**
  * Resolved opening parameters for the generator pipeline.
@@ -38,8 +39,8 @@ public record OpeningParameters(
 			Math.max(1, panelCount),
 			clampRatio(glassRatio),
 			context.angleDegrees("open_angle", 0),
-			context.componentString("panel", "hinge", "left"),
-			context.hasComponent(ComponentKind.PANEL)
+			ComponentPropertyResolver.panelHinge(context, "left"),
+			ComponentPropertyResolver.hasKind(context, ComponentKind.PANEL)
 		);
 	}
 
