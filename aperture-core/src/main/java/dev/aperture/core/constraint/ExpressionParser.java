@@ -200,9 +200,6 @@ public final class ExpressionParser {
 		}
 
 		private boolean check(ExpressionLexer.TokenType type) {
-			if (isAtEnd()) {
-				return false;
-			}
 			return peek().type() == type;
 		}
 
@@ -212,10 +209,6 @@ public final class ExpressionParser {
 
 		private ExpressionLexer.Token previous() {
 			return tokens.get(index - 1);
-		}
-
-		private boolean isAtEnd() {
-			return peek().type() == ExpressionLexer.TokenType.EOF;
 		}
 
 		private ConstraintExpressionException error(String message) {
