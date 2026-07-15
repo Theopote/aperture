@@ -1,6 +1,5 @@
 package dev.aperture.core.parametric;
 
-import dev.aperture.core.parameter.ParameterDefinition;
 import dev.aperture.core.parameter.ParameterType;
 import dev.aperture.core.parameter.ParameterValue;
 import dev.aperture.core.validation.ValidationIssue;
@@ -36,11 +35,6 @@ public record BooleanParameter(
 	@Override
 	public ParameterType storageType() {
 		return ParameterType.BOOL;
-	}
-
-	@Override
-	public ParameterDefinition toDefinition() {
-		return ParameterDefinition.builder(ParameterType.BOOL).defaultValue(defaultValue).build();
 	}
 
 	@Override

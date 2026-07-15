@@ -1,6 +1,5 @@
 package dev.aperture.core.parametric;
 
-import dev.aperture.core.parameter.ParameterDefinition;
 import dev.aperture.core.parameter.ParameterType;
 import dev.aperture.core.parameter.ParameterValue;
 import dev.aperture.core.validation.ValidationIssue;
@@ -40,14 +39,6 @@ public record EnumParameter(
 	@Override
 	public ParameterType storageType() {
 		return ParameterType.ENUM;
-	}
-
-	@Override
-	public ParameterDefinition toDefinition() {
-		return ParameterDefinition.builder(ParameterType.ENUM)
-			.defaultValue(defaultValue)
-			.enumValues(values.toArray(String[]::new))
-			.build();
 	}
 
 	@Override

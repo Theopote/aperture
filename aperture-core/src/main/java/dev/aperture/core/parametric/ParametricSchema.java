@@ -1,6 +1,5 @@
 package dev.aperture.core.parametric;
 
-import dev.aperture.core.parameter.ParameterDefinition;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.parameter.ParameterValue;
 
@@ -26,22 +25,6 @@ public final class ParametricSchema {
 
 	public static ParametricSchema of(Map<String, Parameter> parameters) {
 		return new ParametricSchema(parameters);
-	}
-
-	/**
-	 * @deprecated Use {@link ParametricSchema#builder()} with typed {@link Parameter} entries.
-	 */
-	@Deprecated
-	public static ParametricSchema fromLegacy(Map<String, ParameterDefinition> legacy) {
-		return new ParametricSchema(ParameterBridge.fromLegacyMap(legacy));
-	}
-
-	/**
-	 * @deprecated Prefer {@link #parameters()} and typed {@link Parameter} schema entries.
-	 */
-	@Deprecated
-	public Map<String, ParameterDefinition> toLegacyMap() {
-		return ParameterBridge.toLegacyMap(parameters);
 	}
 
 	public Map<String, Parameter> parameters() {

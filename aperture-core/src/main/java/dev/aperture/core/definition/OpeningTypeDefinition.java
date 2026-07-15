@@ -5,7 +5,6 @@ import dev.aperture.core.component.OpeningComponent;
 import dev.aperture.core.opening.GeneratorId;
 import dev.aperture.core.opening.OpeningCategory;
 import dev.aperture.core.opening.OpeningId;
-import dev.aperture.core.parameter.ParameterDefinition;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.parametric.ParametricSchema;
 import dev.aperture.core.parametric.Parameter;
@@ -44,14 +43,6 @@ public record OpeningTypeDefinition(
 		materialSlots = List.copyOf(materialSlots);
 	}
 
-	/**
-	 * @deprecated Use {@link #parametricSchema()} and {@link #resolveParameters(ParameterSet)}.
-	 */
-	@Deprecated
-	public Map<String, ParameterDefinition> parameters() {
-		return parametricSchema.toLegacyMap();
-	}
-
 	/** Resolves sparse instance overrides to the full effective parameter set. */
 	public ParameterSet resolveParameters(ParameterSet overrides) {
 		return parametricSchema.mergeDefaults(overrides);
@@ -84,15 +75,6 @@ public record OpeningTypeDefinition(
 
 		public Builder parameter(String name, Parameter parameter) {
 			parametricSchema.put(name, parameter);
-			return this;
-		}
-
-		/**
-		 * @deprecated Use {@link #parameter(String, Parameter)} with typed parametric schema entries.
-		 */
-		@Deprecated
-		public Builder parameter(String name, ParameterDefinition definition) {
-			parametricSchema.put(name, dev.aperture.core.parametric.ParameterBridge.fromDefinition(definition));
 			return this;
 		}
 

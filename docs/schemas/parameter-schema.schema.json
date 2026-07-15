@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aperture.dev/schemas/parameter-schema.schema.json",
+  "title": "ParametricSchemaEntry",
+  "description": "One entry in an opening type ParametricSchema (typed Parameter: RangeParameter, NumberParameter, BooleanParameter, ChoiceParameter, EnumParameter, MaterialParameter).",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "type": "string",
+      "enum": ["range", "number", "boolean", "choice", "enum", "material"],
+      "description": "Editor/UI kind. Prefer kind over legacy type when both are present."
+    },
+    "type": {
+      "type": "string",
+      "enum": ["length", "angle", "count", "number", "enum", "bool", "material_ref"],
+      "description": "Storage type (ParameterType). Legacy alias when kind is omitted."
+    },
+    "unit": {
+      "type": "string",
+      "enum": ["length_mm", "angle_deg", "count", "ratio", "plain"],
+      "description": "NumberUnit for numeric kinds."
+    },
+    "label": { "type": "string" },
+    "group": { "type": "string" },
+    "description": { "type": "string" },
+    "readOnly": { "type": "boolean" },
+    "default": {
+      "description": "Schema default in external JSON form (same encoding as parameter-overrides values)."
+    },
+    "min": { "type": "number" },
+    "max": { "type": "number" },
+    "step": { "type": "number" },
+    "values": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Allowed strings for enum kind."
+    },
+    "choices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["value", "label"],
+        "properties": {
+          "value": { "type": "string" },
+          "label": { "type": "string" }
+        }
+      },
+      "description": "Labeled options for choice kind."
+    }
+  },
+  "anyOf": [
+    { "required": ["kind"] },
+    { "required": ["type"] }
+  ]
+}

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://aperture.dev/schemas/opening-instance.schema.json",
   "title": "OpeningInstance",
-  "description": "Sparse parameter overrides plus runtime state. Omitted parameters inherit opening type defaults.",
+  "description": "Runtime opening instance. parameters holds sparse overrides only; resolve against the type ParametricSchema before generation.",
   "type": "object",
   "required": ["schemaVersion", "instanceId", "typeId", "transform", "revision"],
   "properties": {
@@ -19,9 +19,8 @@
       "pattern": "^[a-z][a-z0-9_]*:[a-z][a-z0-9_/]*$"
     },
     "parameters": {
-      "type": "object",
-      "description": "Sparse overrides only — keys must match the opening type parametric schema.",
-      "additionalProperties": true
+      "$ref": "parameter-overrides.schema.json",
+      "description": "Sparse overrides only. Keys must exist on the opening type ParametricSchema. Values equal to schema defaults must be omitted."
     },
     "transform": {
       "type": "object",
@@ -48,13 +47,13 @@
     },
     "state": {
       "type": "object",
-      "description": "Runtime kinematic state separate from parametric schema.",
+      "description": "Runtime kinematic state separate from parametric schema. Applied at generation when open_angle is not explicitly overridden.",
       "properties": {
         "openRatio": {
           "type": "number",
           "minimum": 0,
           "maximum": 1,
-          "description": "0 = closed, 1 = fully open. Scales open_angle when not explicitly overridden."
+          "description": "0 = closed, 1 = fully open. InstanceParameters.forGeneration scales schema open_angle max by this ratio when open_angle is absent from parameters."
         }
       }
     },

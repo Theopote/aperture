@@ -1,6 +1,5 @@
 package dev.aperture.core.parametric;
 
-import dev.aperture.core.parameter.ParameterDefinition;
 import dev.aperture.core.parameter.ParameterType;
 import dev.aperture.core.parameter.ParameterValue;
 import dev.aperture.core.validation.ValidationIssue;
@@ -44,16 +43,6 @@ public record NumberParameter(
 	@Override
 	public ParameterType storageType() {
 		return unit.storageType();
-	}
-
-	@Override
-	public ParameterDefinition toDefinition() {
-		ParameterDefinition.Builder builder = ParameterDefinition.builder(storageType())
-			.defaultValue(defaultValue);
-		min.ifPresent(builder::min);
-		max.ifPresent(builder::max);
-		step.ifPresent(builder::step);
-		return builder.build();
 	}
 
 	@Override

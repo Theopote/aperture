@@ -41,14 +41,6 @@ public final class ParameterSet {
 		return schema.mergeDefaults(overrides);
 	}
 
-	/**
-	 * @deprecated Use {@link ParametricSchema#mergeDefaults(ParameterSet)} instead.
-	 */
-	@Deprecated
-	public static ParameterSet mergeDefaults(Map<String, ParameterDefinition> schema, ParameterSet overrides) {
-		return ParametricSchema.fromLegacy(schema).mergeDefaults(overrides);
-	}
-
 	public Map<String, ParameterValue> asMap() {
 		return values;
 	}

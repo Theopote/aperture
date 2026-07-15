@@ -1,6 +1,5 @@
 package dev.aperture.core.parametric;
 
-import dev.aperture.core.parameter.ParameterDefinition;
 import dev.aperture.core.parameter.ParameterType;
 import dev.aperture.core.parameter.ParameterValue;
 import dev.aperture.core.validation.ValidationIssue;
@@ -27,12 +26,6 @@ public sealed interface Parameter permits
 	ParameterValue defaultValue();
 
 	ParameterType storageType();
-
-	/**
-	 * @deprecated Legacy bridge for {@link ParameterDefinition}. Prefer {@link ParametricSchema}.
-	 */
-	@Deprecated
-	ParameterDefinition toDefinition();
 
 	void validateValue(String name, ParameterValue value, List<ValidationIssue> issues);
 
