@@ -21,6 +21,7 @@ public class ApertureClient implements ClientModInitializer {
 	);
 	public static KeyMapping commitPlacementKey;
 	public static KeyMapping cyclePreviewModeKey;
+	public static KeyMapping openParameterEditorKey;
 
 	@Override
 	public void onInitializeClient() {
@@ -32,6 +33,11 @@ public class ApertureClient implements ClientModInitializer {
 		cyclePreviewModeKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
 			"key.aperture.cycle_preview_mode",
 			GLFW.GLFW_KEY_M,
+			KEY_CATEGORY
+		));
+		openParameterEditorKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+			"key.aperture.open_parameter_editor",
+			GLFW.GLFW_KEY_O,
 			KEY_CATEGORY
 		));
 
@@ -54,6 +60,10 @@ public class ApertureClient implements ClientModInitializer {
 		while (cyclePreviewModeKey.consumeClick()) {
 			ClientMaterialPreview.cycle();
 			Aperture.LOGGER.debug("Placement preview material mode: {}", ClientMaterialPreview.mode());
+		}
+
+		while (openParameterEditorKey.consumeClick()) {
+			ClientPlacementPreview.openParameterEditor(client);
 		}
 	}
 }

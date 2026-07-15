@@ -8,6 +8,7 @@ import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.instance.OpeningInstanceStore;
 import dev.aperture.core.opening.OpeningId;
 import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.core.validation.CompositeOpeningValidator;
 import dev.aperture.core.validation.OpeningValidator;
 import dev.aperture.core.validation.ParameterConstraintValidator;
 import dev.aperture.core.validation.ValidationResult;
@@ -25,7 +26,7 @@ public final class PlacementService {
 		this(
 			openingTypes,
 			instances,
-			new ParameterConstraintValidator(),
+			CompositeOpeningValidator.schemaAndConstraints(new ParameterConstraintValidator()),
 			PlacementValidatorChain.defaults(openingTypes)
 		);
 	}

@@ -1,9 +1,10 @@
 package dev.aperture.client.placement;
 
 import dev.aperture.api.ApertureApi;
+import dev.aperture.client.parameter.ParameterEditorScreen;
 import dev.aperture.client.render.placement.PlacementPreviewMeshService;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
-import dev.aperture.core.instance.OpeningInstance;
+import dev.aperture.core.opening.OpeningId;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.placement.PlacementSession;
 import dev.aperture.fabric.placement.FabricPlacementAdapter;
@@ -24,6 +25,8 @@ public final class ClientPlacementPreview {
 
 	private static FabricPlacementTarget currentTarget;
 	private static PlacementSession currentSession;
+	private static OpeningId selectedTypeId = BuiltinOpeningTypes.DOOR_ID;
+	private static ParameterSet parameterOverrides = ParameterSet.empty();
 
 	private ClientPlacementPreview() {
 	}
@@ -49,17 +52,38 @@ public final class ClientPlacementPreview {
 			}
 
 			currentTarget = target.get();
-			currentSession = api.placement().preview(
-				BuiltinOpeningTypes.FIXED_WINDOW_ID,
-				ParameterSet.empty(),
-				currentTarget.suggestedTransform(),
-				currentTarget.host(),
-				currentTarget.placementContext()
-			);
-			PlacementPreviewMeshService.update(currentSession);
+			refreshSession(api);
 		} catch (IllegalStateException notInitialized) {
 			clear();
 		}
+	}
+
+	public static void openParameterEditor(Minecraft client) {
+		if (currentSession == null) {
+			return;
+		}
+
+		ApertureApi api = ApertureApi.get();
+		var definition = api.openingTypes().require(selectedTypeId);
+		client.setScreen(new ParameterEditorScreen(definition, parameterOverrides, overrides -> {
+			parameterOverrides = overrides;
+			refreshSession(api);
+		}));
+	}
+
+	private static void refreshSession(ApertureApi api) {
+		if (currentTarget == null) {
+			return;
+		}
+
+		currentSession = api.placement().preview(
+			selectedTypeId,
+			parameterOverrides,
+			currentTarget.suggestedTransform(),
+			currentTarget.host(),
+			currentTarget.placementContext()
+		);
+		PlacementPreviewMeshService.update(currentSession);
 	}
 
 	public static Optional<FabricPlacementTarget> target() {
@@ -70,6 +94,10 @@ public final class ClientPlacementPreview {
 		return Optional.ofNullable(currentSession);
 	}
 
+	public static ParameterSet parameterOverrides() {
+		return parameterOverrides;
+	}
+
 	public static boolean commitPreview() {
 		Optional<PlacementSession> session = session();
 		if (session.isEmpty() || !session.get().isValid()) {
@@ -78,7 +106,7 @@ public final class ClientPlacementPreview {
 
 		Minecraft client = Minecraft.getInstance();
 		try {
-			OpeningInstance committed = ApertureApi.get().placement().commit(session.get());
+			var committed = ApertureApi.get().placement().commit(session.get());
 			if (client.level != null) {
 				OpeningWorldPlacement.placeCommittedInstance(client.level, committed);
 			}

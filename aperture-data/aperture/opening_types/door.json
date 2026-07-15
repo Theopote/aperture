@@ -82,6 +82,20 @@
       "default": "minecraft:oak_planks"
     }
   },
+  "constraints": [
+    {
+      "expr": "width > height * 0.5",
+      "message": "Width must exceed half the height"
+    },
+    {
+      "expr": "panel_count >= 1",
+      "message": "At least one panel is required"
+    },
+    {
+      "expr": "glass_ratio >= 0 and glass_ratio <= 1",
+      "message": "Glass ratio must stay between 0 and 1"
+    }
+  ],
   "materialSlots": ["frame", "glazing"],
   "components": {
     "frame": { "profile": "aperture:frame_standard_50" },

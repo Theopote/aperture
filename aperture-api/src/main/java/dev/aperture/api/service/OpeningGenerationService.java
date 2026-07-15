@@ -5,6 +5,7 @@ import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.core.validation.CompositeOpeningValidator;
 import dev.aperture.core.validation.OpeningValidator;
 import dev.aperture.core.validation.ParameterConstraintValidator;
 import dev.aperture.core.validation.ValidationResult;
@@ -26,7 +27,7 @@ public final class OpeningGenerationService {
 		GeneratorRegistry generators,
 		ProfileCatalogRegistry profiles
 	) {
-		this(openingTypes, generators, profiles, new ParameterConstraintValidator());
+		this(openingTypes, generators, profiles, CompositeOpeningValidator.schemaAndConstraints(new ParameterConstraintValidator()));
 	}
 
 	public OpeningGenerationService(

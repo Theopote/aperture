@@ -10,6 +10,12 @@
     "frame_depth": { "type": "length", "default": 80, "min": 30, "max": 200 },
     "open_angle": { "type": "angle", "default": 0, "min": 0, "max": 90 }
   },
+  "constraints": [
+    {
+      "expr": "width > height * 0.3",
+      "message": "Width must exceed 30% of the height"
+    }
+  ],
   "generator": "aperture:rectangular_window_v1",
   "components": {
     "frame": { "profile": "aperture:frame_l_50x80" },

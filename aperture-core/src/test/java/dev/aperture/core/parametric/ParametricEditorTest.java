@@ -73,6 +73,17 @@ class ParametricEditorTest {
 		assertTrue(definition.parametricSchema().get("hinge_side").orElseThrow() instanceof ChoiceParameter);
 	}
 
+	@Test
+	void doorConstraintsValidateThroughParametricEditor() {
+		var definition = BuiltinOpeningTypes.door();
+		var editor = ParametricEditor.fromDefinition(definition, ParameterSet.empty());
+
+		assertTrue(editor.validate(definition).isValid());
+
+		editor.patch(Map.of("width", 600, "height", 1500));
+		assertFalse(editor.validate(definition).isValid());
+	}
+
 	private static Object external(ParameterValue value) {
 		return ParameterBridge.toExternalValue(value);
 	}

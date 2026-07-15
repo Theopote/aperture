@@ -39,6 +39,10 @@ public final class ParametricService {
 		return editor(definition, overrides).validate();
 	}
 
+	public ValidationResult validate(OpeningTypeDefinition definition, ParameterSet overrides) {
+		return editor(definition, overrides).validate(definition);
+	}
+
 	public ParameterSet resolve(OpeningTypeDefinition definition, ParameterSet overrides) {
 		return editor(definition, overrides).resolve();
 	}

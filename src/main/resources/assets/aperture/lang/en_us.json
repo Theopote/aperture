@@ -1,7 +1,10 @@
 {
   "key.aperture.commit_placement": "Commit Opening Placement",
   "key.aperture.cycle_preview_mode": "Cycle Preview Material Mode",
+  "key.aperture.open_parameter_editor": "Open Parameter Editor",
   "key.category.aperture.placement": "Aperture Placement",
   "key.category.aperture": "Aperture",
+  "screen.aperture.parameter_editor": "Opening Parameters",
+  "gui.aperture.apply": "Apply",
   "block.aperture.opening": "Opening"
 }

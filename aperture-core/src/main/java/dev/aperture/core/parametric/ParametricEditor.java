@@ -116,6 +116,13 @@ public final class ParametricEditor {
 		return new ValidationResult(issues);
 	}
 
+	public ValidationResult validate(OpeningTypeDefinition definition) {
+		ValidationResult schema = validate();
+		ValidationResult constraints = new dev.aperture.core.constraint.ExpressionConstraintValidator()
+			.validateResolved(definition, resolve());
+		return schema.merge(constraints);
+	}
+
 	public ParameterSet resolve() {
 		return schema.mergeDefaults(new ParameterSet(overrides));
 	}
