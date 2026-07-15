@@ -6,6 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class ExpressionParserTest {
 	@Test
+	void parsesMultiplicationAlone() {
+		assertDoesNotThrow(() -> new ExpressionParser().parse("height * 2"));
+	}
+
+	@Test
+	void parsesComparisonAlone() {
+		assertDoesNotThrow(() -> new ExpressionParser().parse("width > height"));
+	}
+
+	@Test
 	void printsTokensForDebugging() {
 		var tokens = new ExpressionLexer("width > height * 0.5").tokenize();
 		for (ExpressionLexer.Token token : tokens) {
