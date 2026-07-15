@@ -12,4 +12,5 @@ processTestResources {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	systemProperty 'aperture.updateGolden', System.getProperty('aperture.updateGolden', 'false')
 }

@@ -107,13 +107,22 @@ public final class PipelineGoldenSupport {
 	}
 
 	public static void writeClasspathFixture(PipelineGoldenSnapshot snapshot, String resourcePath) {
-		Path output = Path.of("src", "test", "resources", resourcePath);
+		Path output = goldenResourcePath(resourcePath);
 		try {
 			Files.createDirectories(output.getParent());
 			Files.writeString(output, GSON.toJson(snapshot) + System.lineSeparator(), StandardCharsets.UTF_8);
 		} catch (IOException exception) {
 			throw new IllegalStateException("Failed to write golden fixture: " + output, exception);
 		}
+	}
+
+	private static Path goldenResourcePath(String resourcePath) {
+		Path cwd = Path.of(System.getProperty("user.dir"));
+		Path moduleRelative = cwd.resolve("aperture-opening-geometry").resolve("src").resolve("test").resolve("resources").resolve(resourcePath);
+		if (Files.exists(cwd.resolve("aperture-opening-geometry"))) {
+			return moduleRelative;
+		}
+		return cwd.resolve("src").resolve("test").resolve("resources").resolve(resourcePath);
 	}
 
 	public static boolean shouldUpdateGolden() {
