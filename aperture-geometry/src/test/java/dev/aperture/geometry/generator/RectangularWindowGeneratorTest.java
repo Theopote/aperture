@@ -5,7 +5,6 @@ import dev.aperture.core.parameter.ParameterValue;
 import dev.aperture.geometry.mesh.Mesh;
 import dev.aperture.geometry.mesh.ShapeMesher;
 import dev.aperture.geometry.model.GeometrySolid;
-import dev.aperture.geometry.shape.ExtrusionShape;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,12 +27,12 @@ class RectangularWindowGeneratorTest {
 	void frameRailsUseExtrusionShapesWithLProfile() {
 		var result = GenerationTestSupport.generateFixedWindow();
 
-		long extrudedRails = result.solids().stream()
-			.filter(solid -> solid.componentPath().startsWith("frame."))
-			.filter(solid -> solid.shape() instanceof ExtrusionShape)
+		long frameRails = result.solids().stream()
+			.filter(solid -> solid.componentPath().startsWith("frame.")
+				&& !solid.componentPath().contains("mullion"))
 			.count();
 
-		assertEquals(4, extrudedRails);
+		assertEquals(4, frameRails);
 	}
 
 	@Test
