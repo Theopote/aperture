@@ -1,4 +1,4 @@
-package dev.aperture.core.geometry;
+package dev.aperture.math;
 
 /**
  * 3D vector in logical millimeter space.

@@ -2,7 +2,7 @@ package dev.aperture.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import dev.aperture.core.geometry.Transform3d;
+import dev.aperture.math.Transform3d;
 import dev.aperture.fabric.placement.McUnits;
 import dev.aperture.render.mesh.MeshSection;
 import dev.aperture.render.mesh.VertexFormat;

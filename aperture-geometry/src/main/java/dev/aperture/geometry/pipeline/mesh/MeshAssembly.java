@@ -1,6 +1,6 @@
 package dev.aperture.geometry.pipeline.mesh;
 
-import dev.aperture.core.geometry.BoundingBox;
+import dev.aperture.math.BoundingBox;
 import dev.aperture.geometry.mesh.Mesh;
 
 import java.util.Map;

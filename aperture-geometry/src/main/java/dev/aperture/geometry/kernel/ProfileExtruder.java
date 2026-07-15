@@ -1,7 +1,7 @@
 package dev.aperture.geometry.kernel;
 
-import dev.aperture.core.geometry.BoundingBox;
-import dev.aperture.core.geometry.Vec3d;
+import dev.aperture.math.BoundingBox;
+import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.model.GeometrySolid;
 import dev.aperture.geometry.ops.BooleanOp;

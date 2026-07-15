@@ -2,8 +2,8 @@ package dev.aperture.core.serialization;
 
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.definition.OpeningTypeDefinition;
-import dev.aperture.core.geometry.Facing;
-import dev.aperture.core.geometry.Transform3d;
+import dev.aperture.math.Facing;
+import dev.aperture.math.Transform3d;
 import dev.aperture.core.instance.HostBinding;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.parameter.ParameterSet;

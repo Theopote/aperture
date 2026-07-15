@@ -2,7 +2,7 @@ package dev.aperture.client.render;
 
 import dev.aperture.api.ApertureApi;
 import dev.aperture.api.material.MaterialBindingBuilder;
-import dev.aperture.core.geometry.Transform3d;
+import dev.aperture.math.Transform3d;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.geometry.model.GeometryResult;
@@ -86,7 +86,7 @@ public final class InstanceRenderCache {
 		private MeshAsset meshAsset = MeshAsset.empty(LODLevel.FULL);
 		private MaterialBindingSet materialBindings = new MaterialBindingSet(Map.of());
 		private ParameterSet lastParameters = ParameterSet.empty();
-		private Transform3d transform = Transform3d.at(0, 0, 0, dev.aperture.core.geometry.Facing.NORTH);
+		private Transform3d transform = Transform3d.at(0, 0, 0, dev.aperture.math.Facing.NORTH);
 
 		private CachedInstanceRender(RenderDocument document) {
 			this.document = document;

@@ -8,6 +8,7 @@ package dev.aperture.geometry.kernel;
  *
  * <ul>
  *   <li>{@link dev.aperture.geometry.profile.ProfileCurve} — 2D profiles (rectangle, polyline, arc)</li>
+ *   <li>{@link dev.aperture.math.Vec2d} / {@link dev.aperture.math.Vec3d} — millimeter-space vectors</li>
  *   <li>{@link dev.aperture.geometry.ops.ExtrudeOp} — linear extrusion / sweep</li>
  *   <li>{@link dev.aperture.geometry.ops.BooleanOp} — CSG union / subtract</li>
  *   <li>{@link dev.aperture.geometry.mesh.ShapeMesher} — solid → triangle mesh</li>

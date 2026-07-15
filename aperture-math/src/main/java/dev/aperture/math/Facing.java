@@ -1,4 +1,4 @@
-package dev.aperture.core.geometry;
+package dev.aperture.math;
 
 /**
  * Cardinal facing used for placement and host alignment.

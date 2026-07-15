@@ -1,4 +1,4 @@
-package dev.aperture.core.geometry;
+package dev.aperture.math;
 
 /**
  * 2D vector in logical millimeter space (profile / UV plane).

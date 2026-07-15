@@ -1,4 +1,5 @@
 dependencies {
+	api project(':aperture-math')
 	implementation 'com.google.code.gson:gson:2.11.0'
 }
 

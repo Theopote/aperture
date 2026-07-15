@@ -1,6 +1,6 @@
 package dev.aperture.fabric.placement;
 
-import dev.aperture.core.geometry.BoundingBox;
+import dev.aperture.math.BoundingBox;
 import net.minecraft.world.phys.AABB;
 
 /**

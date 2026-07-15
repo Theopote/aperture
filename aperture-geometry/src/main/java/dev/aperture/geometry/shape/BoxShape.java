@@ -1,6 +1,6 @@
 package dev.aperture.geometry.shape;
 
-import dev.aperture.core.geometry.BoundingBox;
+import dev.aperture.math.BoundingBox;
 
 /**
  * Axis-aligned box solid.

@@ -1,4 +1,4 @@
-package dev.aperture.core.geometry;
+package dev.aperture.math;
 
 /**
  * Placement transform for an opening instance or generated part.

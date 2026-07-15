@@ -1,6 +1,6 @@
 package dev.aperture.geometry.model;
 
-import dev.aperture.core.geometry.BoundingBox;
+import dev.aperture.math.BoundingBox;
 
 import java.util.List;
 

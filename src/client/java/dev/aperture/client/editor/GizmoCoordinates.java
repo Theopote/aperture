@@ -1,6 +1,6 @@
 package dev.aperture.client.editor;
 
-import dev.aperture.core.geometry.Vec3d;
+import dev.aperture.math.Vec3d;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.fabric.placement.McUnits;
 import net.minecraft.world.phys.Vec3;

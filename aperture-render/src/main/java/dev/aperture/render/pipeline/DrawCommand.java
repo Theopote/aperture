@@ -1,6 +1,6 @@
 package dev.aperture.render.pipeline;
 
-import dev.aperture.core.geometry.Transform3d;
+import dev.aperture.math.Transform3d;
 import dev.aperture.render.material.MaterialBinding;
 import dev.aperture.render.mesh.MeshSection;
 

@@ -1,9 +1,9 @@
 package dev.aperture.geometry.mesh;
 
-import dev.aperture.core.geometry.BoundingBox;
-import dev.aperture.core.geometry.Transform3d;
-import dev.aperture.core.geometry.Vec2d;
-import dev.aperture.core.geometry.Vec3d;
+import dev.aperture.math.BoundingBox;
+import dev.aperture.math.Transform3d;
+import dev.aperture.math.Vec2d;
+import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.shape.BoxShape;
 import dev.aperture.geometry.shape.ExtrusionShape;
 import dev.aperture.geometry.shape.SolidShape;

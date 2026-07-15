@@ -1,6 +1,6 @@
 package dev.aperture.render.mesh;
 
-import dev.aperture.core.geometry.BoundingBox;
+import dev.aperture.math.BoundingBox;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.render.data.PartId;
 

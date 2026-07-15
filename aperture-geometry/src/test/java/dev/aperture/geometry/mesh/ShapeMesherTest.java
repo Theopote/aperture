@@ -1,6 +1,6 @@
 package dev.aperture.geometry.mesh;
 
-import dev.aperture.core.geometry.Vec3d;
+import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.ops.ExtrudeOp;
 import dev.aperture.geometry.profile.BuiltinProfiles;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class ShapeMesherTest {
 	@Test
 	void boxMeshProducesTwelveTriangles() {
 		Mesh mesh = ShapeMesher.meshLocal(new dev.aperture.geometry.shape.BoxShape(
-			dev.aperture.core.geometry.BoundingBox.fromSize(100, 200, 30)
+			dev.aperture.math.BoundingBox.fromSize(100, 200, 30)
 		));
 
 		assertEquals(12, mesh.triangleCount());

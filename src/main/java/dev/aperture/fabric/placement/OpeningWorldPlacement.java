@@ -1,8 +1,8 @@
 package dev.aperture.fabric.placement;
 
 import dev.aperture.block.entity.OpeningBlockEntity;
-import dev.aperture.core.geometry.Transform3d;
-import dev.aperture.core.geometry.Vec3d;
+import dev.aperture.math.Transform3d;
+import dev.aperture.math.Vec3d;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.registry.ApertureBlocks;
 import net.minecraft.core.BlockPos;

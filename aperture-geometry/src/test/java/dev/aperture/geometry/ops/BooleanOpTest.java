@@ -1,7 +1,7 @@
 package dev.aperture.geometry.ops;
 
-import dev.aperture.core.geometry.BoundingBox;
-import dev.aperture.core.geometry.Vec3d;
+import dev.aperture.math.BoundingBox;
+import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.mesh.Mesh;
 import dev.aperture.geometry.mesh.ShapeMesher;
 import dev.aperture.geometry.profile.BuiltinProfiles;

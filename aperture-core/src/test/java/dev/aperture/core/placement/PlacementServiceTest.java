@@ -2,8 +2,8 @@ package dev.aperture.core.placement;
 
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.catalog.OpeningTypeRegistry;
-import dev.aperture.core.geometry.BoundingBox;
-import dev.aperture.core.geometry.Transform3d;
+import dev.aperture.math.BoundingBox;
+import dev.aperture.math.Transform3d;
 import dev.aperture.core.instance.HostBinding;
 import dev.aperture.core.instance.InMemoryOpeningInstanceStore;
 import dev.aperture.core.instance.OpeningInstance;
@@ -43,7 +43,7 @@ class PlacementServiceTest {
 		PlacementSession session = placement.preview(
 			BuiltinOpeningTypes.FIXED_WINDOW_ID,
 			ParameterSet.empty(),
-			Transform3d.at(100, 100, 0, dev.aperture.core.geometry.Facing.NORTH),
+			Transform3d.at(100, 100, 0, dev.aperture.math.Facing.NORTH),
 			HostBinding.wall("section:0,0,0"),
 			context
 		);
@@ -61,7 +61,7 @@ class PlacementServiceTest {
 		PlacementSession session = placement.preview(
 			BuiltinOpeningTypes.FIXED_WINDOW_ID,
 			ParameterSet.empty(),
-			Transform3d.at(500, 500, 0, dev.aperture.core.geometry.Facing.NORTH),
+			Transform3d.at(500, 500, 0, dev.aperture.math.Facing.NORTH),
 			HostBinding.wall("section:0,0,0"),
 			context
 		);
@@ -81,7 +81,7 @@ class PlacementServiceTest {
 				.put("mullions", ParameterValue.count(0))
 				.put("frame_width", ParameterValue.length(50))
 				.build())
-			.transform(Transform3d.at(100, 100, 0, dev.aperture.core.geometry.Facing.NORTH))
+			.transform(Transform3d.at(100, 100, 0, dev.aperture.math.Facing.NORTH))
 			.host(HostBinding.wall("section:0,0,0"))
 			.build();
 		instances.put(existing);
@@ -95,7 +95,7 @@ class PlacementServiceTest {
 		PlacementSession session = placement.preview(
 			BuiltinOpeningTypes.FIXED_WINDOW_ID,
 			ParameterSet.empty(),
-			Transform3d.at(200, 200, 0, dev.aperture.core.geometry.Facing.NORTH),
+			Transform3d.at(200, 200, 0, dev.aperture.math.Facing.NORTH),
 			HostBinding.wall("section:0,0,0"),
 			context
 		);
@@ -115,7 +115,7 @@ class PlacementServiceTest {
 		PlacementSession session = placement.preview(
 			BuiltinOpeningTypes.FIXED_WINDOW_ID,
 			ParameterSet.empty(),
-			Transform3d.at(0, 0, 0, dev.aperture.core.geometry.Facing.NORTH),
+			Transform3d.at(0, 0, 0, dev.aperture.math.Facing.NORTH),
 			HostBinding.wall("section:0,0,0"),
 			context
 		);
@@ -135,7 +135,7 @@ class PlacementServiceTest {
 		PlacementSession session = placement.preview(
 			BuiltinOpeningTypes.FIXED_WINDOW_ID,
 			ParameterSet.empty(),
-			Transform3d.at(0, 0, 0, dev.aperture.core.geometry.Facing.NORTH),
+			Transform3d.at(0, 0, 0, dev.aperture.math.Facing.NORTH),
 			HostBinding.wall("section:0,0,0"),
 			context
 		);

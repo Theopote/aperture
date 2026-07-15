@@ -1,6 +1,6 @@
 package dev.aperture.geometry.shape;
 
-import dev.aperture.core.geometry.BoundingBox;
+import dev.aperture.math.BoundingBox;
 
 /**
  * Platform-agnostic solid shape description produced by opening generators.

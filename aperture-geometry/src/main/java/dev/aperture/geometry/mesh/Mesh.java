@@ -1,6 +1,6 @@
 package dev.aperture.geometry.mesh;
 
-import dev.aperture.core.geometry.BoundingBox;
+import dev.aperture.math.BoundingBox;
 
 import java.util.Arrays;
 

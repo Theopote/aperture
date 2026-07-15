@@ -1,6 +1,6 @@
 package dev.aperture.core.instance;
 
-import dev.aperture.core.geometry.Transform3d;
+import dev.aperture.math.Transform3d;
 import dev.aperture.core.opening.OpeningId;
 import dev.aperture.core.parameter.ParameterSet;
 
@@ -83,7 +83,7 @@ public record OpeningInstance(
 		private UUID instanceId = UUID.randomUUID();
 		private int schemaVersion = 1;
 		private ParameterSet parameters = ParameterSet.empty();
-		private Transform3d transform = Transform3d.at(0, 0, 0, dev.aperture.core.geometry.Facing.NORTH);
+		private Transform3d transform = Transform3d.at(0, 0, 0, dev.aperture.math.Facing.NORTH);
 		private HostBinding host = HostBinding.freeStanding();
 		private OpeningState state = OpeningState.CLOSED;
 		private long revision;

@@ -2,7 +2,7 @@ package dev.aperture.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.aperture.client.render.material.FabricMaterialGraphics;
-import dev.aperture.core.geometry.Transform3d;
+import dev.aperture.math.Transform3d;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.render.material.MaterialBinding;
 import dev.aperture.render.material.MaterialBindingSet;

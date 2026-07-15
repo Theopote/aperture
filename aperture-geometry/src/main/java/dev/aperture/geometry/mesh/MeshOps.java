@@ -1,7 +1,7 @@
 package dev.aperture.geometry.mesh;
 
-import dev.aperture.core.geometry.BoundingBox;
-import dev.aperture.core.geometry.Vec3d;
+import dev.aperture.math.BoundingBox;
+import dev.aperture.math.Vec3d;
 
 import java.util.ArrayList;
 import java.util.List;

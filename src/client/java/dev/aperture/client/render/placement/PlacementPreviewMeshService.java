@@ -6,7 +6,7 @@ import dev.aperture.api.material.MaterialBindingBuilder;
 import dev.aperture.client.placement.ClientPlacementPreview;
 import dev.aperture.client.render.ClientMaterialPreview;
 import dev.aperture.client.render.FabricRenderBackend;
-import dev.aperture.core.geometry.Transform3d;
+import dev.aperture.math.Transform3d;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.placement.PlacementSession;
 import dev.aperture.fabric.placement.McUnits;

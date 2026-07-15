@@ -1,6 +1,6 @@
 package dev.aperture.geometry.ops;
 
-import dev.aperture.core.geometry.BoundingBox;
+import dev.aperture.math.BoundingBox;
 import dev.aperture.geometry.shape.BoxShape;
 import dev.aperture.geometry.shape.SolidShape;
 import dev.aperture.geometry.shape.SubtractShape;

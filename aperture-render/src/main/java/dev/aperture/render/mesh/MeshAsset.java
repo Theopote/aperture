@@ -1,6 +1,6 @@
 package dev.aperture.render.mesh;
 
-import dev.aperture.core.geometry.BoundingBox;
+import dev.aperture.math.BoundingBox;
 import dev.aperture.render.data.PartId;
 
 import java.util.Collections;
@@ -70,8 +70,8 @@ public record MeshAsset(
 		}
 
 		return new BoundingBox(
-			new dev.aperture.core.geometry.Vec3d(minX, minY, minZ),
-			new dev.aperture.core.geometry.Vec3d(maxX, maxY, maxZ)
+			new dev.aperture.math.Vec3d(minX, minY, minZ),
+			new dev.aperture.math.Vec3d(maxX, maxY, maxZ)
 		);
 	}
 }

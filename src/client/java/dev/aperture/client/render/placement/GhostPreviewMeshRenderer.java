@@ -2,8 +2,8 @@ package dev.aperture.client.render.placement;
 
 import dev.aperture.client.placement.ClientPlacementPreview;
 import dev.aperture.client.render.FabricRenderBackend;
-import dev.aperture.core.geometry.Transform3d;
-import dev.aperture.core.geometry.Vec3d;
+import dev.aperture.math.Transform3d;
+import dev.aperture.math.Vec3d;
 import dev.aperture.fabric.placement.McUnits;
 import dev.aperture.render.material.MaterialBindingSet;
 import dev.aperture.render.mesh.MeshAsset;

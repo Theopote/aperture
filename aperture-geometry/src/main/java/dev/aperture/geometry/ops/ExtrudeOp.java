@@ -1,6 +1,6 @@
 package dev.aperture.geometry.ops;
 
-import dev.aperture.core.geometry.Vec3d;
+import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.profile.ProfileCurve;
 import dev.aperture.geometry.shape.ExtrusionShape;
 

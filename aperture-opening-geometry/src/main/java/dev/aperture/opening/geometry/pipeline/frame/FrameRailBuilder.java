@@ -1,7 +1,7 @@
 package dev.aperture.opening.geometry.pipeline.frame;
 
-import dev.aperture.core.geometry.BoundingBox;
-import dev.aperture.core.geometry.Vec3d;
+import dev.aperture.math.BoundingBox;
+import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.kernel.ProfileExtruder;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.model.GeometrySolid;

@@ -1,7 +1,7 @@
 package dev.aperture.geometry.mesh;
 
-import dev.aperture.core.geometry.BoundingBox;
-import dev.aperture.core.geometry.Vec3d;
+import dev.aperture.math.BoundingBox;
+import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.ops.ExtrudeOp;
 import dev.aperture.geometry.profile.BuiltinProfiles;
 import org.junit.jupiter.api.Test;
@@ -36,9 +36,9 @@ class MeshCsgTest {
 			new Vec3d(100, 0, 0),
 			new Vec3d(110, 0, 0),
 			new Vec3d(105, 10, 0),
-			dev.aperture.core.geometry.Vec2d.ZERO,
-			dev.aperture.core.geometry.Vec2d.ZERO,
-			dev.aperture.core.geometry.Vec2d.ZERO
+			dev.aperture.math.Vec2d.ZERO,
+			dev.aperture.math.Vec2d.ZERO,
+			dev.aperture.math.Vec2d.ZERO
 		);
 		Mesh mesh = builder.build();
 		Mesh trimmed = MeshCsg.subtractBox(mesh, new BoundingBox(Vec3d.ZERO, new Vec3d(50, 50, 50)));

@@ -1,6 +1,6 @@
 package dev.aperture.fabric.placement;
 
-import dev.aperture.core.geometry.Facing;
+import dev.aperture.math.Facing;
 import net.minecraft.core.Direction;
 
 /**

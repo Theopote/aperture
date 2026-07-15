@@ -6,7 +6,7 @@ import dev.aperture.client.editor.GizmoDragController;
 import dev.aperture.client.parameter.ParameterEditorScreen;
 import dev.aperture.client.render.placement.PlacementPreviewMeshService;
 import dev.aperture.core.definition.OpeningTypeDefinition;
-import dev.aperture.core.geometry.Transform3d;
+import dev.aperture.math.Transform3d;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.parameter.ParameterDefinition;
 import dev.aperture.core.parameter.ParameterValue;

@@ -1,6 +1,6 @@
 package dev.aperture.core.editor.manipulation;
 
-import dev.aperture.core.geometry.Vec3d;
+import dev.aperture.math.Vec3d;
 
 import java.util.Objects;
 

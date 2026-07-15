@@ -1,6 +1,6 @@
 package dev.aperture.opening.geometry.pipeline.accessory;
 
-import dev.aperture.core.geometry.Vec3d;
+import dev.aperture.math.Vec3d;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.geometry.pipeline.OpeningParameters;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;

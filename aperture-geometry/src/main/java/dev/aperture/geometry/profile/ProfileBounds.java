@@ -1,6 +1,6 @@
 package dev.aperture.geometry.profile;
 
-import dev.aperture.core.geometry.Vec2d;
+import dev.aperture.math.Vec2d;
 
 /**
  * Axis-aligned bounds of a profile curve in local (u, v) space.

@@ -1,7 +1,7 @@
 package dev.aperture.opening.geometry.kinematic;
 
-import dev.aperture.core.geometry.Transform3d;
-import dev.aperture.core.geometry.Vec3d;
+import dev.aperture.math.Transform3d;
+import dev.aperture.math.Vec3d;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;

@@ -1,6 +1,6 @@
 package dev.aperture.geometry.profile;
 
-import dev.aperture.core.geometry.Vec2d;
+import dev.aperture.math.Vec2d;
 
 import java.util.Arrays;
 import java.util.List;

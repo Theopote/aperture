@@ -67,7 +67,7 @@ class EditorSessionTest {
 	@Test
 	void copyAddsSecondObject() {
 		int before = session.objects().size();
-		assertTrue(session.copy(doorId, new dev.aperture.core.geometry.Vec3d(500, 0, 0)).success());
+		assertTrue(session.copy(doorId, new dev.aperture.math.Vec3d(500, 0, 0)).success());
 		assertEquals(before + 1, session.objects().size());
 		assertTrue(session.undo().success());
 		assertEquals(before, session.objects().size());

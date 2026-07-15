@@ -1,4 +1,4 @@
-package dev.aperture.core.geometry;
+package dev.aperture.math;
 
 /**
  * Axis-aligned bounding box in logical millimeter space.

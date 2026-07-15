@@ -1,7 +1,7 @@
 package dev.aperture.core.editor.manipulation;
 
 import dev.aperture.core.definition.OpeningTypeDefinition;
-import dev.aperture.core.geometry.Vec3d;
+import dev.aperture.math.Vec3d;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.parameter.ParameterType;

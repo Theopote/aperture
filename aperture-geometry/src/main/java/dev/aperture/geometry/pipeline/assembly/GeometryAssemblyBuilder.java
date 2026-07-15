@@ -1,6 +1,6 @@
 package dev.aperture.geometry.pipeline.assembly;
 
-import dev.aperture.core.geometry.BoundingBox;
+import dev.aperture.math.BoundingBox;
 import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.geometry.model.GeometrySolid;
 

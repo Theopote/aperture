@@ -5,7 +5,7 @@ import dev.aperture.core.editor.EditorObjectId;
 import dev.aperture.core.editor.history.EditCommand;
 import dev.aperture.core.editor.history.EditResult;
 import dev.aperture.core.editor.session.EditorContext;
-import dev.aperture.core.geometry.Transform3d;
+import dev.aperture.math.Transform3d;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.validation.ValidationResult;
 
