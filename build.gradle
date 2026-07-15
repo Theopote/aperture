@@ -27,7 +27,7 @@ dependencies {
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	implementation project(':aperture-runtime')
-	implementation project(path: ':aperture-fabric', configuration: 'namedElements')
+	implementation project(':aperture-fabric')
 	clientImplementation project(':aperture-editor')
 	clientImplementation project(':aperture-render')
 }
