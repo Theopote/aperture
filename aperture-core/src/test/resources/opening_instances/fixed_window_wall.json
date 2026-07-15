@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "550e8400-e29b-41d4-a716-446655440000",
+  "typeId": "aperture:fixed_window",
+  "parameters": {
+    "width": 1200,
+    "height": 1500,
+    "mullions": 1,
+    "frame_width": 50
+  },
+  "transform": {
+    "x": 100,
+    "y": 200,
+    "z": 0,
+    "facing": "north"
+  },
+  "host": {
+    "type": "wall",
+    "anchor": "section:0,0,0"
+  },
+  "state": {
+    "openRatio": 0.0
+  },
+  "revision": 0
+}

@@ -39,15 +39,17 @@ processResources {
 }
 
 def javaVersion = Integer.parseInt(findProperty('java_version') ?: '21')
+def fabricJavaVersion = Integer.parseInt(findProperty('fabric_java_version') ?: '25')
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = javaVersion
+	it.options.release = fabricJavaVersion
 }
 
 java {
 	withSourcesJar()
-	sourceCompatibility = JavaVersion.toVersion(javaVersion)
-	targetCompatibility = JavaVersion.toVersion(javaVersion)
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(fabricJavaVersion)
+	}
 }
 
 jar {

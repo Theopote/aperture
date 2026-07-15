@@ -8,9 +8,12 @@
 - [x] Parameter engine (static values + min/max)
 - [x] Geometry kernel: rectangular frame + glazing stub
 - [x] Instance store interfaces
+- [x] Instance JSON codec (`OpeningInstanceCodec`)
+- [x] Placement core (preview + validation chain)
 - [x] Basic bootstrap wiring
 - [x] One reference type: fixed window (JSON data pack)
-- [ ] Placement system (preview + validation)
+- [x] Placement core (preview + validation; MC raycast adapter pending)
+- [x] Fabric placement adapter (raycast → PlacementContext)
 - [ ] Rendering pipeline
 - [ ] World persistence (NBT)
 

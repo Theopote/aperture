@@ -11,6 +11,8 @@ import dev.aperture.core.instance.InMemoryOpeningInstanceStore;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.instance.OpeningInstanceStore;
 import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.core.placement.PlacementService;
+import dev.aperture.placement.fabric.FabricPlacementAdapter;
 import dev.aperture.geometry.generators.RectangularWindowGenerator;
 import dev.aperture.geometry.model.GeometryResult;
 import org.slf4j.Logger;
@@ -27,11 +29,13 @@ public final class ApertureBootstrap {
 	private final OpeningInstanceStore instances = new InMemoryOpeningInstanceStore();
 	private final OpeningTypeCatalogLoader catalogLoader = new OpeningTypeCatalogLoader();
 	private final OpeningGenerationService generation = new OpeningGenerationService(openingTypes, generators);
+	private final PlacementService placement = new PlacementService(openingTypes, instances);
+	private final FabricPlacementAdapter fabricPlacement = new FabricPlacementAdapter();
 
 	public void initialize() {
 		registerGenerators();
 		loadOpeningTypes();
-		ApertureApi.init(new ApertureApi(openingTypes, generators, instances, generation));
+		ApertureApi.init(new ApertureApi(openingTypes, generators, instances, generation, placement));
 		verifyReferencePipeline();
 		LOGGER.info("Aperture bootstrap complete — {} opening types, {} generators",
 			openingTypes.all().size(), 1);
@@ -78,5 +82,13 @@ public final class ApertureBootstrap {
 
 	public OpeningGenerationService generation() {
 		return generation;
+	}
+
+	public PlacementService placement() {
+		return placement;
+	}
+
+	public FabricPlacementAdapter fabricPlacement() {
+		return fabricPlacement;
 	}
 }
