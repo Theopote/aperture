@@ -5,6 +5,8 @@ import dev.aperture.core.component.DividerComponent;
 import dev.aperture.opening.geometry.pipeline.ComponentPipelineStep;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
@@ -26,7 +28,7 @@ class ComponentPlanBuilderTest {
 	}
 
 	@Test
-	void stepIdsMatchComponentInstanceIds() {
+	void stepIdsMatchComponentInstanceIdsInGeometryOrder() {
 		var assembly = ComponentAssemblyPresets.door(
 			"aperture:frame_standard_50",
 			"aperture:frame_standard_50",
@@ -36,7 +38,7 @@ class ComponentPlanBuilderTest {
 		var plan = ComponentPlanBuilder.buildPlan(assembly);
 
 		assertEquals(
-			assembly.all().stream().map(component -> component.ref().id()).toList(),
+			List.of("door_frame", "door_leaf", "door_glass", "threshold", "hinges", "handle"),
 			plan.stepIds().subList(0, assembly.size())
 		);
 	}
