@@ -1,8 +1,8 @@
 package dev.aperture.core.placement;
 
 import dev.aperture.core.definition.OpeningTypeDefinition;
-import dev.aperture.core.geometry.BoundingBox;
-import dev.aperture.core.geometry.Vec3d;
+import dev.aperture.geometry.primitives.BoundingBox;
+import dev.aperture.geometry.primitives.Vec3d;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.parameter.ParameterSet;
 import dev.aperture.core.parameter.ParameterType;
