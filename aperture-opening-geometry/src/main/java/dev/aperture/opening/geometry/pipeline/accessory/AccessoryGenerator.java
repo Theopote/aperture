@@ -5,7 +5,7 @@ import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.geometry.pipeline.OpeningParameters;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 import dev.aperture.opening.geometry.pipeline.PipelineStep;
-import dev.aperture.geometry.pipeline.assembly.GeometryAssemblyBuilder;
+import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 import dev.aperture.opening.geometry.pipeline.frame.FrameRailBuilder;
 import dev.aperture.geometry.profile.ProfileCurve;
 
@@ -21,17 +21,17 @@ public final class AccessoryGenerator implements PipelineStep {
 	}
 
 	@Override
-	public void execute(OpeningPipelineContext context, GeometryAssemblyBuilder assembly) {
+	public void execute(OpeningPipelineContext context, GeometryCompilationTarget target) {
 		OpeningLayout layout = context.layout();
 		OpeningParameters parameters = context.openingParameters();
 		ProfileCurve profile = context.resolvedProfiles().frame().curve();
 
-		emitVerticalMullions(assembly, layout, profile, parameters);
-		emitHorizontalMullions(assembly, layout, profile, parameters);
+		emitVerticalMullions(target, layout, profile, parameters);
+		emitHorizontalMullions(target, layout, profile, parameters);
 	}
 
 	private static void emitVerticalMullions(
-		GeometryAssemblyBuilder assembly,
+		GeometryCompilationTarget target,
 		OpeningLayout layout,
 		ProfileCurve profile,
 		OpeningParameters parameters
@@ -43,7 +43,7 @@ public final class AccessoryGenerator implements PipelineStep {
 			double t = (double) i / (count + 1);
 			double x = layout.frameFace() + layout.innerWidth() * t - layout.frameFace() / 2.0;
 			String path = parameters.cols() > 1 ? "divider.vertical." + i : "frame.mullion." + i;
-			assembly.addSolid(FrameRailBuilder.miteredRail(
+			target.addSolid(FrameRailBuilder.miteredRail(
 				path,
 				profile,
 				new Vec3d(x, layout.frameFace(), 0),
@@ -55,7 +55,7 @@ public final class AccessoryGenerator implements PipelineStep {
 	}
 
 	private static void emitHorizontalMullions(
-		GeometryAssemblyBuilder assembly,
+		GeometryCompilationTarget target,
 		OpeningLayout layout,
 		ProfileCurve profile,
 		OpeningParameters parameters
@@ -67,7 +67,7 @@ public final class AccessoryGenerator implements PipelineStep {
 		for (int i = 1; i <= count; i++) {
 			double t = (double) i / (count + 1);
 			double y = layout.frameFace() + layout.innerHeight() * t - layout.frameFace() / 2.0;
-			assembly.addSolid(FrameRailBuilder.miteredRail(
+			target.addSolid(FrameRailBuilder.miteredRail(
 				"divider.horizontal." + i,
 				profile,
 				new Vec3d(layout.frameFace(), y, 0),

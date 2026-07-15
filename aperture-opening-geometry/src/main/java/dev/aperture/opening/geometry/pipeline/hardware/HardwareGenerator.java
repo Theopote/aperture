@@ -9,7 +9,7 @@ import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.geometry.pipeline.OpeningParameters;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 import dev.aperture.opening.geometry.pipeline.PipelineStep;
-import dev.aperture.geometry.pipeline.assembly.GeometryAssemblyBuilder;
+import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 import dev.aperture.opening.geometry.pipeline.panel.PanelCellLayout;
 import dev.aperture.opening.geometry.pipeline.panel.PanelLayoutPlanner;
 
@@ -33,7 +33,7 @@ public final class HardwareGenerator implements PipelineStep {
 	}
 
 	@Override
-	public void execute(OpeningPipelineContext context, GeometryAssemblyBuilder assembly) {
+	public void execute(OpeningPipelineContext context, GeometryCompilationTarget target) {
 		if (!context.definition().components().has(ComponentKind.HARDWARE)) {
 			return;
 		}
@@ -55,14 +55,14 @@ public final class HardwareGenerator implements PipelineStep {
 			.orElse("generic");
 
 		switch (hardwareType) {
-			case "hinge_set", "hinges" -> emitHingeSet(assembly, primary, layout);
-			default -> emitHingeSet(assembly, primary, layout);
+			case "hinge_set", "hinges" -> emitHingeSet(target, primary, layout);
+			default -> emitHingeSet(target, primary, layout);
 		}
-		emitHandle(assembly, primary, layout);
+		emitHandle(target, primary, layout);
 	}
 
 	private static void emitHingeSet(
-		GeometryAssemblyBuilder assembly,
+		GeometryCompilationTarget target,
 		PanelCellLayout leaf,
 		OpeningLayout layout
 	) {
@@ -76,7 +76,7 @@ public final class HardwareGenerator implements PipelineStep {
 			double centerY = leaf.originY() + leaf.height() * positions[i];
 			double minY = centerY - HINGE_HEIGHT / 2.0;
 			double maxY = centerY + HINGE_HEIGHT / 2.0;
-			assembly.addSolid(GeometrySolid.box(
+			target.addSolid(GeometrySolid.box(
 				"hardware.hinge." + (i + 1),
 				"hardware",
 				GeometryLayer.CUTOUT,
@@ -89,7 +89,7 @@ public final class HardwareGenerator implements PipelineStep {
 	}
 
 	private static void emitHandle(
-		GeometryAssemblyBuilder assembly,
+		GeometryCompilationTarget target,
 		PanelCellLayout leaf,
 		OpeningLayout layout
 	) {
@@ -99,7 +99,7 @@ public final class HardwareGenerator implements PipelineStep {
 			case "right" -> layout.sashFace() * 0.2;
 			default -> -HANDLE_WIDTH - layout.sashFace() * 0.2;
 		};
-		assembly.addSolid(GeometrySolid.box(
+		target.addSolid(GeometrySolid.box(
 			"hardware.handle",
 			"hardware",
 			GeometryLayer.CUTOUT,

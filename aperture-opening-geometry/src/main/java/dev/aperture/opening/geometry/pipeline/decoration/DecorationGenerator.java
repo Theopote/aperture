@@ -2,7 +2,7 @@ package dev.aperture.opening.geometry.pipeline.decoration;
 
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 import dev.aperture.opening.geometry.pipeline.PipelineStep;
-import dev.aperture.geometry.pipeline.assembly.GeometryAssemblyBuilder;
+import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 
 /**
  * Reserved for decorative muntins, grilles, and applied ornament.
@@ -16,7 +16,7 @@ public final class DecorationGenerator implements PipelineStep {
 	}
 
 	@Override
-	public void execute(OpeningPipelineContext context, GeometryAssemblyBuilder assembly) {
+	public void execute(OpeningPipelineContext context, GeometryCompilationTarget target) {
 		// Decoration geometry will be generated from DecorationComponent definitions in a later phase.
 	}
 }

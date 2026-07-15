@@ -8,7 +8,7 @@ import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.geometry.pipeline.OpeningParameters;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 import dev.aperture.opening.geometry.pipeline.PipelineStep;
-import dev.aperture.geometry.pipeline.assembly.GeometryAssemblyBuilder;
+import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 
 /**
  * Generates fixed glazing when no operable panel is present.
@@ -23,7 +23,7 @@ public final class GlassGenerator implements PipelineStep {
 	}
 
 	@Override
-	public void execute(OpeningPipelineContext context, GeometryAssemblyBuilder assembly) {
+	public void execute(OpeningPipelineContext context, GeometryCompilationTarget target) {
 		OpeningParameters parameters = context.openingParameters();
 		if (parameters.hasPanel()) {
 			return;
@@ -35,11 +35,11 @@ public final class GlassGenerator implements PipelineStep {
 		}
 
 		if (parameters.cols() > 1 || parameters.rows() > 1) {
-			emitGridGlazing(assembly, layout, parameters);
+			emitGridGlazing(target, layout, parameters);
 			return;
 		}
 
-		assembly.addSolid(GeometrySolid.box(
+		target.addSolid(GeometrySolid.box(
 			"glazing",
 			"glazing",
 			GeometryLayer.TRANSLUCENT,
@@ -51,7 +51,7 @@ public final class GlassGenerator implements PipelineStep {
 	}
 
 	private static void emitGridGlazing(
-		GeometryAssemblyBuilder assembly,
+		GeometryCompilationTarget target,
 		OpeningLayout layout,
 		OpeningParameters parameters
 	) {
@@ -66,7 +66,7 @@ public final class GlassGenerator implements PipelineStep {
 				if (maxX <= minX || maxY <= minY) {
 					continue;
 				}
-				assembly.addSolid(GeometrySolid.box(
+				target.addSolid(GeometrySolid.box(
 					"glazing." + row + "." + col,
 					"glazing",
 					GeometryLayer.TRANSLUCENT,

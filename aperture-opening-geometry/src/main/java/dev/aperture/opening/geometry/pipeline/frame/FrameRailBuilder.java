@@ -6,13 +6,26 @@ import dev.aperture.geometry.kernel.ProfileExtruder;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.model.GeometrySolid;
 import dev.aperture.geometry.profile.ProfileCurve;
+import dev.aperture.geometry.recipe.shape.ShapeRecipe;
+import dev.aperture.geometry.recipe.shape.ShapeRecipes;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 
 /**
- * Opening-specific frame rail layout built on the pure {@link ProfileExtruder} kernel.
+ * Opening-specific frame rail layout compiled into kernel {@link ShapeRecipe} ops.
  */
 public final class FrameRailBuilder {
 	private FrameRailBuilder() {
+	}
+
+	public static ShapeRecipe miteredRailShape(
+		ProfileCurve profile,
+		Vec3d pathStart,
+		Vec3d pathEnd,
+		Vec3d profileU,
+		Vec3d profileV,
+		BoundingBox... subtractBoxes
+	) {
+		return ShapeRecipes.extrudeLinear(profile, pathStart, pathEnd, profileU, profileV, subtractBoxes);
 	}
 
 	public static GeometrySolid miteredRail(

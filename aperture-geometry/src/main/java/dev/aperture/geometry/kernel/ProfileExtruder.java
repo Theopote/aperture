@@ -4,9 +4,9 @@ import dev.aperture.math.BoundingBox;
 import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.model.GeometrySolid;
-import dev.aperture.geometry.ops.BooleanOp;
-import dev.aperture.geometry.ops.ExtrudeOp;
 import dev.aperture.geometry.profile.ProfileCurve;
+import dev.aperture.geometry.recipe.ShapeRecipeEvaluator;
+import dev.aperture.geometry.recipe.shape.ShapeRecipes;
 import dev.aperture.geometry.shape.SolidShape;
 
 /**
@@ -31,10 +31,9 @@ public final class ProfileExtruder {
 		Vec3d profileV,
 		BoundingBox... subtractBoxes
 	) {
-		SolidShape shape = ExtrudeOp.linear(profile, pathStart, pathEnd, profileU, profileV);
-		if (subtractBoxes.length > 0) {
-			shape = BooleanOp.subtractBoxes(shape, subtractBoxes);
-		}
+		SolidShape shape = ShapeRecipeEvaluator.evaluate(
+			ShapeRecipes.extrudeLinear(profile, pathStart, pathEnd, profileU, profileV, subtractBoxes)
+		);
 		return GeometrySolid.of(partPath, materialGroup, layer, shape);
 	}
 }

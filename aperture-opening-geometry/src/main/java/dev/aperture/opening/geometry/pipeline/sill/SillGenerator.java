@@ -7,7 +7,7 @@ import dev.aperture.geometry.model.GeometrySolid;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 import dev.aperture.opening.geometry.pipeline.PipelineStep;
-import dev.aperture.geometry.pipeline.assembly.GeometryAssemblyBuilder;
+import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 
 /**
  * Generates the sill / threshold at the bottom of the opening.
@@ -22,13 +22,13 @@ public final class SillGenerator implements PipelineStep {
 	}
 
 	@Override
-	public void execute(OpeningPipelineContext context, GeometryAssemblyBuilder assembly) {
+	public void execute(OpeningPipelineContext context, GeometryCompilationTarget target) {
 		OpeningLayout layout = context.layout();
 		double sillHeight = layout.frameFace() * 0.5;
 		if (sillHeight <= 0) {
 			return;
 		}
-		assembly.addSolid(GeometrySolid.box(
+		target.addSolid(GeometrySolid.box(
 			"sill.main",
 			"frame",
 			GeometryLayer.OPAQUE,

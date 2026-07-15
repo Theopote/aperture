@@ -4,7 +4,7 @@ import dev.aperture.math.Vec3d;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 import dev.aperture.opening.geometry.pipeline.PipelineStep;
-import dev.aperture.geometry.pipeline.assembly.GeometryAssemblyBuilder;
+import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 import dev.aperture.opening.geometry.pipeline.frame.FrameRailBuilder;
 import dev.aperture.geometry.profile.ProfileCurve;
 
@@ -20,11 +20,11 @@ public final class HeaderGenerator implements PipelineStep {
 	}
 
 	@Override
-	public void execute(OpeningPipelineContext context, GeometryAssemblyBuilder assembly) {
+	public void execute(OpeningPipelineContext context, GeometryCompilationTarget target) {
 		OpeningLayout layout = context.layout();
 		ProfileCurve profile = context.resolvedProfiles().frame().curve();
 		double y = layout.height() - layout.frameFace();
-		assembly.addSolid(FrameRailBuilder.miteredRail(
+		target.addSolid(FrameRailBuilder.miteredRail(
 			"header.main",
 			profile,
 			new Vec3d(0, y, 0),

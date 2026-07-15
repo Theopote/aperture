@@ -1,7 +1,7 @@
 package dev.aperture.opening.geometry.pipeline;
 
 import dev.aperture.opening.geometry.pipeline.accessory.AccessoryGenerator;
-import dev.aperture.geometry.pipeline.assembly.GeometryAssemblyBuilder;
+import dev.aperture.geometry.recipe.GeometryRecipeBuilder;
 import dev.aperture.opening.geometry.pipeline.frame.FrameGenerator;
 import dev.aperture.opening.geometry.pipeline.glass.GlassGenerator;
 import dev.aperture.geometry.pipeline.mesh.MeshAssembler;
@@ -58,11 +58,11 @@ public final class OpeningPipeline {
 	}
 
 	public PipelineResult execute(OpeningPipelineContext context) {
-		GeometryAssemblyBuilder assembly = new GeometryAssemblyBuilder();
+		GeometryRecipeBuilder recipe = new GeometryRecipeBuilder();
 		for (PipelineStep step : steps) {
-			step.execute(context, assembly);
+			step.execute(context, recipe);
 		}
-		var geometry = assembly.build();
+		var geometry = recipe.execute();
 		var meshes = meshAssembler.assemble(geometry);
 		return new PipelineResult(geometry, meshes);
 	}

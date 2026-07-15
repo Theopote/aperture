@@ -1,6 +1,6 @@
 package dev.aperture.opening.geometry.pipeline;
 
-import dev.aperture.geometry.pipeline.assembly.GeometryAssemblyBuilder;
+import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 
 /**
  * One step in the opening generator pipeline.
@@ -8,5 +8,5 @@ import dev.aperture.geometry.pipeline.assembly.GeometryAssemblyBuilder;
 public interface PipelineStep {
 	String id();
 
-	void execute(OpeningPipelineContext context, GeometryAssemblyBuilder assembly);
+	void execute(OpeningPipelineContext context, GeometryCompilationTarget target);
 }

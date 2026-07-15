@@ -3,7 +3,7 @@ package dev.aperture.opening.geometry.pipeline.profile;
 import dev.aperture.opening.geometry.pipeline.OpeningPipelineContext;
 import dev.aperture.opening.geometry.pipeline.PipelineStep;
 import dev.aperture.opening.geometry.pipeline.ResolvedProfiles;
-import dev.aperture.geometry.pipeline.assembly.GeometryAssemblyBuilder;
+import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 import dev.aperture.geometry.profile.ProfileDefinition;
 
 import java.util.Optional;
@@ -20,7 +20,7 @@ public final class ProfileGenerator implements PipelineStep {
 	}
 
 	@Override
-	public void execute(OpeningPipelineContext context, GeometryAssemblyBuilder assembly) {
+	public void execute(OpeningPipelineContext context, GeometryCompilationTarget target) {
 		ProfileDefinition frame = context.scaledFrameProfile();
 		Optional<ProfileDefinition> panel = context.hasComponent("panel")
 			? Optional.of(context.scaledPanelProfile())
