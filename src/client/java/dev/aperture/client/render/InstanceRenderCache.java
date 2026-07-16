@@ -4,7 +4,7 @@ import dev.aperture.runtime.ApertureRuntime;
 import dev.aperture.runtime.material.MaterialBindingBuilder;
 import dev.aperture.math.Transform3d;
 import dev.aperture.core.instance.OpeningInstance;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.geometry.pipeline.PipelineResult;
 import dev.aperture.render.data.RenderDelta;

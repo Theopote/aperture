@@ -7,7 +7,7 @@ import dev.aperture.core.editor.manipulation.ResizeAxis;
 import dev.aperture.core.editor.operation.EditorOperations;
 import dev.aperture.core.editor.session.EditorSession;
 import dev.aperture.core.instance.OpeningInstance;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

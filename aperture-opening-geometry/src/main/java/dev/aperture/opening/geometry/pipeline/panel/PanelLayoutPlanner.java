@@ -1,7 +1,7 @@
 package dev.aperture.opening.geometry.pipeline.panel;
 
 import dev.aperture.core.component.ComponentKind;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.opening.geometry.pipeline.OpeningLayout;
 import dev.aperture.opening.resolve.ComponentPropertyResolver;

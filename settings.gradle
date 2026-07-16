@@ -17,6 +17,7 @@ rootProject.name = 'aperture'
 
 include 'aperture-core'
 include 'aperture-math'
+include 'aperture-parameter'
 include 'aperture-geometry'
 include 'aperture-opening-geometry'
 include 'aperture-render'

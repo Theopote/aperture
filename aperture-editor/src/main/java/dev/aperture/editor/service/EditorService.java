@@ -7,7 +7,7 @@ import dev.aperture.core.editor.manipulation.ResizeAxis;
 import dev.aperture.core.editor.session.EditorSession;
 import dev.aperture.math.Vec3d;
 import dev.aperture.core.instance.OpeningInstance;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 
 /**
  * Public API for headless opening editing — manipulators, history, undo/redo.

@@ -1,7 +1,7 @@
 package dev.aperture.client.preview;
 
 import dev.aperture.core.definition.OpeningTypeDefinition;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.geometry.pipeline.PipelineResult;
 import dev.aperture.geometry.pipeline.PipelineResultCache;
 import dev.aperture.opening.geometry.generator.GenerationTestSupport;

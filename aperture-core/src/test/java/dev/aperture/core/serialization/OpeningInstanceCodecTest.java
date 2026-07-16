@@ -6,8 +6,8 @@ import dev.aperture.math.Facing;
 import dev.aperture.math.Transform3d;
 import dev.aperture.core.instance.HostBinding;
 import dev.aperture.core.instance.OpeningInstance;
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterValue;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;

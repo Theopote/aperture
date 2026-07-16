@@ -4,7 +4,7 @@ import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.component.ComponentKind;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.opening.OpeningCategory;
-import dev.aperture.core.parameter.ParameterType;
+import dev.aperture.parameter.ParameterType;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;

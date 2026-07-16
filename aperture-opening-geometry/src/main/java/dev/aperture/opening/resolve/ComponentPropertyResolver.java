@@ -1,8 +1,8 @@
 package dev.aperture.opening.resolve;
 
 import dev.aperture.core.component.ComponentKind;
-import dev.aperture.core.parameter.ParameterType;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterType;
+import dev.aperture.parameter.ParameterValue;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
 
 /**

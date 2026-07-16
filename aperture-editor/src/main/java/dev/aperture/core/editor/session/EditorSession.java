@@ -19,7 +19,7 @@ import dev.aperture.core.editor.snap.SnapPolicy;
 import dev.aperture.math.Transform3d;
 import dev.aperture.math.Vec3d;
 import dev.aperture.core.instance.OpeningInstance;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterValue;
 import dev.aperture.core.validation.CompositeOpeningValidator;
 import dev.aperture.core.validation.OpeningValidator;
 import dev.aperture.core.validation.ParameterConstraintValidator;

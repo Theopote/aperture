@@ -5,7 +5,7 @@ import dev.aperture.core.component.OpeningComponent;
 import dev.aperture.core.opening.GeneratorId;
 import dev.aperture.core.opening.OpeningCategory;
 import dev.aperture.core.opening.OpeningId;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.core.parametric.ParametricSchema;
 import dev.aperture.core.parametric.Parameter;
 

@@ -2,7 +2,7 @@ package dev.aperture.opening.geometry.pipeline.glass;
 
 import dev.aperture.core.component.ComponentKind;
 import dev.aperture.core.component.GlassComponent;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.math.BoundingBox;
 import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.model.GeometryLayer;

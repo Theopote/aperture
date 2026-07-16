@@ -4,9 +4,9 @@ import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.math.BoundingBox;
 import dev.aperture.math.Vec3d;
 import dev.aperture.core.instance.OpeningInstance;
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterType;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterType;
+import dev.aperture.parameter.ParameterValue;
 
 import java.util.Optional;
 

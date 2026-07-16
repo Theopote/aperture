@@ -1,8 +1,8 @@
 package dev.aperture.core.parametric;
 
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterValue;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;

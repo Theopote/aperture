@@ -2,8 +2,8 @@ package dev.aperture.core.parametric;
 
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.instance.OpeningState;
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterValue;
 
 /**
  * Maps runtime {@link OpeningState} into effective parametric values for geometry generation.

@@ -2,7 +2,7 @@ package dev.aperture.core.instance;
 
 import dev.aperture.math.Transform3d;
 import dev.aperture.core.opening.OpeningId;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 
 import java.util.Objects;
 import java.util.UUID;

@@ -5,7 +5,7 @@ import dev.aperture.core.component.ComponentKind;
 import dev.aperture.core.component.FrameComponent;
 import dev.aperture.core.component.PanelComponent;
 import dev.aperture.core.definition.OpeningTypeDefinition;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 import dev.aperture.geometry.profile.ProfileDefinition;
 import dev.aperture.geometry.profile.ProfileScaler;

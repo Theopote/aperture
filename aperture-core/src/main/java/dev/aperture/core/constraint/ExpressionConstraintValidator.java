@@ -3,7 +3,7 @@ package dev.aperture.core.constraint;
 import dev.aperture.core.definition.ConstraintRule;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.instance.OpeningInstance;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.core.validation.OpeningValidator;
 import dev.aperture.core.validation.ValidationIssue;
 import dev.aperture.core.validation.ValidationResult;

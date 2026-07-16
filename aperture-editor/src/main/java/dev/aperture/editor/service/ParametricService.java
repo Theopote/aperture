@@ -2,10 +2,10 @@ package dev.aperture.editor.service;
 
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.instance.OpeningInstance;
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parametric.InstanceParameters;
-import dev.aperture.core.parametric.ParametricEditor;
-import dev.aperture.core.parametric.ParametricEditResult;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parametric.InstanceParameters;
+import dev.aperture.parametric.ParametricEditor;
+import dev.aperture.parametric.ParametricEditResult;
 import dev.aperture.core.validation.ValidationResult;
 
 import java.util.Map;

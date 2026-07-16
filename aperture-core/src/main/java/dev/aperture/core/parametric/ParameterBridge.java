@@ -1,7 +1,7 @@
 package dev.aperture.core.parametric;
 
-import dev.aperture.core.parameter.ParameterType;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterType;
+import dev.aperture.parameter.ParameterValue;
 
 import java.util.List;
 

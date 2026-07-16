@@ -8,12 +8,12 @@ import dev.aperture.math.Facing;
 import dev.aperture.math.Transform3d;
 import dev.aperture.math.Vec3d;
 import dev.aperture.core.instance.OpeningInstance;
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterType;
-import dev.aperture.core.parameter.ParameterValue;
-import dev.aperture.core.parametric.NumberParameter;
-import dev.aperture.core.parametric.ParametricEditor;
-import dev.aperture.core.parametric.RangeParameter;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterType;
+import dev.aperture.parameter.ParameterValue;
+import dev.aperture.parametric.NumberParameter;
+import dev.aperture.parametric.ParametricEditor;
+import dev.aperture.parametric.RangeParameter;
 
 import java.util.Map;
 import java.util.Optional;

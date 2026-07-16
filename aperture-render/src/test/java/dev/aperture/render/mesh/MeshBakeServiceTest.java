@@ -2,8 +2,8 @@ package dev.aperture.render.mesh;
 
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.math.BoundingBox;
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterValue;
 import dev.aperture.opening.geometry.generator.RectangularWindowGenerator;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.geometry.model.GeometryLayer;

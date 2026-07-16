@@ -14,7 +14,7 @@ import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.instance.OpeningState;
 import dev.aperture.core.opening.OpeningId;
 import dev.aperture.core.parametric.ParameterSetJson;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 
 import java.io.IOException;
 import java.io.InputStream;

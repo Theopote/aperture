@@ -4,8 +4,8 @@ import com.google.gson.JsonObject;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.instance.OpeningState;
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterValue;
 import dev.aperture.core.validation.ValidationResult;
 
 import java.util.Map;

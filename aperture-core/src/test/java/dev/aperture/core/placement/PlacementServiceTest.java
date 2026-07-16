@@ -7,8 +7,8 @@ import dev.aperture.math.Transform3d;
 import dev.aperture.core.instance.HostBinding;
 import dev.aperture.core.instance.InMemoryOpeningInstanceStore;
 import dev.aperture.core.instance.OpeningInstance;
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterValue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

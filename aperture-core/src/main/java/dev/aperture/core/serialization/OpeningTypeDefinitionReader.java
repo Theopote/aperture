@@ -22,8 +22,8 @@ import dev.aperture.core.parametric.ParameterKind;
 import dev.aperture.core.parametric.ParameterMetadata;
 import dev.aperture.core.parametric.ParametricSchema;
 import dev.aperture.core.parametric.RangeParameter;
-import dev.aperture.core.parameter.ParameterType;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterType;
+import dev.aperture.parameter.ParameterValue;
 
 import java.io.IOException;
 import java.io.InputStream;

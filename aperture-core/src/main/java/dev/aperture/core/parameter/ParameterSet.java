@@ -7,15 +7,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 
-import dev.aperture.core.parametric.ParametricSchema;
-
 /**
  * Resolved parameter values for an opening instance or generation request.
- * <p>
- * Instances store <em>sparse overrides</em> (see {@link dev.aperture.core.parametric.InstanceParameters}).
- * Use {@link #mergeDefaults} or {@link dev.aperture.core.definition.OpeningTypeDefinition#resolveParameters}
- * to obtain the full effective set before generation or validation.
+ *
+ * @deprecated Use {@link dev.aperture.parameter.ParameterSet} instead.
  */
+@Deprecated
 public final class ParameterSet {
 	private final Map<String, ParameterValue> values;
 
@@ -37,12 +34,6 @@ public final class ParameterSet {
 
 	public static Builder builder() {
 		return new Builder();
-	}
-
-	public static ParameterSet mergeDefaults(ParametricSchema schema, ParameterSet overrides) {
-		Objects.requireNonNull(schema, "schema");
-		Objects.requireNonNull(overrides, "overrides");
-		return schema.mergeDefaults(overrides);
 	}
 
 	public Map<String, ParameterValue> asMap() {

@@ -1,7 +1,7 @@
 package dev.aperture.core.constraint;
 
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterValue;
 import dev.aperture.core.parametric.ParametricSchema;
 
 /**

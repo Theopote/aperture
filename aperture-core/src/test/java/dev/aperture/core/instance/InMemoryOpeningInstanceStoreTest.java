@@ -1,7 +1,7 @@
 package dev.aperture.core.instance;
 
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

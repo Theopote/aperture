@@ -1,0 +1,149 @@
+package dev.aperture.parameter;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.OptionalDouble;
+
+/**
+ * Resolved parameter values for an opening instance or generation request.
+ */
+public final class ParameterSet {
+	private final Map<String, ParameterValue> values;
+
+	public ParameterSet(Map<String, ParameterValue> values) {
+		this.values = Map.copyOf(values);
+	}
+
+	public static ParameterSet empty() {
+		return new ParameterSet(Map.of());
+	}
+
+	public static ParameterSet of(String key, ParameterValue value) {
+		return new ParameterSet(Map.of(key, value));
+	}
+
+	public static ParameterSet of(Map<String, ParameterValue> values) {
+		return new ParameterSet(values);
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public Map<String, ParameterValue> asMap() {
+		return values;
+	}
+
+	public Optional<ParameterValue> get(String name) {
+		return Optional.ofNullable(values.get(name));
+	}
+
+	public double requireLength(String name) {
+		return ((ParameterValue.LengthValue) require(name, ParameterType.LENGTH)).millimeters();
+	}
+
+	public int requireCount(String name) {
+		return ((ParameterValue.CountValue) require(name, ParameterType.COUNT)).value();
+	}
+
+	public double requireAngle(String name) {
+		return ((ParameterValue.AngleValue) require(name, ParameterType.ANGLE)).degrees();
+	}
+
+	public double requireNumber(String name) {
+		return ((ParameterValue.NumberValue) require(name, ParameterType.NUMBER)).value();
+	}
+
+	public boolean requireBool(String name) {
+		return ((ParameterValue.BoolValue) require(name, ParameterType.BOOL)).value();
+	}
+
+	public String requireEnum(String name) {
+		return ((ParameterValue.EnumValue) require(name, ParameterType.ENUM)).value();
+	}
+
+	public String requireMaterialRef(String name) {
+		return ((ParameterValue.MaterialRefValue) require(name, ParameterType.MATERIAL_REF)).raw();
+	}
+
+	public int countOrDefault(String name, int defaultValue) {
+		return get(name)
+			.filter(value -> value.type() == ParameterType.COUNT)
+			.map(value -> ((ParameterValue.CountValue) value).value())
+			.orElse(defaultValue);
+	}
+
+	public double numberOrDefault(String name, double defaultValue) {
+		return get(name)
+			.filter(value -> value.type() == ParameterType.NUMBER)
+			.map(value -> ((ParameterValue.NumberValue) value).value())
+			.orElse(defaultValue);
+	}
+
+	public double angleOrDefault(String name, double defaultDegrees) {
+		return get(name)
+			.filter(value -> value.type() == ParameterType.ANGLE)
+			.map(value -> ((ParameterValue.AngleValue) value).degrees())
+			.orElse(defaultDegrees);
+	}
+
+	public String enumOrDefault(String name, String defaultValue) {
+		return get(name)
+			.filter(value -> value.type() == ParameterType.ENUM)
+			.map(value -> ((ParameterValue.EnumValue) value).value())
+			.orElse(defaultValue);
+	}
+
+	public OptionalDouble optionalLength(String name) {
+		return get(name)
+			.filter(value -> value.type() == ParameterType.LENGTH)
+			.map(value -> ((ParameterValue.LengthValue) value).millimeters())
+			.map(OptionalDouble::of)
+			.orElse(OptionalDouble.empty());
+	}
+
+	private ParameterValue require(String name, ParameterType type) {
+		ParameterValue value = values.get(name);
+		if (value == null) {
+			throw new IllegalArgumentException("Missing parameter: " + name);
+		}
+		value.validateType(type);
+		return value;
+	}
+
+	public static final class Builder {
+		private final Map<String, ParameterValue> values = new LinkedHashMap<>();
+
+		public Builder put(String name, ParameterValue value) {
+			values.put(name, value);
+			return this;
+		}
+
+		public Builder putAll(Map<String, ParameterValue> other) {
+			values.putAll(other);
+			return this;
+		}
+
+		public ParameterSet build() {
+			return new ParameterSet(Collections.unmodifiableMap(new LinkedHashMap<>(values)));
+		}
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof ParameterSet other && values.equals(other.values);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(values);
+	}
+
+	@Override
+	public String toString() {
+		return values.toString();
+	}
+}

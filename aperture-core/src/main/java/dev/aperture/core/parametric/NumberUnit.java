@@ -1,6 +1,6 @@
 package dev.aperture.core.parametric;
 
-import dev.aperture.core.parameter.ParameterType;
+import dev.aperture.parameter.ParameterType;
 
 /**
  * Logical unit for numeric parameters. Internal storage uses millimeters / degrees / counts / ratios.

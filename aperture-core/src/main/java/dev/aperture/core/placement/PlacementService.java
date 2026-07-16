@@ -7,7 +7,7 @@ import dev.aperture.core.instance.HostBinding;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.instance.OpeningInstanceStore;
 import dev.aperture.core.opening.OpeningId;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.core.validation.CompositeOpeningValidator;
 import dev.aperture.core.validation.OpeningValidator;
 import dev.aperture.core.validation.ParameterConstraintValidator;

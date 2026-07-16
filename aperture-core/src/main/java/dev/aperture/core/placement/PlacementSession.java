@@ -3,7 +3,7 @@ package dev.aperture.core.placement;
 import dev.aperture.core.instance.HostBinding;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.opening.OpeningId;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.core.validation.ValidationResult;
 
 import java.util.Objects;

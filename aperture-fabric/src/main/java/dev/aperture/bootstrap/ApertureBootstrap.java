@@ -7,7 +7,7 @@ import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.instance.InMemoryOpeningInstanceStore;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.instance.OpeningInstanceStore;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.core.placement.PlacementService;
 import dev.aperture.fabric.placement.FabricPlacementAdapter;
 import dev.aperture.geometry.model.GeometryResult;

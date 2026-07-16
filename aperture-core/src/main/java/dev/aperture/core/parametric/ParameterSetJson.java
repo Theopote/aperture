@@ -3,8 +3,8 @@ package dev.aperture.core.parametric;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.aperture.core.definition.OpeningTypeDefinition;
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterValue;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
