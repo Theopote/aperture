@@ -4,23 +4,20 @@ import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.parameter.ParameterSet;
 import dev.aperture.parameter.ParameterValue;
 import dev.aperture.opening.geometry.generator.GenerationTestSupport;
-import dev.aperture.opening.geometry.generator.RectangularWindowGenerator;
+import dev.aperture.opening.component.ComponentPlanBuilder;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class OpeningPipelineTest {
+class OpeningGenerationPipelineTest {
 	@Test
 	void componentPipelineRunsStepsInPlannedOrderForFixedWindow() {
-		var pipeline = new RectangularWindowGenerator().pipelineFor(
-			GenerationTestSupport.context(BuiltinOpeningTypes.fixedWindow(), ParameterSet.empty())
-		);
-
+		var assembly = BuiltinOpeningTypes.fixedWindow().components();
 		assertEquals(
-			ComponentPipelinePlanner.plannedStepIds(BuiltinOpeningTypes.fixedWindow().components()),
-			pipeline.stepIds()
+			ComponentPlanBuilder.plannedStepIds(assembly),
+			ComponentPlanBuilder.buildPlan(assembly).stepIds()
 		);
 	}
 
