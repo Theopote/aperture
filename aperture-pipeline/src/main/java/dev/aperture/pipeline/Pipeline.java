@@ -124,7 +124,7 @@ public final class Pipeline {
 		try {
 			return ((PipelineStage<Object, ?>) stage).execute(input, context);
 		} catch (Exception exception) {
-			return new StageResult.Failure<>("Unexpected error in stage " + stage.name(), exception);
+			return new StageResult.Failure<>(DiagnosticCode.INTERNAL_ERROR, "Unexpected error in stage " + stage.name(), exception);
 		}
 	}
 

@@ -34,7 +34,7 @@ public final class ParameterStage implements PipelineStage<ParameterStage.Resolv
 			);
 			return new StageResult.Success<>(new ResolvedParameters(resolved.typeDefinition(), parameters));
 		} catch (Exception exception) {
-			return new StageResult.Failure<>("Failed to resolve parameters: " + exception.getMessage(), exception);
+			return new StageResult.Failure<>(dev.aperture.pipeline.DiagnosticCode.PARAMETER_TYPE_MISMATCH, "Failed to resolve parameters: " + exception.getMessage(), exception);
 		}
 	}
 

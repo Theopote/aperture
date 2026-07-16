@@ -82,7 +82,7 @@ final class ApertureKernelImpl implements ApertureKernel {
 		} catch (Exception e) {
 			// Unexpected exception - not from pipeline
 			long duration = System.nanoTime() - startTime;
-			statsCollector.recordFailure(request.typeId(), "exception");
+			statsCollector.recordFailure(request.typeId(), KernelErrorCode.INTERNAL_ERROR.name());
 
 			if (enableDebugLogging) {
 				log("Generation failed with exception: " + e.getMessage());
