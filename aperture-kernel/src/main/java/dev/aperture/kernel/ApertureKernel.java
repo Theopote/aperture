@@ -2,7 +2,9 @@ package dev.aperture.kernel;
 
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.opening.OpeningId;
+import dev.aperture.geometry.profile.ProfileDefinition;
 import dev.aperture.parameter.ParameterSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -114,6 +116,12 @@ public interface ApertureKernel extends AutoCloseable {
 	 * @throws NullPointerException if definition is null
 	 */
 	void registerType(OpeningTypeDefinition definition);
+
+	/** Atomically replaces definitions and profiles, then invalidates dependent caches. */
+	void replaceResources(
+		Collection<OpeningTypeDefinition> definitions,
+		Collection<ProfileDefinition> profiles
+	);
 
 	/**
 	 * Clear the pipeline cache.

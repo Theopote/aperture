@@ -1,6 +1,9 @@
 package dev.aperture.kernel;
 
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
+import dev.aperture.core.catalog.OpeningTypeRegistry;
+import dev.aperture.geometry.profile.ProfileCatalogLoader;
+import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.instance.OpeningState;
 import dev.aperture.core.opening.OpeningId;
@@ -129,6 +132,31 @@ class KernelIntegrationTest {
 		assertEquals(hitsBeforeClear, kernel.getStats().cacheStats().hits());
 	}
 
+	@Test
+	void replacingResourcesAdvancesRevisionsAndInvalidatesCache() {
+		OpeningTypeRegistry registry = new OpeningTypeRegistry();
+		registry.replaceAll(BuiltinOpeningTypes.referenceDefinitions());
+		ProfileCatalogRegistry profiles = new ProfileCatalogLoader().loadClasspathCatalog();
+		kernel.close();
+		kernel = ApertureKernel.builder()
+			.withRegistry(registry)
+			.withProfiles(profiles)
+			.build();
+
+		OpeningRequest request = new OpeningRequest("aperture:door", Map.of());
+		assertTrue(kernel.generate(request).isSuccess());
+		assertTrue(kernel.getStats().cacheStats().currentSize() > 0);
+		long registryRevision = registry.revision();
+		long profileRevision = profiles.revision();
+
+		var replacementProfiles = new ProfileCatalogLoader().loadClasspathDirectory("aperture/profiles");
+		kernel.replaceResources(BuiltinOpeningTypes.referenceDefinitions(), replacementProfiles);
+
+		assertEquals(registryRevision + 1, registry.revision());
+		assertEquals(profileRevision + 1, profiles.revision());
+		assertEquals(0, kernel.getStats().cacheStats().currentSize());
+		assertTrue(kernel.generate(request).isSuccess());
+	}
 	@Test
 	void closeRejectsFurtherGeneration() {
 		kernel.close();

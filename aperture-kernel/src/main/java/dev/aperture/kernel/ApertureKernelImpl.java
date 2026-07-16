@@ -27,6 +27,7 @@ final class ApertureKernelImpl implements ApertureKernel {
 
 	private final OpeningTypeRegistry registry;
 	private final OpeningPipelineAdapter pipeline;
+	private final dev.aperture.geometry.profile.ProfileCatalogRegistry profiles;
 	private final StatsCollector statsCollector;
 	private final ExecutorService executorService;
 	private final boolean enableDebugLogging;
@@ -35,6 +36,7 @@ final class ApertureKernelImpl implements ApertureKernel {
 	ApertureKernelImpl(KernelConfig config) {
 		this.registry = config.registry();
 		this.pipeline = config.pipeline();
+		this.profiles = config.profiles();
 		this.statsCollector = new StatsCollector();
 		this.executorService = config.executorService();
 		this.enableDebugLogging = config.enableDebugLogging();
@@ -216,6 +218,7 @@ final class ApertureKernelImpl implements ApertureKernel {
 
 		// Clear cache to avoid stale results
 		pipeline.clearCache();
+		statsCollector.updateCacheStats(pipeline.getCacheStats());
 
 		if (enableDebugLogging) {
 			log("Registered type: " + definition.id());
@@ -223,9 +226,24 @@ final class ApertureKernelImpl implements ApertureKernel {
 	}
 
 	@Override
+	public void replaceResources(
+		java.util.Collection<OpeningTypeDefinition> definitions,
+		java.util.Collection<dev.aperture.geometry.profile.ProfileDefinition> profiles
+	) {
+		Objects.requireNonNull(definitions, "definitions cannot be null");
+		Objects.requireNonNull(profiles, "profiles cannot be null");
+		ensureNotClosed();
+		registry.replaceAll(definitions);
+		this.profiles.replaceAll(profiles);
+		pipeline.clearCache();
+		statsCollector.updateCacheStats(pipeline.getCacheStats());
+	}
+
+	@Override
 	public void clearCache() {
 		ensureNotClosed();
 		pipeline.clearCache();
+		statsCollector.updateCacheStats(pipeline.getCacheStats());
 
 		if (enableDebugLogging) {
 			log("Cache cleared");

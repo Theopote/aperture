@@ -14,7 +14,6 @@ import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.kernel.ApertureKernel;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
-import dev.aperture.geometry.profile.ProfileDefinition;
 import dev.aperture.registry.ApertureBlockEntities;
 import dev.aperture.registry.ApertureBlocks;
 import dev.aperture.runtime.ApertureRuntime;
@@ -24,6 +23,7 @@ import dev.aperture.runtime.material.CatalogMaterialResolver;
 import dev.aperture.runtime.material.VanillaMaterialResolver;
 import dev.aperture.runtime.registry.MaterialResolverRegistry;
 import dev.aperture.runtime.service.OpeningGenerationService;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +50,7 @@ public final class ApertureBootstrap {
 
 	public void initialize() {
 		registerBlocks();
-		loadOpeningTypes();
-		loadProfileCatalog();
+		reloadKernelResources();
 		loadMaterialCatalog();
 		ApertureRuntime.init(new ApertureRuntime(
 			openingTypes,
@@ -72,16 +71,24 @@ public final class ApertureBootstrap {
 		LOGGER.info("Registered opening block + block entity");
 	}
 
-	private void loadOpeningTypes() {
-		openingTypes.register(catalogLoader.loadClasspathResource("aperture/opening_types/fixed_window.json"));
-		openingTypes.register(catalogLoader.loadClasspathResource("aperture/opening_types/door.json"));
-		openingTypes.register(catalogLoader.loadClasspathResource("aperture/opening_types/curtain_wall.json"));
-		enforceReferenceTypeFreeze();
-		LOGGER.info("Loaded {} opening types from data pack", openingTypes.all().size());
+	public void reloadKernelResources() {
+		List<OpeningTypeDefinition> definitions = List.of(
+			catalogLoader.loadClasspathResource("aperture/opening_types/fixed_window.json"),
+			catalogLoader.loadClasspathResource("aperture/opening_types/door.json"),
+			catalogLoader.loadClasspathResource("aperture/opening_types/curtain_wall.json")
+		);
+		enforceReferenceTypeFreeze(definitions);
+		var profiles = new ProfileCatalogLoader().loadClasspathDirectory("aperture/profiles");
+		kernel.replaceResources(definitions, profiles);
+		LOGGER.info(
+			"Reloaded {} opening types (revision {}) and {} profiles (revision {})",
+			openingTypes.all().size(), openingTypes.revision(),
+			profileCatalog.all().size(), profileCatalog.revision()
+		);
 	}
 
-	private void enforceReferenceTypeFreeze() {
-		for (OpeningTypeDefinition definition : openingTypes.all()) {
+	private void enforceReferenceTypeFreeze(Iterable<OpeningTypeDefinition> definitions) {
+		for (OpeningTypeDefinition definition : definitions) {
 			if (!BuiltinOpeningTypes.isReferenceType(definition.id())) {
 				throw new IllegalStateException(
 					"Family library freeze: unexpected opening type in catalog: " + definition.id()
@@ -89,15 +96,6 @@ public final class ApertureBootstrap {
 			}
 		}
 	}
-
-	private void loadProfileCatalog() {
-		ProfileCatalogRegistry loaded = new ProfileCatalogLoader().loadClasspathCatalog();
-		for (ProfileDefinition definition : loaded.all().values()) {
-			profileCatalog.register(definition);
-		}
-		LOGGER.info("Loaded {} catalog profiles", profileCatalog.all().size());
-	}
-
 	private void loadMaterialCatalog() {
 		MaterialCatalogRegistry loaded = new MaterialCatalogLoader().loadClasspathCatalog();
 		for (var definition : loaded.all().values()) {
