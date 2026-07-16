@@ -231,4 +231,14 @@ public final class KernelBuilder {
 
 	public KernelBuilder registry(OpeningTypeRegistry registry) {
 		return withRegistry(registry);
+	}
+	public KernelBuilder cacheCapacity(int capacity) {
+		return withCacheCapacity(capacity);
+	}
+	public KernelBuilder enableLogging(boolean enabled) {
+		return enabled ? enableDebugLogging() : disableDebugLogging();
+	}
+
+	public KernelBuilder threadPoolSize(int size) {
+		return withAsyncThreadPoolSize(size);
 	}}

@@ -205,4 +205,9 @@ public interface ApertureKernel extends AutoCloseable {
 		Map<String, Object> rawParameters = new java.util.LinkedHashMap<>();
 		parameters.asMap().forEach(rawParameters::put);
 		return generate(typeId.toString(), rawParameters);
+	}
+	default CompletableFuture<OpeningResult> generateAsync(OpeningId typeId, ParameterSet parameters) {
+		Map<String, Object> rawParameters = new java.util.LinkedHashMap<>();
+		parameters.asMap().forEach(rawParameters::put);
+		return generateAsync(new OpeningRequest(typeId.toString(), rawParameters));
 	}}

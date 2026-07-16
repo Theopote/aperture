@@ -47,3 +47,10 @@ jar {
 		rename { "${it}_${project.name}" }
 	}
 }
+
+// GameTests require Loom's dedicated server test harness and are not JUnit sources.
+sourceSets {
+	test {
+		java.exclude 'dev/aperture/e2e/**'
+	}
+}
