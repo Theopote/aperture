@@ -1,6 +1,8 @@
 package dev.aperture.kernel.internal;
 
 import dev.aperture.kernel.GenerationMetrics;
+import dev.aperture.kernel.KernelDiagnostic;
+import dev.aperture.kernel.KernelErrorCode;
 import dev.aperture.kernel.OpeningRequest;
 import dev.aperture.kernel.OpeningResult;
 import dev.aperture.geometry.pipeline.mesh.MeshAssembly;
@@ -69,19 +71,19 @@ public final class ResultMapper {
 	) {
 		String failedStage = pipelineResult.getFailedStageName();
 		String errorMessage = pipelineResult.getFailureMessage();
-		return new OpeningResult.Failure(
-			request.typeId(),
-			failedStage == null ? "unknown" : failedStage,
-			errorMessage == null ? "Unknown error" : errorMessage,
-			pipelineResult.getFailureCause()
+		dev.aperture.pipeline.PipelineDiagnostic source = ((PipelineResult.Failure) pipelineResult).diagnostic();
+		KernelDiagnostic diagnostic = new KernelDiagnostic(
+			KernelErrorCode.valueOf(source.code().name()), source.severity(), source.stage(),
+			source.componentPath(), source.parameterPath(), source.message(), source.cause()
 		);
+		return new OpeningResult.Failure(request.typeId(), diagnostic);
 	}
 
 	public static GenerationMetrics buildMetrics(PipelineResult pipelineResult) {
-		long totalTime = pipelineResult.executionTimeMs();
+		java.time.Duration totalTime = pipelineResult.executionTime();
 		int cacheHits = pipelineResult.cacheHits();
 		int cacheMisses = pipelineResult.stageCount() - cacheHits;
-		Map<String, Long> stageTimings = new HashMap<>();
+		Map<String, java.time.Duration> stageTimings = new HashMap<>();
 		var metrics = pipelineResult.getMetrics();
 
 		if (metrics != null) {
@@ -90,8 +92,8 @@ public final class ResultMapper {
 				"geometry", "mesh", "collision", "placement"
 			};
 			for (String stage : stageNames) {
-				long time = metrics.getStageTime(stage);
-				if (time > 0) {
+				java.time.Duration time = metrics.stageTime(stage);
+				if (!time.isZero()) {
 					stageTimings.put(stage, time);
 				}
 			}

@@ -47,7 +47,7 @@ final class ApertureKernelImpl implements ApertureKernel {
 
 		request.validate();
 
-		long startTime = System.currentTimeMillis();
+		long startTime = System.nanoTime();
 
 		try {
 			if (enableDebugLogging) {
@@ -65,8 +65,8 @@ final class ApertureKernelImpl implements ApertureKernel {
 			OpeningResult result = ResultMapper.map(request, pipelineResult);
 
 			// Collect statistics
-			long duration = System.currentTimeMillis() - startTime;
-			statsCollector.record(result, duration);
+			long duration = System.nanoTime() - startTime;
+			statsCollector.record(result, java.time.Duration.ofNanos(duration));
 
 			// Update cache stats
 			statsCollector.updateCacheStats(pipeline.getCacheStats());
@@ -74,26 +74,25 @@ final class ApertureKernelImpl implements ApertureKernel {
 			if (enableDebugLogging) {
 				log("Generation completed: " +
 					(result.isSuccess() ? "SUCCESS" : "FAILURE") +
-					" in " + duration + "ms");
+					" in " + java.time.Duration.ofNanos(duration).toMillis() + "ms");
 			}
 
 			return result;
 
 		} catch (Exception e) {
 			// Unexpected exception - not from pipeline
-			long duration = System.currentTimeMillis() - startTime;
+			long duration = System.nanoTime() - startTime;
 			statsCollector.recordFailure(request.typeId(), "exception");
 
 			if (enableDebugLogging) {
 				log("Generation failed with exception: " + e.getMessage());
 			}
 
-			return new OpeningResult.Failure(
-				request.typeId(),
-				"exception",
-				"Unexpected error: " + e.getMessage(),
-				e
-			);
+			return new OpeningResult.Failure(request.typeId(), new KernelDiagnostic(
+				KernelErrorCode.INTERNAL_ERROR, dev.aperture.pipeline.DiagnosticSeverity.ERROR,
+				dev.aperture.pipeline.StageId.CUSTOM, null, null,
+				"Unexpected error: " + e.getMessage(), e
+			));
 		}
 	}
 
@@ -118,7 +117,7 @@ final class ApertureKernelImpl implements ApertureKernel {
 			log("Generating batch of " + requests.size() + " openings");
 		}
 
-		long batchStartTime = System.currentTimeMillis();
+		long batchStartTime = System.nanoTime();
 
 		// Sequential execution to maximize cache benefits
 		// Requests with same typeId and similar parameters benefit most
@@ -126,14 +125,14 @@ final class ApertureKernelImpl implements ApertureKernel {
 			.map(this::generate)
 			.toList();
 
-		long batchDuration = System.currentTimeMillis() - batchStartTime;
+		long batchDuration = System.nanoTime() - batchStartTime;
 
 		if (enableDebugLogging) {
 			long successCount = results.stream()
 				.filter(OpeningResult::isSuccess)
 				.count();
 
-			double avgTime = (double) batchDuration / requests.size();
+			double avgTime = (double) java.time.Duration.ofNanos(batchDuration).toMillis() / requests.size();
 
 			log("Batch completed: " + successCount + "/" + requests.size() +
 				" successful, avg " + String.format("%.1fms", avgTime) + " per opening");

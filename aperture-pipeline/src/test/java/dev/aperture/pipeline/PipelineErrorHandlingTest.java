@@ -218,7 +218,7 @@ class PipelineErrorHandlingTest {
 		assertFalse(result.isSuccess());
 		assertNotNull(result.getMetrics(), "Should collect metrics even on failure");
 		assertTrue(
-			result.getMetrics().getStageTime("stage1") >= 0,
+			result.getMetrics().stageTime("stage1").toNanos() >= 0,
 			"Should have timing for successful stage"
 		);
 	}

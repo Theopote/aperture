@@ -61,14 +61,9 @@ public final class Pipeline {
 			long duration = System.nanoTime() - stageStarted;
 			metrics.stageTime(stageName, duration);
 			if (!result.isSuccess()) {
-				return failure(
-					stageName,
-					result.getErrorMessage().orElse("Unknown error"),
-					result.getCause().orElse(null),
-					outputs,
-					metrics,
-					started
-				);
+				PipelineDiagnostic diagnostic = result.diagnostic()
+					.orElseGet(() -> PipelineDiagnostic.error(DiagnosticCode.INTERNAL_ERROR, stage.id(), "Unknown error", null));
+				return failure(diagnostic.withStage(stage.id()), outputs, metrics, started);
 			}
 
 			Object output = result.getValue();
@@ -92,6 +87,13 @@ public final class Pipeline {
 		return new PipelineResult.Success(outputs, metrics.build(), currentInput);
 	}
 
+	private static PipelineResult.Failure failure(
+		PipelineDiagnostic diagnostic, Map<String, StageOutput> outputs,
+		PipelineMetrics.Builder metrics, long started
+	) {
+		metrics.totalTime(System.nanoTime() - started);
+		return new PipelineResult.Failure(diagnostic, outputs);
+	}
 	private static PipelineResult.Failure failure(
 		String stage,
 		String message,

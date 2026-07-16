@@ -225,9 +225,9 @@ class PipelinePerformanceTest {
 		System.out.println("\nStage timing breakdown:");
 		System.out.println("─────────────────────────────────");
 
-		long totalTime = result.executionTimeMs();
+		long totalTime = result.executionTime().toNanos();
 		for (String stage : stages) {
-			long stageTime = metrics.getStageTime(stage);
+			long stageTime = metrics.stageTime(stage).toNanos();
 			double percentage = (stageTime * 100.0) / totalTime;
 			System.out.printf("%-12s: %4dms (%5.1f%%)%n", stage, stageTime, percentage);
 		}

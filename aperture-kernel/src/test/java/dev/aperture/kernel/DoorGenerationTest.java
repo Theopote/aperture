@@ -65,7 +65,7 @@ class DoorGenerationTest {
         assertNotNull(success.metrics(), "Should have generation metrics");
 
         System.out.printf("✓ Door generated successfully in %d ms%n", elapsedMs);
-        System.out.printf("  Metrics: total=%d ms%n", success.metrics().totalTimeMs());
+        System.out.printf("  Metrics: total=%d ms%n", success.metrics().totalTime().toNanos());
     }
 
     @Test
@@ -322,10 +322,10 @@ class DoorGenerationTest {
         var metrics = result.asSuccess().metrics();
 
         assertNotNull(metrics, "Should have metrics");
-        assertTrue(metrics.totalTimeMs() > 0, "Should have total time");
+        assertTrue(metrics.totalTime().toNanos() > 0, "Should have total time");
 
         System.out.println("\n=== Generation Metrics ===");
-        System.out.printf("Total time: %d ms%n", metrics.totalTimeMs());
+        System.out.printf("Total time: %d ms%n", metrics.totalTime().toNanos());
 
         if (!metrics.stageTimings().isEmpty()) {
             System.out.println("Stage timings:");

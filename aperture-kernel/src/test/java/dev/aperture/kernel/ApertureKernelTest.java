@@ -160,7 +160,7 @@ class ApertureKernelTest {
 			var success = result.asSuccess();
 			GenerationMetrics metrics = success.metrics();
 
-			assertTrue(metrics.totalTimeMs() >= 0, "Total time should be non-negative");
+			assertTrue(metrics.totalTime().toNanos() >= 0, "Total time should be non-negative");
 			assertNotNull(metrics.stageTimings(), "Stage timings should not be null");
 		}
 	}

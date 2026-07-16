@@ -29,9 +29,9 @@ public final class StatsCollector {
 	/**
 	 * Record a completed request.
 	 */
-	public void record(OpeningResult result, long executionTimeMs) {
+	public void record(OpeningResult result, java.time.Duration executionTime) {
 		totalRequests.incrementAndGet();
-		totalExecutionTime.add(executionTimeMs);
+		totalExecutionTime.add(executionTime.toNanos());
 
 		if (result.isSuccess()) {
 			successfulRequests.incrementAndGet();
@@ -69,7 +69,7 @@ public final class StatsCollector {
 	public KernelStats getStats() {
 		long total = totalRequests.get();
 		double avgTime = total == 0 ? 0.0 :
-			(double) totalExecutionTime.sum() / total;
+			(double) totalExecutionTime.sum() / total / 1_000_000.0;
 
 		// Convert ConcurrentHashMap<String, AtomicLong> to Map<String, Long>
 		Map<String, Long> failures = new ConcurrentHashMap<>();

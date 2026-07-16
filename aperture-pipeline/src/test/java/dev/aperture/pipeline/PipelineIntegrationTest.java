@@ -56,7 +56,7 @@ class PipelineIntegrationTest {
 		assertTrue(result.isSuccess(), "Pipeline should complete successfully: " + result);
 		assertNotNull(result.getFinalOutput(), "Final output should not be null");
 		assertEquals(8, result.stageCount(), "Should execute all 8 stages");
-		assertTrue(result.executionTimeMs() > 0, "Should record execution time");
+		assertTrue(result.executionTime().toNanos() > 0, "Should record execution time");
 
 		// Verify final output is PlacementInfo
 		assertInstanceOf(
@@ -74,11 +74,11 @@ class PipelineIntegrationTest {
 
 		// Act - First execution (no cache)
 		PipelineResult result1 = pipeline.execute(input);
-		long firstTime = result1.executionTimeMs();
+		long firstTime = result1.executionTime().toNanos();
 
 		// Act - Second execution (with cache)
 		PipelineResult result2 = pipeline.execute(input);
-		long secondTime = result2.executionTimeMs();
+		long secondTime = result2.executionTime().toNanos();
 
 		// Assert
 		assertTrue(result1.isSuccess(), "First execution should succeed");
@@ -152,7 +152,7 @@ class PipelineIntegrationTest {
 		};
 
 		for (String stageName : expectedStages) {
-			long stageTime = metrics.getStageTime(stageName);
+			long stageTime = metrics.stageTime(stageName).toNanos();
 			assertTrue(
 				stageTime >= 0,
 				"Stage '" + stageName + "' should have timing data"
