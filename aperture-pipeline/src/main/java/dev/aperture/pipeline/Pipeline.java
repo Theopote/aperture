@@ -167,6 +167,10 @@ public final class Pipeline {
 		cache.clear();
 	}
 
+	public PipelineCache.CacheStats cacheStats() {
+		return cache.getStats();
+	}
+
 	/**
 	 * Record for internal stage registration.
 	 */

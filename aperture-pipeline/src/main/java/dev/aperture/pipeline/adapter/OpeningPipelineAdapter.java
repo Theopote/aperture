@@ -90,7 +90,7 @@ public final class OpeningPipelineAdapter {
 	}
 
 	public PipelineCache.CacheStats getCacheStats() {
-		return new PipelineCache.CacheStats(0, 100, 0, 0);
+		return pipeline.cacheStats();
 	}
 
 	private static OpeningTypeRegistry defaultRegistry() {
