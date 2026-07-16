@@ -8,9 +8,11 @@ Doors, windows, curtain walls, roofs, stairs, and future building components are
 
 ## The Iron Law
 
-> **Every new feature must improve the kernel before it improves a specific building component.**
+> **"aperture-core and aperture-geometry SHALL NOT import net.minecraft.*"**
 
-This ensures Aperture remains an extensible architectural design platform, not a collection of hard-coded Minecraft blocks.
+The Kernel must remain Minecraft-free to ensure reusability, testability, and clear separation of concerns.
+
+Every new feature must strengthen the platform before adding content. This ensures Aperture remains an extensible architectural design kernel, not a collection of hard-coded Minecraft blocks.
 
 ## Philosophy
 

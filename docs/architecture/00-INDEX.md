@@ -35,15 +35,15 @@ This index maps all architecture documents to these layers and tracks their comp
 |----------|--------|-------------|
 | [APERTURE-REDEFINED.md](APERTURE-REDEFINED.md) | ✅ | Strategic framework: "Aperture is an Architectural Design Kernel" |
 | [DEVELOPMENT.md](DEVELOPMENT.md) | ✅ | Standard 8-step development process |
-| [01-vision.md](architecture/01-vision.md) | 🔄 | Project vision, mission, design tenets (needs update with new positioning) |
+| [01-vision.md](architecture/01-vision.md) | ✅ | Project vision, mission, design tenets with new positioning |
 | [03-module-architecture.md](architecture/03-module-architecture.md) | ✅ | Gradle module structure and dependency rules |
 | [09-folder-structure.md](architecture/09-folder-structure.md) | ✅ | Repository layout |
-| **00-dependency-rules.md** | ⏸️ | Layer boundary enforcement (to be created) |
+| [00-dependency-rules.md](architecture/00-dependency-rules.md) | ✅ | Layer boundary enforcement with CI checks |
 
 ### Action Items:
-- [ ] Update 01-vision.md with "Architectural Design Kernel" positioning
-- [ ] Create 00-dependency-rules.md with CI enforcement rules
-- [ ] Add "Iron Law" to README.md and CONTRIBUTING.md
+- [x] Update 01-vision.md with new positioning ✅
+- [x] Create 00-dependency-rules.md ✅
+- [x] Add Iron Law to README and CONTRIBUTING ✅
 
 ---
 
@@ -160,11 +160,11 @@ This index maps all architecture documents to these layers and tracks their comp
 
 | Document | Status | Description |
 |----------|--------|-------------|
-| **editor/01-editor-kernel.md** | 📝 | Selection, Manipulator, Command, History, Snap (GUI-independent abstractions) |
+| [editor/01-editor-kernel.md](architecture/editor/01-editor-kernel.md) | ✅ | Selection, Manipulator, Command, History, Snap (GUI-independent abstractions) |
 | **editor/02-manipulation.md** | ⏸️ | Gizmo system, drag math, constraint projection |
 | **editor/03-history.md** | ⏸️ | Undo/redo, edit commands, revision tracking |
 
-### Completion Status: **~20%**
+### Completion Status: **~30%**
 
 **Exists**:
 - ✅ Editor module structure (aperture-editor)
@@ -172,9 +172,9 @@ This index maps all architecture documents to these layers and tracks their comp
 - ✅ Gizmo rendering skeleton
 - ✅ History and Command pattern interfaces
 - ✅ Snap engine skeleton
+- ✅ Complete editor kernel documentation
 
 **Missing**:
-- ❌ Editor Kernel documentation
 - ❌ Gizmo → Parameter binding (drag handle → update width)
 - ❌ Inspector ↔ Gizmo bidirectional sync
 - ❌ Live preview during resize (incremental pipeline invalidation)
@@ -182,7 +182,7 @@ This index maps all architecture documents to these layers and tracks their comp
 - ❌ Dimension overlays
 
 ### Action Items:
-- [ ] Write editor/01-editor-kernel.md (Selection, Manipulator, History abstractions)
+- [x] Write editor/01-editor-kernel.md ✅
 - [ ] Write editor/02-manipulation.md (Gizmo math, parameter projection)
 - [ ] Implement gizmo → parameter → preview → render flow
 - [ ] Implement undo/redo for parameter edits
@@ -275,7 +275,7 @@ Based on [APERTURE-REDEFINED.md](APERTURE-REDEFINED.md), the immediate prioritie
    - [x] platform/01-opening-pipeline.md ✅
 
 4. **Write missing Editor docs**
-   - [ ] editor/01-editor-kernel.md
+   - [x] editor/01-editor-kernel.md ✅
 
 5. **Architecture review**
    - [ ] Verify consistency across all docs
@@ -301,13 +301,13 @@ Based on [APERTURE-REDEFINED.md](APERTURE-REDEFINED.md), the immediate prioritie
 
 | Layer | Documents | Complete | In Progress | Planned |
 |-------|-----------|----------|-------------|---------|
-| **Foundation** | 6 | 4 | 1 | 1 |
+| **Foundation** | 6 | 6 | 0 | 0 |
 | **Kernel** | 11 | 10 | 0 | 1 |
 | **Platform** | 5 | 5 | 0 | 0 |
-| **Editor** | 3 | 0 | 0 | 3 |
+| **Editor** | 3 | 1 | 0 | 2 |
 | **Applications** | 2 | 0 | 0 | 2 |
 | **Roadmaps** | 4 | 4 | 0 | 0 |
-| **Total** | 31 | 23 (74%) | 1 (3%) | 7 (23%) |
+| **Total** | 31 | 26 (84%) | 0 (0%) | 5 (16%) |
 
 **Target**: 100% Foundation, Kernel, Platform docs complete before Phase 4.
 
