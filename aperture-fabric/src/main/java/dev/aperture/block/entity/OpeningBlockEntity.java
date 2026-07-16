@@ -32,6 +32,13 @@ public final class OpeningBlockEntity extends BlockEntity {
 	}
 
 	/**
+	 * Returns the current opening instance wrapped in an Optional.
+	 */
+	public java.util.Optional<OpeningInstance> resolveInstance() {
+		return java.util.Optional.ofNullable(instance);
+	}
+
+	/**
 	 * Sets the opening instance and marks dirty.
 	 */
 	public void setInstance(@Nullable OpeningInstance instance) {

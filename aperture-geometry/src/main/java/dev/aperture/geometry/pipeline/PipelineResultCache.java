@@ -1,6 +1,6 @@
 package dev.aperture.geometry.pipeline;
 
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

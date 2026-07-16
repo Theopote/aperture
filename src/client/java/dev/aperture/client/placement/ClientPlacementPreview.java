@@ -6,7 +6,7 @@ import dev.aperture.client.editor.GizmoDragController;
 import dev.aperture.client.parameter.ParameterEditorScreen;
 import dev.aperture.client.render.placement.PlacementPreviewMeshService;
 import dev.aperture.core.definition.OpeningTypeDefinition;
-import dev.aperture.parametric.InstanceParameters;
+import dev.aperture.core.parametric.InstanceParameters;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.opening.OpeningId;
 import dev.aperture.math.Transform3d;
@@ -62,7 +62,7 @@ public final class ClientPlacementPreview {
 
 			currentTarget = target.get();
 			Object targetKey = targetKey(currentTarget);
-			if (lastTargetKey == null || !targetKey.equals(lastTargetKey)) {
+			if (!targetKey.equals(lastTargetKey)) {
 				lastTargetKey = targetKey;
 				if (!GizmoDragController.isDragging()) {
 					transformOverride = null;

@@ -1,15 +1,15 @@
 package dev.aperture.client.parameter;
 
-import dev.aperture.parametric.BooleanParameter;
-import dev.aperture.parametric.ChoiceOption;
-import dev.aperture.parametric.ChoiceParameter;
-import dev.aperture.parametric.EnumParameter;
-import dev.aperture.parametric.MaterialParameter;
-import dev.aperture.parametric.NumberParameter;
-import dev.aperture.parametric.Parameter;
-import dev.aperture.parametric.ParameterBridge;
-import dev.aperture.parametric.ParametricEditor;
-import dev.aperture.parametric.RangeParameter;
+import dev.aperture.core.parametric.BooleanParameter;
+import dev.aperture.core.parametric.ChoiceOption;
+import dev.aperture.core.parametric.ChoiceParameter;
+import dev.aperture.core.parametric.EnumParameter;
+import dev.aperture.core.parametric.MaterialParameter;
+import dev.aperture.core.parametric.NumberParameter;
+import dev.aperture.core.parametric.Parameter;
+import dev.aperture.core.parametric.ParameterBridge;
+import dev.aperture.core.parametric.ParametricEditor;
+import dev.aperture.core.parametric.RangeParameter;
 import dev.aperture.parameter.ParameterValue;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;

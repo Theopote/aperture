@@ -4,10 +4,9 @@ import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.parameter.ParameterSet;
 import dev.aperture.geometry.pipeline.PipelineResult;
 import dev.aperture.geometry.pipeline.PipelineResultCache;
-import dev.aperture.opening.geometry.generator.GenerationTestSupport;
 import dev.aperture.opening.geometry.generator.RectangularWindowGenerator;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
-import org.jspecify.annotations.Nullable;
+import dev.aperture.runtime.ApertureRuntime;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -28,13 +27,13 @@ public class PreviewManager {
     private final PipelineResultCache cache = new PipelineResultCache(10);
     private final RectangularWindowGenerator generator = new RectangularWindowGenerator();
 
-    private @Nullable CompletableFuture<PipelineResult> currentGeneration;
-    private @Nullable PreviewUpdateListener updateListener;
+    private CompletableFuture<PipelineResult> currentGeneration;
+    private PreviewUpdateListener updateListener;
 
     /**
      * Sets the listener to be notified when preview updates.
      */
-    public void setUpdateListener(@Nullable PreviewUpdateListener listener) {
+    public void setUpdateListener(PreviewUpdateListener listener) {
         this.updateListener = listener;
     }
 
@@ -52,9 +51,7 @@ public class PreviewManager {
         }
 
         // Start new generation
-        currentGeneration = CompletableFuture.supplyAsync(() -> {
-            return generatePreview(definition, parameters);
-        }, GENERATION_EXECUTOR).thenApply(result -> {
+        currentGeneration = CompletableFuture.supplyAsync(() -> generatePreview(definition, parameters), GENERATION_EXECUTOR).thenApply(result -> {
             // Notify listener on completion
             if (updateListener != null) {
                 updateListener.onPreviewUpdated(result);
@@ -87,7 +84,7 @@ public class PreviewManager {
         GenerationContext context = new GenerationContext(
             definition,
             definition.resolveParameters(parameters),
-            GenerationTestSupport.profiles()
+            ApertureRuntime.get().profiles()
         );
 
         return generator.generate(context);

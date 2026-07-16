@@ -6,7 +6,7 @@ import dev.aperture.geometry.mesh.Mesh;
 import dev.aperture.geometry.pipeline.PipelineResult;
 import dev.aperture.math.Vec3d;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import org.joml.Matrix4f;
 
 /**

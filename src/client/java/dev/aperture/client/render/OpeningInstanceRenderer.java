@@ -8,12 +8,13 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Renders committed opening instances through the Aperture render pipeline.
  */
-public final class OpeningInstanceRenderer implements BlockEntityRenderer<OpeningBlockEntity, OpeningInstanceRenderState> {
+public final class OpeningInstanceRenderer implements BlockEntityRenderer<@org.jetbrains.annotations.NotNull OpeningBlockEntity, @org.jetbrains.annotations.NotNull OpeningInstanceRenderState> {
 	private final FabricRenderBackend backend = FabricRenderBackend.INSTANCE;
 
 	public OpeningInstanceRenderer(BlockEntityRendererProvider.Context context) {
@@ -26,11 +27,11 @@ public final class OpeningInstanceRenderer implements BlockEntityRenderer<Openin
 
 	@Override
 	public void extractRenderState(
-		OpeningBlockEntity blockEntity,
-		OpeningInstanceRenderState state,
-		float tickProgress,
-		Vec3 cameraPos,
-		ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay
+			OpeningBlockEntity blockEntity,
+			OpeningInstanceRenderState state,
+			float tickProgress,
+			@NotNull Vec3 cameraPos,
+			ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay
 	) {
 		BlockEntityRenderer.super.extractRenderState(blockEntity, state, tickProgress, cameraPos, crumblingOverlay);
 		blockEntity.resolveInstance().ifPresentOrElse(
@@ -41,10 +42,10 @@ public final class OpeningInstanceRenderer implements BlockEntityRenderer<Openin
 
 	@Override
 	public void submit(
-		OpeningInstanceRenderState state,
-		PoseStack poseStack,
-		SubmitNodeCollector queue,
-		CameraRenderState camera
+			OpeningInstanceRenderState state,
+			@NotNull PoseStack poseStack,
+			@NotNull SubmitNodeCollector queue,
+			@NotNull CameraRenderState camera
 	) {
 		if (!state.hasMesh()) {
 			return;
