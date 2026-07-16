@@ -118,11 +118,12 @@ public final class FabricRenderBackend implements RenderBackend {
 	}
 
 	private void drawSection(MeshSection section, @Nullable Boolean ghostValid) {
-		if (frameContext == null) {
+		RenderFrameContext ctx = this.frameContext;
+		if (ctx == null) {
 			return;
 		}
 
-		MaterialBinding binding = frameContext.materialBindings().get(section.partId()).orElse(null);
+		MaterialBinding binding = ctx.materialBindings().get(section.partId()).orElse(null);
 		FabricMaterialGraphics.ResolvedMaterialDraw draw;
 		if (binding != null) {
 			draw = ghostValid != null
@@ -132,17 +133,22 @@ public final class FabricRenderBackend implements RenderBackend {
 			draw = fallbackDraw(section.layer());
 		}
 
-		frameContext.queue().submitCustomGeometry(
-			frameContext.poseStack(),
+		Transform3d transform = ctx.transform();
+		BlockPos blockPos = ctx.blockPos();
+		int lightCoords = ctx.lightCoords();
+		int tintArgb = draw.tintArgb();
+
+		ctx.queue().submitCustomGeometry(
+			ctx.poseStack(),
 			draw.renderType(),
 			(pose, buffer) -> MeshSectionEmitter.emit(
 				pose,
 				buffer,
 				section,
-				frameContext.transform(),
-				frameContext.blockPos(),
-				draw.tintArgb(),
-				frameContext.lightCoords()
+				transform,
+				blockPos,
+				tintArgb,
+				lightCoords
 			)
 		);
 	}
