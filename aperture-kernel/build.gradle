@@ -1,0 +1,10 @@
+dependencies {
+	api project(':aperture-core')
+	api project(':aperture-pipeline')
+	api project(':aperture-parameter')
+	api project(':aperture-geometry')
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
