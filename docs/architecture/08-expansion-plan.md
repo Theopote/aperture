@@ -1,3 +1,9 @@
+---
+status: historical
+superseded_by: docs/architecture/03-module-architecture.md
+last_verified: 2026-07-17
+---
+
 # 08 — Expansion Plan
 
 > **Product decision framework:** [13-platform-roadmap-af.md](13-platform-roadmap-af.md) — Phase A–F + **族库冻结策略**（Door/Window/Curtain Wall 族库在 Opening Pipeline + Editor 2.0 封板前暂停）。

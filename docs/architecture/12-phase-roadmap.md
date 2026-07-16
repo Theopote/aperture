@@ -1,3 +1,9 @@
+---
+status: historical
+superseded_by: docs/architecture/03-module-architecture.md
+last_verified: 2026-07-17
+---
+
 # 12 — Twelve-Phase Product Roadmap
 
 Aperture 的完整**工程任务分解**，将项目拆分为 **12 个可交付阶段**。每个阶段有明确的目标、交付物、依赖关系与验收标准。

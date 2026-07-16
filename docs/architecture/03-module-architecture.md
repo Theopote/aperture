@@ -1,87 +1,49 @@
-# 03 — Module Architecture
+---
+status: active
+implementation_version: kernel-pipeline-v1
+last_verified: 2026-07-17
+---
 
-## Module Diagram
+# Module Architecture
 
-```mermaid
-flowchart TB
-    subgraph PureJava["Pure Java (platform-agnostic)"]
-        CORE[aperture-core]
-        GEO[aperture-geometry]
-        RENDER[aperture-render]
-        API[aperture-api]
-    end
+Aperture is split into small Java libraries and thin Minecraft/Fabric adapters. Dependency direction points from foundational data types toward the runtime; platform code must not leak back into the libraries.
 
-    subgraph Minecraft["Minecraft adapters"]
-        ROOT[aperture — Fabric mod]
-        DATA[aperture-data]
-    end
-
-    subgraph Extensions["Third-party addons"]
-        ADDON[addon-mods]
-    end
-
-    GEO --> CORE
-    RENDER --> GEO
-    RENDER --> CORE
-    API --> CORE
-    API --> GEO
-    API --> RENDER
-    ROOT --> API
-    DATA --> CORE
-    ADDON --> API
+```text
+aperture-math
+  -> aperture-parameter
+  -> aperture-core
+  -> aperture-geometry
+  -> aperture-opening
+  -> aperture-pipeline
+  -> aperture-kernel
+  -> aperture-runtime
+       -> aperture-editor
+       -> aperture-render
+       -> aperture-fabric / root client adapters
 ```
 
-## Module Responsibilities
+This is a direction rule, not a requirement that every module depend on every predecessor.
 
-| Module | Responsibility | Minecraft Imports |
+## Responsibilities
+
+| Module | Responsibility | Minecraft imports |
 |---|---|---|
-| `aperture-core` | Domain model, parameters, validation, codec contracts | **Forbidden** |
-| `aperture-geometry` | Procedural mesh/solid generation | **Forbidden** |
-| `aperture-render` | Render data, mesh, material, pipeline contracts | **Forbidden** |
-| `aperture-api` | Stable public surface for addons | **Forbidden** |
-| `aperture` (root) | World instances, placement, host cuts, networking, save, render | Allowed |
-| `aperture-data` | Opening families, profiles, presets (JSON packs) | N/A |
+| `aperture-math` | Numeric and transform primitives | Forbidden |
+| `aperture-parameter` | The single `ParameterSet` model | Forbidden |
+| `aperture-core` | Opening definitions and domain contracts | Forbidden |
+| `aperture-geometry` | Geometry/profile primitives | Forbidden |
+| `aperture-opening` | Component planning and geometry/mesh compilers | Forbidden |
+| `aperture-pipeline` | Typed stage orchestration and structural caching | Forbidden |
+| `aperture-kernel` | Stable generation facade and composition root | Forbidden |
+| `aperture-runtime` | World-facing generation service and instance mapping | Forbidden |
+| `aperture-editor` | Headless editor state and interaction models | Forbidden |
+| `aperture-render` | Platform-neutral render data and mesh services | Forbidden |
+| `aperture-fabric`, root sources | Minecraft registration, input, rendering and world adapters | Allowed |
 
-## Dependency Rules
+## Public surface
 
-Enforced in CI — violations fail the build.
+There is currently no compatibility-oriented `aperture-api` module. During development, consumers use the Kernel contracts directly. A separate API module should return only when real third-party SPI requirements exist; it must then depend inward on stable contracts rather than on Runtime or Editor implementations.
 
-```
-aperture-core        →  (no upward deps)
-aperture-geometry    →  core
-aperture-render      →  core, geometry
-aperture-api         →  core, geometry, render
-aperture (root mod)  →  api, render (client)
-addon mods           →  api only (never common internals)
-```
+## Client boundary
 
-## Package Root
-
-All Java code uses `dev.aperture` as the root package.
-
-| Module | Package |
-|---|---|
-| core | `dev.aperture.core.*` |
-| geometry | `dev.aperture.geometry.*` |
-| render | `dev.aperture.render.*` |
-| api | `dev.aperture.api.*` |
-| fabric mod | `dev.aperture.*` (bootstrap, registry, network) |
-| fabric client | `dev.aperture.client.*` |
-
-## The Golden Rule
-
-> If a class imports `net.minecraft.*`, it does not belong in `aperture-core`, `aperture-geometry`, or `aperture-api`.
-
-Minecraft adapters live exclusively in the root Fabric module (`src/main`, `src/client`).
-
-## Extension Points
-
-| Extension Point | API Surface | Module |
-|---|---|---|
-| New opening type | JSON definition + optional `Generator` | api + data |
-| New profile | JSON profile + extrude rule | data |
-| New material resolver | `MaterialResolver` | api |
-| New host type | `HostAdapter` | fabric mod (future) |
-| New placement rule | `PlacementValidator` | api |
-| New export format | `InterchangeExporter` | api (future) |
-| New behavior | `OpeningBehavior` strategy | core |
+Root `src/client` owns Minecraft-specific input, picking, buffer submission, and screen adapters. Platform-neutral editor state, interaction targets, and render caches belong in `aperture-editor` or `aperture-render`.

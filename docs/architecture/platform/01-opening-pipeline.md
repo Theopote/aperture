@@ -1,3 +1,9 @@
+---
+status: active
+implementation_version: kernel-pipeline-v1
+last_verified: 2026-07-17
+---
+
 # 01 — Opening Pipeline
 
 **Layer**: Platform  

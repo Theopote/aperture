@@ -1,3 +1,9 @@
+---
+status: historical
+superseded_by: docs/architecture/03-module-architecture.md
+last_verified: 2026-07-17
+---
+
 # 05 — Rendering Architecture
 
 ## Problem

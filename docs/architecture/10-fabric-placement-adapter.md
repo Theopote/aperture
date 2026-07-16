@@ -1,3 +1,9 @@
+---
+status: historical
+superseded_by: docs/architecture/03-module-architecture.md
+last_verified: 2026-07-17
+---
+
 # 10 — Fabric Placement Adapter
 
 This document describes the **Fabric-side placement adapter** that bridges Minecraft world interaction (raycasts, block faces, host geometry) to the pure-Java core placement system (`PlacementContext`, `PlacementService`).
