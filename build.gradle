@@ -113,3 +113,56 @@ publishing {
 		mavenCentral()
 	}
 }
+tasks.register('checkArchitecture') {
+	group = 'verification'
+	description = 'Enforces K1 module dependency direction and forbidden source patterns.'
+	doLast {
+		def forbiddenProjectDeps = [
+			'aperture-math': ['aperture-parameter','aperture-core','aperture-geometry','aperture-opening','aperture-pipeline','aperture-kernel','aperture-runtime','aperture-render','aperture-editor','aperture-fabric'],
+			'aperture-parameter': ['aperture-runtime','aperture-editor','aperture-render','aperture-fabric'],
+			'aperture-core': ['aperture-opening','aperture-pipeline','aperture-kernel','aperture-runtime','aperture-render','aperture-editor','aperture-fabric'],
+			'aperture-geometry': ['aperture-opening','aperture-pipeline','aperture-kernel','aperture-runtime','aperture-render','aperture-editor','aperture-fabric'],
+			'aperture-opening': ['aperture-pipeline','aperture-kernel','aperture-runtime','aperture-render','aperture-editor','aperture-fabric'],
+			'aperture-pipeline': ['aperture-runtime','aperture-render','aperture-editor','aperture-fabric'],
+			'aperture-kernel': ['aperture-runtime','aperture-render','aperture-editor','aperture-fabric'],
+			'aperture-runtime': ['aperture-editor','aperture-fabric'],
+			'aperture-render': ['aperture-fabric'],
+			'aperture-editor': ['aperture-fabric']
+		]
+		def violations = []
+		forbiddenProjectDeps.each { moduleName, forbidden ->
+			def module = project(":" + moduleName)
+			['api', 'implementation'].each { configurationName ->
+				def configuration = module.configurations.findByName(configurationName)
+				configuration?.dependencies?.withType(ProjectDependency)?.each { dependency ->
+					if (forbidden.contains(dependency.path.substring(1))) {
+						violations << "${moduleName} must not depend on ${dependency.path} (${configurationName})"
+					}
+				}
+			}
+		}
+
+		def sourceRules = [
+			[files: fileTree(rootDir) { include '**/src/**/*.java'; exclude '**/build/**' }, pattern: ~/dev\.aperture\.core\.parameter\./, message: 'old core.parameter API is forbidden'],
+			[files: fileTree(rootDir) { include '**/src/**/*.java'; exclude '**/build/**' }, pattern: ~/new\s+DefinitionStage\s*\(\s*\)/, message: 'DefinitionStage requires an injected registry'],
+			[files: fileTree("${rootDir}/aperture-pipeline/src/main/java/dev/aperture/pipeline/stage") { include '**/*.java' }, pattern: ~/loadClasspathCatalog\s*\(/, message: 'stages must not load profile catalogs'],
+			[files: fileTree("${rootDir}/aperture-runtime/src") { include '**/*.java' }, pattern: ~/OpeningGenerationPipeline/, message: 'Runtime must not reference the removed pipeline'],
+			[files: fileTree("${rootDir}/aperture-render/src/main") { include '**/*.java' }, pattern: ~/dev\.aperture\.opening\.(compile|geometry\.build)/, message: 'Renderer must not compile geometry'],
+			[files: fileTree("${rootDir}/aperture-fabric/src") { include '**/*.java' }, pattern: ~/package\s+dev\.aperture\.(core|geometry|opening)\b/, message: 'Fabric must not define domain packages']
+		]
+		sourceRules.each { rule ->
+			rule.files.each { source ->
+				if ((source.getText('UTF-8') =~ rule.pattern).find()) {
+					violations << "${rule.message}: ${rootDir.toPath().relativize(source.toPath())}"
+				}
+			}
+		}
+		if (!violations.isEmpty()) {
+			throw new GradleException("Architecture violations:\n - " + violations.join('\n - '))
+		}
+	}
+}
+
+tasks.named('check') {
+	dependsOn tasks.named('checkArchitecture')
+}

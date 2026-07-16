@@ -14,9 +14,6 @@ import java.util.Objects;
 public final class ConstraintStage implements PipelineStage<ParameterStage.ResolvedParameters, ConstraintStage.ValidatedParameters> {
 	private final ExpressionConstraintValidator validator;
 
-	public ConstraintStage() {
-		this(new ExpressionConstraintValidator());
-	}
 
 	public ConstraintStage(ExpressionConstraintValidator validator) {
 		this.validator = Objects.requireNonNull(validator, "validator cannot be null");

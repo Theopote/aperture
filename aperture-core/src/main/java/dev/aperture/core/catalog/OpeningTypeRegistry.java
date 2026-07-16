@@ -13,9 +13,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class OpeningTypeRegistry {
 	private final Map<OpeningId, OpeningTypeDefinition> definitions = new ConcurrentHashMap<>();
+	private final java.util.concurrent.atomic.AtomicLong revision = new java.util.concurrent.atomic.AtomicLong();
 
 	public void register(OpeningTypeDefinition definition) {
 		definitions.put(definition.id(), definition);
+		revision.incrementAndGet();
 	}
 
 	public Optional<OpeningTypeDefinition> get(OpeningId id) {
@@ -30,7 +32,12 @@ public final class OpeningTypeRegistry {
 		return definitions.values();
 	}
 
+	public long revision() {
+		return revision.get();
+	}
+
 	public void clear() {
 		definitions.clear();
+		revision.incrementAndGet();
 	}
 }

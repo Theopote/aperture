@@ -39,38 +39,39 @@ public final class OpeningPipelineAdapter {
 		OpeningTypeRegistry registry,
 		ProfileCatalogRegistry profiles
 	) {
-		return withCache(
-			cacheCapacity,
-			registry,
-			profiles,
-			new ComponentPlanBuilder(),
-			new OpeningGeometryCompiler(),
-			new OpeningMeshCompiler()
+		return assemble(
+			registry, profiles,
+			new dev.aperture.core.constraint.ExpressionConstraintValidator(),
+			new ComponentPlanBuilder(), new OpeningGeometryCompiler(), new OpeningMeshCompiler(),
+			new BoundingBoxCollisionStage(), new BasicPlacementMetadataStage(),
+			new PipelineCache(cacheCapacity)
 		);
 	}
 
-	public static OpeningPipelineAdapter withCache(
-		int cacheCapacity,
+	public static OpeningPipelineAdapter assemble(
 		OpeningTypeRegistry registry,
 		ProfileCatalogRegistry profiles,
+		dev.aperture.core.constraint.ExpressionConstraintValidator constraintValidator,
 		ComponentPlanBuilder componentPlanner,
 		OpeningGeometryCompiler geometryCompiler,
-		OpeningMeshCompiler meshCompiler
+		OpeningMeshCompiler meshCompiler,
+		BoundingBoxCollisionStage collisionCompiler,
+		BasicPlacementMetadataStage placementCompiler,
+		PipelineCache cache
 	) {
 		Pipeline pipeline = new PipelineBuilder()
 			.addStage(new DefinitionStage(registry))
 			.addStage(new ParameterStage())
-			.addStage(new ConstraintStage())
+			.addStage(new ConstraintStage(constraintValidator))
 			.addStage(new ComponentStage(componentPlanner))
 			.addStage(new GeometryStage(geometryCompiler, profiles))
 			.addStage(new MeshStage(meshCompiler))
-			.addStage(new BoundingBoxCollisionStage())
-			.addStage(new BasicPlacementMetadataStage())
-			.withCache(new PipelineCache(cacheCapacity))
+			.addStage(collisionCompiler)
+			.addStage(placementCompiler)
+			.withCache(cache)
 			.build();
 		return new OpeningPipelineAdapter(pipeline);
 	}
-
 	public static OpeningPipelineAdapter withoutCache(
 		OpeningTypeRegistry registry,
 		ProfileCatalogRegistry profiles

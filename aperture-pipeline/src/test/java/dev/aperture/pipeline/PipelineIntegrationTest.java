@@ -26,7 +26,7 @@ class PipelineIntegrationTest {
 		pipeline = Pipeline.builder()
 			.addStage(new DefinitionStage(PipelineTestFactory.registry()))
 			.addStage(new ParameterStage())
-			.addStage(new ConstraintStage())
+			.addStage(new ConstraintStage(new dev.aperture.core.constraint.ExpressionConstraintValidator()))
 			.addStage(PipelineTestFactory.componentStage())
 			.addStage(PipelineTestFactory.geometryStage())
 			.addStage(PipelineTestFactory.meshStage())
@@ -102,7 +102,7 @@ class PipelineIntegrationTest {
 		Pipeline failingPipeline = Pipeline.builder()
 			.addStage(new DefinitionStage(PipelineTestFactory.registry()))
 			.addStage(new ParameterStage())
-			.addStage(new ConstraintStage()) // This will fail with invalid constraints
+			.addStage(new ConstraintStage(new dev.aperture.core.constraint.ExpressionConstraintValidator())) // This will fail with invalid constraints
 			.addStage(PipelineTestFactory.componentStage())
 			.addStage(PipelineTestFactory.geometryStage())
 			.addStage(PipelineTestFactory.meshStage())

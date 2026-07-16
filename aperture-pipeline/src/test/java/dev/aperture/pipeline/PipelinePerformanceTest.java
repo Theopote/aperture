@@ -32,7 +32,7 @@ class PipelinePerformanceTest {
 		pipeline = Pipeline.builder()
 			.addStage(new DefinitionStage(PipelineTestFactory.registry()))
 			.addStage(new ParameterStage())
-			.addStage(new ConstraintStage())
+			.addStage(new ConstraintStage(new dev.aperture.core.constraint.ExpressionConstraintValidator()))
 			.addStage(PipelineTestFactory.componentStage())
 			.addStage(PipelineTestFactory.geometryStage())
 			.addStage(PipelineTestFactory.meshStage())

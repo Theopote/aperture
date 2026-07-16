@@ -1,6 +1,7 @@
 package dev.aperture.kernel;
 
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
+import dev.aperture.core.constraint.ExpressionConstraintValidator;
 import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
@@ -8,7 +9,10 @@ import dev.aperture.kernel.internal.KernelConfig;
 import dev.aperture.opening.compile.OpeningGeometryCompiler;
 import dev.aperture.opening.compile.OpeningMeshCompiler;
 import dev.aperture.opening.component.ComponentPlanBuilder;
+import dev.aperture.pipeline.PipelineCache;
 import dev.aperture.pipeline.adapter.OpeningPipelineAdapter;
+import dev.aperture.pipeline.stage.BasicPlacementMetadataStage;
+import dev.aperture.pipeline.stage.BoundingBoxCollisionStage;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -157,16 +161,16 @@ public final class KernelBuilder {
 			: new ProfileCatalogLoader().loadClasspathCatalog();
 
 		// Create pipeline with configured cache
+		ExpressionConstraintValidator constraintValidator = new ExpressionConstraintValidator();
 		ComponentPlanBuilder componentPlanner = new ComponentPlanBuilder();
 		OpeningGeometryCompiler geometryCompiler = new OpeningGeometryCompiler();
 		OpeningMeshCompiler meshCompiler = new OpeningMeshCompiler();
-		OpeningPipelineAdapter pipeline = OpeningPipelineAdapter.withCache(
-			cacheCapacity,
-			finalRegistry,
-			finalProfiles,
-			componentPlanner,
-			geometryCompiler,
-			meshCompiler
+		BoundingBoxCollisionStage collisionCompiler = new BoundingBoxCollisionStage();
+		BasicPlacementMetadataStage placementCompiler = new BasicPlacementMetadataStage();
+		PipelineCache cache = new PipelineCache(cacheCapacity);
+		OpeningPipelineAdapter pipeline = OpeningPipelineAdapter.assemble(
+			finalRegistry, finalProfiles, constraintValidator, componentPlanner,
+			geometryCompiler, meshCompiler, collisionCompiler, placementCompiler, cache
 		);
 
 		// Create or use executor service
