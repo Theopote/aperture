@@ -50,7 +50,7 @@ public final class DefinitionStage implements PipelineStage<DefinitionStage.Open
 		}
 
 		ParametricEditor editor = ParametricEditor.fromDefinition(typeDefinition, ParameterSet.empty());
-		var patchResult = editor.patch(request.userParameters());
+		var patchResult = editor.patch(normalizeParameterValues(request.userParameters()));
 		if (!patchResult.success()) {
 			return new StageResult.Failure<>("Invalid opening parameters: " + patchResult.issues());
 		}
@@ -59,6 +59,20 @@ public final class DefinitionStage implements PipelineStage<DefinitionStage.Open
 		);
 	}
 
+	private static Map<String, Object> normalizeParameterValues(Map<String, Object> values) {
+		Map<String, Object> normalized = new java.util.LinkedHashMap<>();
+		values.forEach((name, value) -> normalized.put(name, switch (value) {
+			case dev.aperture.parameter.ParameterValue.LengthValue length -> length.millimeters();
+			case dev.aperture.parameter.ParameterValue.AngleValue angle -> angle.degrees();
+			case dev.aperture.parameter.ParameterValue.CountValue count -> count.value();
+			case dev.aperture.parameter.ParameterValue.NumberValue number -> number.value();
+			case dev.aperture.parameter.ParameterValue.EnumValue enumeration -> enumeration.value();
+			case dev.aperture.parameter.ParameterValue.BoolValue bool -> bool.value();
+			case dev.aperture.parameter.ParameterValue.MaterialRefValue material -> material.raw();
+			default -> value;
+		}));
+		return Map.copyOf(normalized);
+	}
 	private static String normalizeLegacyTypeId(String typeId) {
 		return switch (typeId) {
 			case "aperture:door_standard" -> "aperture:door";

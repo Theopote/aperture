@@ -4,7 +4,7 @@ import dev.aperture.pipeline.PipelineResult;
 import dev.aperture.pipeline.PipelineTestFactory;
 import dev.aperture.pipeline.stage.DefinitionStage;
 import dev.aperture.pipeline.stage.PlacementStage;
-import dev.aperture.opening.geometry.build.CompiledGeometry;
+import dev.aperture.pipeline.stage.GeometryStage;
 import dev.aperture.geometry.pipeline.mesh.MeshAssembly;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -91,7 +91,7 @@ class OpeningPipelineAdapterTest {
 	void exposesGeometryAndPlacementStageOutputs() {
 		PipelineResult result = adapter.execute("aperture:door", Map.of());
 		PipelineResult.Success success = assertInstanceOf(PipelineResult.Success.class, result);
-		assertInstanceOf(CompiledGeometry.class, success.getStageValue("geometry").orElseThrow());
+		assertInstanceOf(GeometryStage.GeometryCompilation.class, success.getStageValue("geometry").orElseThrow());
 		assertInstanceOf(MeshAssembly.class, success.getStageValue("mesh").orElseThrow());
 		assertInstanceOf(PlacementStage.PlacementInfo.class, success.getStageValue("placement").orElseThrow());
 	}

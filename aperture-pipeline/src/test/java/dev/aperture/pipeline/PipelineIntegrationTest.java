@@ -42,9 +42,9 @@ class PipelineIntegrationTest {
 		// Arrange
 		String openingTypeId = "aperture:door_standard";
 		Map<String, Object> userParams = Map.of(
-			"width", 1.0,
-			"height", 2.0,
-			"thickness", 0.1
+			"width", 1000.0,
+			"height", 2000.0,
+			"thickness", 100.0
 		);
 
 		var input = new DefinitionStage.OpeningRequest(openingTypeId, userParams);
@@ -53,7 +53,7 @@ class PipelineIntegrationTest {
 		PipelineResult result = pipeline.execute(input);
 
 		// Assert
-		assertTrue(result.isSuccess(), "Pipeline should complete successfully");
+		assertTrue(result.isSuccess(), "Pipeline should complete successfully: " + result);
 		assertNotNull(result.getFinalOutput(), "Final output should not be null");
 		assertEquals(8, result.stageCount(), "Should execute all 8 stages");
 		assertTrue(result.executionTimeMs() > 0, "Should record execution time");

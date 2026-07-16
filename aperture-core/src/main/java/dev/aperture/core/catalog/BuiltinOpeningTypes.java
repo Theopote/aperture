@@ -139,7 +139,6 @@ public final class BuiltinOpeningTypes {
 				"minecraft:oak_planks",
 				ParameterMetadata.grouped("Frame Material", "Materials")
 			))
-			.constraint("width > height * 0.5", "Width must exceed half the height")
 			.constraint("panel_count >= 1", "At least one panel is required")
 			.constraint("glass_ratio >= 0 and glass_ratio <= 1", "Glass ratio must stay between 0 and 1")
 			.materialSlot("frame")

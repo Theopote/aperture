@@ -84,7 +84,7 @@ class DoorGenerationTest {
         OpeningResult result = kernel.generate(doorId, params);
 
         // Then: Should succeed
-        assertTrue(result.isSuccess(), "Custom door should generate");
+        assertTrue(result.isSuccess(), "Custom door should generate: " + result);
 
         var success = result.asSuccess();
         var placement = success.placement();

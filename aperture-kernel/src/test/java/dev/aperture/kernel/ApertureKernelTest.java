@@ -40,8 +40,8 @@ class ApertureKernelTest {
 		// Arrange
 		String typeId = "aperture:door_standard";
 		Map<String, Object> params = Map.of(
-			"width", 1.0,
-			"height", 2.0
+			"width", 1000.0,
+			"height", 2000.0
 		);
 
 		// Act
@@ -49,7 +49,7 @@ class ApertureKernelTest {
 
 		// Assert
 		assertNotNull(result, "Result should not be null");
-		assertTrue(result.isSuccess(), "Generation should succeed");
+		assertTrue(result.isSuccess(), "Generation should succeed: " + result);
 		assertEquals(typeId, result.typeId());
 	}
 
@@ -59,7 +59,7 @@ class ApertureKernelTest {
 		// Arrange
 		var request = new OpeningRequest(
 			"aperture:door_standard",
-			Map.of("width", 1.0)
+			Map.of("width", 1000.0)
 		);
 
 		// Act
@@ -80,7 +80,7 @@ class ApertureKernelTest {
 
 		var request = new OpeningRequest(
 			"aperture:door_standard",
-			Map.of("width", 1.0),
+			Map.of("width", 1000.0),
 			options
 		);
 
@@ -129,7 +129,7 @@ class ApertureKernelTest {
 		// Arrange
 		var request = new OpeningRequest(
 			"aperture:door_standard",
-			Map.of("width", 1.0, "height", 2.0)
+			Map.of("width", 1000.0, "height", 2000.0)
 		);
 
 		// Act
@@ -149,7 +149,7 @@ class ApertureKernelTest {
 		// Arrange
 		var request = new OpeningRequest(
 			"aperture:door_standard",
-			Map.of("width", 1.0, "height", 2.0)
+			Map.of("width", 1000.0, "height", 2000.0)
 		);
 
 		// Act
@@ -206,7 +206,7 @@ class ApertureKernelTest {
 	void testBatchGeneration() {
 		// Arrange
 		List<OpeningRequest> requests = List.of(
-			new OpeningRequest("aperture:door_standard", Map.of("width", 1.0)),
+			new OpeningRequest("aperture:door_standard", Map.of("width", 1000.0)),
 			new OpeningRequest("aperture:door_standard", Map.of("width", 1.5)),
 			new OpeningRequest("aperture:door_standard", Map.of("width", 2.0))
 		);
@@ -236,7 +236,7 @@ class ApertureKernelTest {
 		// Arrange
 		var request = new OpeningRequest(
 			"aperture:door_standard",
-			Map.of("width", 1.0)
+			Map.of("width", 1000.0)
 		);
 
 		// Act
@@ -252,7 +252,7 @@ class ApertureKernelTest {
 	@DisplayName("Multiple async generations")
 	void testMultipleAsyncGenerations() throws Exception {
 		// Arrange
-		var request1 = new OpeningRequest("aperture:door_standard", Map.of("width", 1.0));
+		var request1 = new OpeningRequest("aperture:door_standard", Map.of("width", 1000.0));
 		var request2 = new OpeningRequest("aperture:door_standard", Map.of("width", 1.5));
 
 		// Act
@@ -273,7 +273,7 @@ class ApertureKernelTest {
 	@DisplayName("Get kernel statistics")
 	void testGetStats() {
 		// Arrange
-		kernel.generate("aperture:door_standard", Map.of("width", 1.0));
+		kernel.generate("aperture:door_standard", Map.of("width", 1000.0));
 		kernel.generate("aperture:door_standard", Map.of("width", 1.5));
 
 		// Act
@@ -289,7 +289,7 @@ class ApertureKernelTest {
 	@DisplayName("Reset statistics")
 	void testResetStats() {
 		// Arrange
-		kernel.generate("aperture:door_standard", Map.of("width", 1.0));
+		kernel.generate("aperture:door_standard", Map.of("width", 1000.0));
 		assertEquals(1, kernel.getStats().totalRequests());
 
 		// Act
@@ -304,7 +304,7 @@ class ApertureKernelTest {
 	@DisplayName("Clear cache")
 	void testClearCache() {
 		// Arrange
-		var request = new OpeningRequest("aperture:door_standard", Map.of("width", 1.0));
+		var request = new OpeningRequest("aperture:door_standard", Map.of("width", 1000.0));
 		kernel.generate(request); // First call
 		kernel.generate(request); // Second call (cached)
 
