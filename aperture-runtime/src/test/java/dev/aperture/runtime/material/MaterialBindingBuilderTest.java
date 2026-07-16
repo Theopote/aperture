@@ -3,7 +3,7 @@ package dev.aperture.runtime.material;
 import dev.aperture.runtime.registry.MaterialResolverRegistry;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.instance.OpeningInstance;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.opening.geometry.generator.RectangularWindowGenerator;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;

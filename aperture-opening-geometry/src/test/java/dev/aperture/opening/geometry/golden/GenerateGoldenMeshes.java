@@ -1,7 +1,7 @@
 package dev.aperture.opening.geometry.golden;
 
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterValue;
 import dev.aperture.geometry.mesh.Mesh;
 import dev.aperture.geometry.mesh.MeshAssembly;
 import dev.aperture.geometry.pipeline.PipelineResult;

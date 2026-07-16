@@ -5,7 +5,7 @@ import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.parametric.InstanceParameters;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.core.validation.CompositeOpeningValidator;
 import dev.aperture.core.validation.OpeningValidator;
 import dev.aperture.core.validation.ParameterConstraintValidator;

@@ -30,7 +30,7 @@ public final class OpeningWorldPlacement {
 		}
 
 		if (level.getBlockEntity(pos) instanceof OpeningBlockEntity openingBlockEntity) {
-			openingBlockEntity.setInstanceId(instance.instanceId());
+			openingBlockEntity.setInstance(instance);
 		}
 	}
 

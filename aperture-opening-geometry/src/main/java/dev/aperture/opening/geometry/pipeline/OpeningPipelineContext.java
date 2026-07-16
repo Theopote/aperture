@@ -39,7 +39,7 @@ public final class OpeningPipelineContext {
 		return resolved.context().definition();
 	}
 
-	public dev.aperture.core.parameter.ParameterSet parameters() {
+	public dev.aperture.parameter.ParameterSet parameters() {
 		return resolved.context().parameters();
 	}
 

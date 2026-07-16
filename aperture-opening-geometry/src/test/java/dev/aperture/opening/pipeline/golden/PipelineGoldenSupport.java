@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.parametric.InstanceParameters;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.model.GeometrySolid;
 import dev.aperture.geometry.pipeline.PipelineResult;

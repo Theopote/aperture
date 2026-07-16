@@ -6,7 +6,7 @@ import dev.aperture.core.editor.history.EditCommand;
 import dev.aperture.core.editor.history.EditResult;
 import dev.aperture.core.editor.session.EditorContext;
 import dev.aperture.core.instance.OpeningInstance;
-import dev.aperture.parametric.ParametricEditor;
+import dev.aperture.core.parametric.ParametricEditor;
 import dev.aperture.parameter.ParameterSet;
 import dev.aperture.parameter.ParameterValue;
 import dev.aperture.core.validation.ValidationResult;

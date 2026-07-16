@@ -1,7 +1,7 @@
 package dev.aperture.runtime.material;
 
 import dev.aperture.core.definition.OpeningTypeDefinition;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.core.opening.OpeningId;
 import dev.aperture.geometry.model.GeometryLayer;
 

@@ -1,6 +1,6 @@
 package dev.aperture.block.entity;
 
-import dev.aperture.core.serialization.OpeningInstanceNbtCodec;
+import dev.aperture.fabric.serialization.OpeningInstanceNbtCodec;
 import dev.aperture.runtime.ApertureRuntime;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.registry.ApertureBlockEntities;
@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
@@ -39,7 +40,7 @@ public final class OpeningBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	protected void saveAdditional(ValueOutput output) {
+	protected void saveAdditional(@NotNull ValueOutput output) {
 		super.saveAdditional(output);
 		if (instance != null) {
 			output.storeBoolean("hasInstance", true);
@@ -50,7 +51,7 @@ public final class OpeningBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	protected void loadAdditional(ValueInput input) {
+	protected void loadAdditional(@NotNull ValueInput input) {
 		super.loadAdditional(input);
 		boolean hasInstance = input.readBoolean("hasInstance").orElse(false);
 		if (hasInstance) {

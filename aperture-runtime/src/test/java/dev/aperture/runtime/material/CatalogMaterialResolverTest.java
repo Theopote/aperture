@@ -3,7 +3,7 @@ package dev.aperture.runtime.material;
 import dev.aperture.runtime.catalog.MaterialCatalogLoader;
 import dev.aperture.runtime.catalog.MaterialCatalogRegistry;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.core.material.BlendMode;
 import org.junit.jupiter.api.Test;

@@ -6,7 +6,7 @@ import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.parameter.ParameterSet;
 import dev.aperture.parameter.ParameterType;
 import dev.aperture.parameter.ParameterValue;
-import dev.aperture.parametric.ParametricSchema;
+import dev.aperture.core.parametric.ParametricSchema;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

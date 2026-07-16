@@ -2,7 +2,7 @@ package dev.aperture.opening.geometry.pipeline.mullion;
 
 import dev.aperture.core.component.MullionComponent;
 import dev.aperture.parameter.ParameterSet;
-import dev.aperture.parametric.ParameterRef;
+import dev.aperture.core.parametric.ParameterRef;
 import dev.aperture.math.Vec3d;
 import dev.aperture.geometry.pipeline.assembly.GeometryCompilationTarget;
 import dev.aperture.geometry.profile.ProfileCurve;

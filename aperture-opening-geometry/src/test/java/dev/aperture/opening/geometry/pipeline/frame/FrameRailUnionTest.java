@@ -1,7 +1,7 @@
 package dev.aperture.opening.geometry.pipeline.frame;
 
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.geometry.mesh.ShapeMesher;
 import dev.aperture.geometry.recipe.GeometryRecipeBuilder;
 import dev.aperture.geometry.recipe.GeometryRecipeExecutor;

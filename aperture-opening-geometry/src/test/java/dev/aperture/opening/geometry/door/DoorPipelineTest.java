@@ -1,8 +1,8 @@
 package dev.aperture.opening.geometry.door;
 
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterValue;
 import dev.aperture.geometry.pipeline.CollisionCalculator;
 import dev.aperture.geometry.pipeline.FootprintCalculator;
 import dev.aperture.geometry.pipeline.PipelineResult;

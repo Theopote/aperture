@@ -1,6 +1,6 @@
 package dev.aperture.opening.geometry.pipeline.hardware;
 
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.opening.geometry.generator.GenerationTestSupport;
 import org.junit.jupiter.api.Test;
 

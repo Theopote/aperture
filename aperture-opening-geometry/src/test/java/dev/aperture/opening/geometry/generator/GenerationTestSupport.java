@@ -3,7 +3,7 @@ package dev.aperture.opening.geometry.generator;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.opening.test.OpeningTestFixtures;
 import dev.aperture.core.definition.OpeningTypeDefinition;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.geometry.pipeline.PipelineResult;

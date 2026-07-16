@@ -2,7 +2,7 @@ package dev.aperture.runtime.registry;
 
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.opening.GeneratorId;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.opening.geometry.generator.OpeningGenerator;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.geometry.model.GeometryResult;

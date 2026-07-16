@@ -1,8 +1,8 @@
 package dev.aperture.opening.geometry.pipeline;
 
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterValue;
 import dev.aperture.opening.geometry.generator.GenerationTestSupport;
 import dev.aperture.opening.geometry.generator.RectangularWindowGenerator;
 import org.junit.jupiter.api.Test;

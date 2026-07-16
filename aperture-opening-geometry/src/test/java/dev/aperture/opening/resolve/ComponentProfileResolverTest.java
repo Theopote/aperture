@@ -3,7 +3,7 @@ package dev.aperture.opening.resolve;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.component.FrameComponent;
 import dev.aperture.core.component.PanelComponent;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.geometry.profile.ProfileDefinition;
 import dev.aperture.opening.geometry.generator.GenerationTestSupport;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,7 @@
 package dev.aperture.opening.geometry.pipeline.panel;
 
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterValue;
 import dev.aperture.opening.geometry.generator.GenerationTestSupport;
 import org.junit.jupiter.api.Test;
 

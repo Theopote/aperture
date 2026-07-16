@@ -1,8 +1,8 @@
 package dev.aperture.opening.resolve;
 
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
-import dev.aperture.core.parameter.ParameterSet;
-import dev.aperture.core.parameter.ParameterValue;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterValue;
 import dev.aperture.opening.geometry.generator.GenerationTestSupport;
 import org.junit.jupiter.api.Test;
 

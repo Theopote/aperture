@@ -6,7 +6,7 @@ import dev.aperture.runtime.registry.GeneratorRegistry;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.core.instance.OpeningInstance;
-import dev.aperture.core.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterSet;
 import dev.aperture.geometry.export.gltf.GltfExporter;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
