@@ -1,7 +1,9 @@
 package dev.aperture.pipeline.stage;
 
+import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.core.definition.OpeningTypeDefinition;
+import dev.aperture.core.opening.OpeningId;
 import dev.aperture.core.parametric.ParametricEditor;
 import dev.aperture.parameter.ParameterSet;
 import dev.aperture.pipeline.PipelineStage;
@@ -11,30 +13,22 @@ import dev.aperture.pipeline.StageResult;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * Definition resolution stage.
- * <p>
- * Looks up the opening type definition from the registry using the type ID.
- * <p>
- * Input: {@link OpeningRequest} (type ID + raw user parameters)
- * Output: {@link ParameterStage.ResolvedDefinition} (type definition + user parameters)
- */
+/** Resolves an opening type and validates raw parameter overrides. */
 public final class DefinitionStage implements PipelineStage<Object, ParameterStage.ResolvedDefinition> {
-
 	private final OpeningTypeRegistry registry;
 
-	/**
-	 * Create definition stage with default registry.
-	 */
 	public DefinitionStage() {
-		this(OpeningTypeRegistry.getInstance());
+		this(defaultRegistry());
 	}
 
-	/**
-	 * Create definition stage with given registry.
-	 */
 	public DefinitionStage(OpeningTypeRegistry registry) {
 		this.registry = Objects.requireNonNull(registry, "registry cannot be null");
+	}
+
+	private static OpeningTypeRegistry defaultRegistry() {
+		OpeningTypeRegistry registry = new OpeningTypeRegistry();
+		BuiltinOpeningTypes.referenceDefinitions().forEach(registry::register);
+		return registry;
 	}
 
 	@Override
@@ -51,48 +45,41 @@ public final class DefinitionStage implements PipelineStage<Object, ParameterSta
 			);
 		}
 
-		ctx.debug("Looking up opening type: " + request.typeId());
-
-		// Lookup type definition
-		OpeningTypeDefinition typeDef = registry.lookup(request.typeId());
-
-		if (typeDef == null) {
-			return new StageResult.Failure<>(
-				"Unknown opening type: " + request.typeId()
-			);
+		String typeId = normalizeLegacyTypeId(request.typeId());
+		OpeningTypeDefinition typeDefinition;
+		try {
+			typeDefinition = registry.get(OpeningId.parse(typeId)).orElse(null);
+		} catch (IllegalArgumentException exception) {
+			return new StageResult.Failure<>("Invalid opening type ID: " + request.typeId(), exception);
+		}
+		if (typeDefinition == null) {
+			return new StageResult.Failure<>("Unknown opening type: " + request.typeId());
 		}
 
-		ctx.debug("Found opening type: " + typeDef.id());
-
-		ParametricEditor editor = ParametricEditor.fromDefinition(typeDef, ParameterSet.empty());
+		ParametricEditor editor = ParametricEditor.fromDefinition(typeDefinition, ParameterSet.empty());
 		var patchResult = editor.patch(request.userParameters());
 		if (!patchResult.success()) {
-			return new StageResult.Failure<>(
-				"Invalid opening parameters: " + patchResult.issues()
-			);
+			return new StageResult.Failure<>("Invalid opening parameters: " + patchResult.issues());
 		}
-
 		return new StageResult.Success<>(
-			new ParameterStage.ResolvedDefinition(typeDef, editor.overridesOnly())
+			new ParameterStage.ResolvedDefinition(typeDefinition, editor.overridesOnly())
 		);
 	}
 
-	/**
-	 * Input for DefinitionStage.
-	 * Raw opening request with type ID and user parameters.
-	 */
-	public record OpeningRequest(
-		String typeId,
-		Map<String, Object> userParameters
-	) {
+	private static String normalizeLegacyTypeId(String typeId) {
+		return switch (typeId) {
+			case "aperture:door_standard" -> "aperture:door";
+			case "aperture:window_standard" -> "aperture:fixed_window";
+			default -> typeId;
+		};
+	}
+
+	public record OpeningRequest(String typeId, Map<String, Object> userParameters) {
 		public OpeningRequest {
 			Objects.requireNonNull(typeId, "typeId cannot be null");
 			Objects.requireNonNull(userParameters, "userParameters cannot be null");
 		}
 
-		/**
-		 * Create definition with empty parameters.
-		 */
 		public static OpeningRequest of(String typeId) {
 			return new OpeningRequest(typeId, Map.of());
 		}

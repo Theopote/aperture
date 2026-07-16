@@ -132,3 +132,5 @@ public final class MullionGenerator implements ComponentPipelineStep {
 		COLS,
 		ROWS,
 		ALL
+	}
+}

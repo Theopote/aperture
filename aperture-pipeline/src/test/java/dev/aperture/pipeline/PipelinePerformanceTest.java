@@ -229,11 +229,11 @@ class PipelinePerformanceTest {
 		for (String stage : stages) {
 			long stageTime = metrics.getStageTime(stage);
 			double percentage = (stageTime * 100.0) / totalTime;
-			System.out.println(String.format("%-12s: %4dms (%5.1f%%)", stage, stageTime, percentage));
+			System.out.printf("%-12s: %4dms (%5.1f%%)%n", stage, stageTime, percentage);
 		}
 
 		System.out.println("─────────────────────────────────");
-		System.out.println(String.format("%-12s: %4dms", "Total", totalTime));
+		System.out.printf("%-12s: %4dms%n", "Total", totalTime);
 	}
 
 	@Test

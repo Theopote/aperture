@@ -1,6 +1,8 @@
 package dev.aperture.kernel;
 
-import dev.aperture.core.registry.OpeningTypeRegistry;
+import dev.aperture.core.catalog.BuiltinOpeningTypes;
+import dev.aperture.core.catalog.OpeningTypeRegistry;
+import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 import dev.aperture.kernel.internal.KernelConfig;
 import dev.aperture.pipeline.adapter.OpeningPipelineAdapter;
@@ -145,11 +147,11 @@ public final class KernelBuilder {
 		// Use defaults for missing dependencies
 		OpeningTypeRegistry finalRegistry = registry != null
 			? registry
-			: OpeningTypeRegistry.getInstance();
+			: defaultRegistry();
 
 		ProfileCatalogRegistry finalProfiles = profiles != null
 			? profiles
-			: ProfileCatalogRegistry.getDefault();
+			: new ProfileCatalogLoader().loadClasspathCatalog();
 
 		// Create pipeline with configured cache
 		OpeningPipelineAdapter pipeline = cacheCapacity == 0
@@ -193,6 +195,12 @@ public final class KernelBuilder {
 	 *     .build()
 	 * }</pre>
 	 */
+	private static OpeningTypeRegistry defaultRegistry() {
+		OpeningTypeRegistry registry = new OpeningTypeRegistry();
+		BuiltinOpeningTypes.referenceDefinitions().forEach(registry::register);
+		return registry;
+	}
+
 	public static ApertureKernel buildForTesting() {
 		return new KernelBuilder()
 			.withCacheCapacity(0)

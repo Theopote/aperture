@@ -1,7 +1,8 @@
 package dev.aperture.kernel;
 
 import dev.aperture.core.definition.OpeningTypeDefinition;
-import dev.aperture.core.registry.OpeningTypeRegistry;
+import dev.aperture.core.opening.OpeningId;
+import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.kernel.internal.KernelConfig;
 import dev.aperture.kernel.internal.ResultMapper;
 import dev.aperture.kernel.internal.StatsCollector;
@@ -291,13 +292,15 @@ final class ApertureKernelImpl implements ApertureKernel {
 		Objects.requireNonNull(typeId, "typeId cannot be null");
 		ensureNotClosed();
 
-		return registry.get(typeId);
+		return registry.get(OpeningId.parse(typeId));
 	}
 
 	@Override
 	public Set<String> listTypes() {
 		ensureNotClosed();
-		return registry.getAllIds();
+		return registry.all().stream()
+			.map(definition -> definition.id().toString())
+			.collect(java.util.stream.Collectors.toUnmodifiableSet());
 	}
 
 	@Override

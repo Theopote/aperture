@@ -1,37 +1,24 @@
 package dev.aperture.pipeline.stage;
 
-import dev.aperture.constraint.ExpressionConstraintValidator;
+import dev.aperture.core.constraint.ExpressionConstraintValidator;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.parameter.ParameterSet;
 import dev.aperture.pipeline.PipelineStage;
 import dev.aperture.pipeline.StageContext;
 import dev.aperture.pipeline.StageResult;
-import dev.aperture.core.validation.ValidationResult;
 
 import java.util.Objects;
 
-/**
- * Constraint validation stage.
- * <p>
- * Validates that the resolved parameters satisfy all constraints
- * defined in the opening type definition.
- * <p>
- * Input: {@link ParameterSet} (resolved parameters)
- * Output: {@link ValidatedParameters} (validated parameters + type definition)
- */
-public final class ConstraintStage implements PipelineStage<ParameterSet, ConstraintStage.ValidatedParameters> {
-
+/** Validates resolved parameters against the definition's constraints. */
+public final class ConstraintStage implements PipelineStage<ParameterStage.ResolvedParameters, ConstraintStage.ValidatedParameters> {
 	private final ExpressionConstraintValidator validator;
-	private final OpeningTypeDefinition typeDefinition;
 
-	/**
-	 * Create constraint stage.
-	 *
-	 * @param typeDefinition Type definition containing constraints
-	 */
-	public ConstraintStage(OpeningTypeDefinition typeDefinition) {
-		this.typeDefinition = Objects.requireNonNull(typeDefinition, "typeDefinition cannot be null");
-		this.validator = new ExpressionConstraintValidator();
+	public ConstraintStage() {
+		this(new ExpressionConstraintValidator());
+	}
+
+	public ConstraintStage(ExpressionConstraintValidator validator) {
+		this.validator = Objects.requireNonNull(validator, "validator cannot be null");
 	}
 
 	@Override
@@ -40,40 +27,20 @@ public final class ConstraintStage implements PipelineStage<ParameterSet, Constr
 	}
 
 	@Override
-	public StageResult<ValidatedParameters> execute(ParameterSet input, StageContext ctx) {
+	public StageResult<ValidatedParameters> execute(ParameterStage.ResolvedParameters input, StageContext ctx) {
 		Objects.requireNonNull(input, "input cannot be null");
-
-		ctx.debug("Validating constraints for " + typeDefinition.id());
-
-		// Validate constraints
-		ValidationResult result = validator.validate(typeDefinition, input);
-
+		var result = validator.validateResolved(input.typeDefinition(), input.parameters());
 		if (!result.isValid()) {
-			// Collect all constraint violations
-			String errorMessage = "Constraint validation failed:\n" +
-				result.issues().stream()
-					.map(issue -> "  - " + issue.message())
-					.reduce((a, b) -> a + "\n" + b)
-					.orElse("Unknown constraint violation");
-
-			return new StageResult.Failure<>(errorMessage);
+			String message = result.issues().stream()
+				.map(issue -> issue.message())
+				.reduce((left, right) -> left + "; " + right)
+				.orElse("Unknown constraint violation");
+			return new StageResult.Failure<>("Constraint validation failed: " + message);
 		}
-
-		ctx.debug("All constraints satisfied");
-
-		return new StageResult.Success<>(
-			new ValidatedParameters(input, typeDefinition)
-		);
+		return new StageResult.Success<>(new ValidatedParameters(input.parameters(), input.typeDefinition()));
 	}
 
-	/**
-	 * Output from ConstraintStage.
-	 * Contains validated parameters and type definition for downstream stages.
-	 */
-	public record ValidatedParameters(
-		ParameterSet parameters,
-		OpeningTypeDefinition typeDefinition
-	) {
+	public record ValidatedParameters(ParameterSet parameters, OpeningTypeDefinition typeDefinition) {
 		public ValidatedParameters {
 			Objects.requireNonNull(parameters, "parameters cannot be null");
 			Objects.requireNonNull(typeDefinition, "typeDefinition cannot be null");

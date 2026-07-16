@@ -1,6 +1,6 @@
 package dev.aperture.kernel.internal;
 
-import dev.aperture.core.registry.OpeningTypeRegistry;
+import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 import dev.aperture.pipeline.adapter.OpeningPipelineAdapter;
 

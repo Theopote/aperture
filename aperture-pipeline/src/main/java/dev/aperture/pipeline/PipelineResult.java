@@ -170,7 +170,7 @@ public sealed interface PipelineResult {
 	 */
 	default long executionTimeMs() {
 		if (this instanceof Success success) {
-			return success.metrics().totalTimeMs();
+			return success.metrics().totalExecutionTimeMs();
 		}
 		return 0;
 	}
