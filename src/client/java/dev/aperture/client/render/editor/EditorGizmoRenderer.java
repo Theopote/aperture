@@ -2,7 +2,7 @@ package dev.aperture.client.render.editor;
 
 import dev.aperture.client.editor.GizmoCoordinates;
 import dev.aperture.client.editor.GizmoDragController;
-import dev.aperture.client.editor.GizmoPickTarget;
+import dev.aperture.editor.interaction.GizmoPickTarget;
 import dev.aperture.client.placement.ClientPlacementPreview;
 import dev.aperture.core.editor.EditorObject;
 import dev.aperture.core.editor.manipulation.Manipulator;

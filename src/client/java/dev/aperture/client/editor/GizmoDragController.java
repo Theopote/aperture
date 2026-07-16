@@ -1,5 +1,9 @@
 package dev.aperture.client.editor;
 
+import dev.aperture.editor.bridge.ClientEditorBridge;
+
+import dev.aperture.editor.interaction.GizmoPickTarget;
+
 import dev.aperture.client.placement.ClientPlacementPreview;
 import dev.aperture.core.editor.EditorObject;
 import dev.aperture.core.editor.EditorObjectId;

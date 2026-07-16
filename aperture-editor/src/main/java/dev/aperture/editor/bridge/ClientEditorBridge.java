@@ -1,4 +1,6 @@
-package dev.aperture.client.editor;
+package dev.aperture.editor.bridge;
+
+import dev.aperture.editor.bridge.ClientEditorBridge;
 
 import dev.aperture.editor.ApertureEditor;
 import dev.aperture.runtime.ApertureRuntime;

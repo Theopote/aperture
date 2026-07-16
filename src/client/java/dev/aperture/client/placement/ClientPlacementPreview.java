@@ -1,7 +1,7 @@
 package dev.aperture.client.placement;
 
 import dev.aperture.runtime.ApertureRuntime;
-import dev.aperture.client.editor.ClientEditorBridge;
+import dev.aperture.editor.bridge.ClientEditorBridge;
 import dev.aperture.client.editor.GizmoDragController;
 import dev.aperture.client.parameter.ParameterEditorScreen;
 import dev.aperture.client.render.placement.PlacementPreviewMeshService;

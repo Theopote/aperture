@@ -1,3 +1,9 @@
+---
+status: active
+implementation_version: kernel-pipeline-v1
+last_verified: 2026-07-17
+---
+
 # 04 — Generation Pipeline
 
 **Layer**: Kernel  
@@ -256,7 +262,7 @@ public record ComponentInstance(
 - **Invalidation**: Definition component assembly change
 
 ### Ownership
-- **Module**: `aperture-core/component`, `aperture-opening-geometry`
+- **Module**: `aperture-core/component`, `aperture-opening`
 - **Class**: `ComponentPlanBuilder`
 
 ---
@@ -329,7 +335,7 @@ public sealed interface SolidShape permits
 - **Invalidation**: Component plan change OR material catalog change
 
 ### Ownership
-- **Module**: `aperture-opening-geometry`, `aperture-geometry`
+- **Module**: `aperture-opening`, `aperture-geometry`
 - **Class**: `GeometryBuilder`
 
 ---

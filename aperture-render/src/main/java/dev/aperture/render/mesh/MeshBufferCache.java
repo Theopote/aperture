@@ -1,4 +1,4 @@
-package dev.aperture.client.render;
+package dev.aperture.render.mesh;
 
 import dev.aperture.render.mesh.MeshHandle;
 import dev.aperture.render.mesh.MeshSection;

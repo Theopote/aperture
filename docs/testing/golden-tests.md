@@ -38,7 +38,7 @@ Golden tests verify that pipeline output remains stable across code changes. The
 ### Storage Location
 
 ```
-aperture-opening-geometry/src/test/resources/golden/
+aperture-opening/src/test/resources/golden/
 ├── fixed_window_1200x1500_frame_bottom.json
 ├── fixed_window_1200x1500_frame_top.json
 ├── door_single_900x2100_frame_bottom.json
@@ -57,7 +57,7 @@ Run when you've verified that pipeline output is correct:
 ./scripts/generate-golden-meshes.sh
 
 # Or run specific test
-./gradlew :aperture-opening-geometry:test \
+./gradlew :aperture-opening:test \
   --tests "GenerateGoldenMeshes.generateFixedWindowGolden"
 ```
 
@@ -65,11 +65,11 @@ Run when you've verified that pipeline output is correct:
 
 ```bash
 # Run all golden tests
-./gradlew :aperture-opening-geometry:test \
+./gradlew :aperture-opening:test \
   --tests "PipelineGoldenTest"
 
 # Run specific golden test
-./gradlew :aperture-opening-geometry:test \
+./gradlew :aperture-opening:test \
   --tests "PipelineGoldenTest.fixedWindow_1200x1500_matchesGolden"
 ```
 
@@ -151,7 +151,7 @@ Golden tests should run on every PR:
 
 ```yaml
 - name: Run Golden Tests
-  run: ./gradlew :aperture-opening-geometry:test --tests "PipelineGoldenTest"
+  run: ./gradlew :aperture-opening:test --tests "PipelineGoldenTest"
 ```
 
 ## Debugging Failed Tests
@@ -167,7 +167,7 @@ When a golden test fails:
 2. Generate current output and compare:
    ```bash
    # Save current output
-   ./gradlew :aperture-opening-geometry:test \
+   ./gradlew :aperture-opening:test \
      --tests "GenerateGoldenMeshes.generateFixedWindowGolden"
    
    # Compare files

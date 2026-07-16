@@ -110,7 +110,7 @@ This index maps all architecture documents to these layers and tracks their comp
 
 **Purpose**: Runtime system connecting Kernel to Minecraft world, rendering, and persistence.
 
-**Modules**: `aperture-runtime`, `aperture-fabric`, `aperture-opening-geometry`, `aperture-render`
+**Modules**: `aperture-runtime`, `aperture-fabric`, `aperture-opening`, `aperture-render`
 
 ### Core Systems
 
@@ -127,7 +127,7 @@ This index maps all architecture documents to these layers and tracks their comp
 **Exists**:
 - ✅ OpeningTypeDefinition loader (JSON data packs)
 - ✅ OpeningInstance model
-- ✅ Generation pipeline skeleton (OpeningGenerationPipeline)
+- ✅ Generation pipeline skeleton (OpeningPipelineAdapter)
 - ✅ Rendering pipeline (aperture-render module, delta engine, ghost preview)
 - ✅ Material catalog system
 - ✅ Placement preview system

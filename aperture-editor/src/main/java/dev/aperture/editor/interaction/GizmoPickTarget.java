@@ -1,4 +1,6 @@
-package dev.aperture.client.editor;
+package dev.aperture.editor.interaction;
+
+import dev.aperture.editor.interaction.GizmoPickTarget;
 
 import dev.aperture.core.editor.manipulation.ManipulatorKind;
 

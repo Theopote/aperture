@@ -36,15 +36,15 @@ Performance benchmarks measure pipeline generation speed, memory usage, and mesh
 
 ```bash
 # Cold generation benchmark
-./gradlew :aperture-opening-geometry:test \
+./gradlew :aperture-opening:test \
   --tests "ComprehensiveBenchmarkTest.benchmark_fixedWindow_coldGeneration"
 
 # Memory usage
-./gradlew :aperture-opening-geometry:test \
+./gradlew :aperture-opening:test \
   --tests "ComprehensiveBenchmarkTest.benchmark_memoryUsage"
 
 # Mesh complexity
-./gradlew :aperture-opening-geometry:test \
+./gradlew :aperture-opening:test \
   --tests "ComprehensiveBenchmarkTest.benchmark_meshComplexity"
 ```
 
@@ -203,7 +203,7 @@ Fixed Window 1200x1500:
 Run benchmarks and identify slow operations:
 
 ```bash
-./gradlew :aperture-opening-geometry:test \
+./gradlew :aperture-opening:test \
   --tests "ComprehensiveBenchmarkTest.benchmark_varyingComplexity" \
   --debug
 ```
@@ -219,7 +219,7 @@ Use Java profiler (YourKit, JProfiler, or VisualVM):
 
 ```bash
 # Enable profiling
-./gradlew :aperture-opening-geometry:test \
+./gradlew :aperture-opening:test \
   -Dorg.gradle.debug=true
 ```
 

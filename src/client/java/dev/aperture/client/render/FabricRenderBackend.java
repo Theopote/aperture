@@ -7,6 +7,7 @@ import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.material.MaterialBinding;
 import dev.aperture.geometry.material.MaterialBindingSet;
 import dev.aperture.render.mesh.MeshAsset;
+import dev.aperture.render.mesh.MeshBufferCache;
 import dev.aperture.render.mesh.MeshSection;
 import dev.aperture.render.pipeline.DrawCommand;
 import dev.aperture.render.pipeline.InstanceBatch;
