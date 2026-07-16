@@ -228,4 +228,7 @@ public final class KernelBuilder {
 			.disableDebugLogging()
 			.build();
 	}
-}
+
+	public KernelBuilder registry(OpeningTypeRegistry registry) {
+		return withRegistry(registry);
+	}}

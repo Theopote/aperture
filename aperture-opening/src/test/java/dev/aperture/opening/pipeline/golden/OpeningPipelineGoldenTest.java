@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p>Fixtures live under {@code src/test/resources/golden/pipeline/}.
  * Refresh with:
  * <pre>{@code
- * ./gradlew :aperture-opening:test --tests OpeningPipelineGoldenTest.refreshGoldenFixtures -Daperture.updateGolden=true
+ * ./gradlew :aperture-opening-geometry:test --tests OpeningPipelineGoldenTest.refreshGoldenFixtures -Daperture.updateGolden=true
  * }</pre>
  */
 class OpeningPipelineGoldenTest {
@@ -58,4 +58,8 @@ class OpeningPipelineGoldenTest {
 			GOLDEN_ROOT + "fixed_window_default.json"
 		);
 		PipelineGoldenSupport.writeClasspathFixture(
-			PipelineGoldenSupport.capture(BuiltinOpeningTypes.door(), ParameterSet.em
+			PipelineGoldenSupport.capture(BuiltinOpeningTypes.door(), ParameterSet.empty()),
+			GOLDEN_ROOT + "door_default.json"
+		);
+	}
+}

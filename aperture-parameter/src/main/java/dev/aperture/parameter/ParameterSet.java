@@ -146,4 +146,15 @@ public final class ParameterSet {
 	public String toString() {
 		return values.toString();
 	}
-}
+
+	public boolean has(String name) {
+		return values.containsKey(name);
+	}
+
+	public ParameterValue require(String name) {
+		ParameterValue value = values.get(name);
+		if (value == null) {
+			throw new IllegalArgumentException("Missing parameter: " + name);
+		}
+		return value;
+	}}

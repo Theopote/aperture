@@ -26,4 +26,6 @@ class ComponentProfileResolverTest {
 		);
 
 		assertEquals(80, frame.bounds().width(), 0.01);
-		assertNotEquals(frame.bounds().width(), panel.bounds(
+		assertNotEquals(frame.bounds().width(), panel.bounds().width(), 0.01);
+	}
+}

@@ -57,4 +57,6 @@ class RectangularWindowGeneratorTest {
 		var registry = GenerationTestSupport.profiles();
 
 		assertEquals(2, registry.all().size());
-		assertTrue(registry.findB
+		assertTrue(registry.findById("aperture:frame_l_50x80").isPresent());
+	}
+}

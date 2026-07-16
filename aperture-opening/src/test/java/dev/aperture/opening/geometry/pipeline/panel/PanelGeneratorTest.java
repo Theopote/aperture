@@ -63,4 +63,6 @@ class PanelGeneratorTest {
 			.build());
 
 		assertTrue(result.meshes().partsByPath().containsKey("door_leaf.glazing"));
-		assertTrue(result.meshes(
+		assertTrue(result.meshes().partsByPath().containsKey("door_leaf.infill"));
+	}
+}

@@ -179,4 +179,7 @@ public final class Pipeline {
 			Objects.requireNonNull(stage, "stage cannot be null");
 		}
 	}
-}
+
+	public static PipelineBuilder builder() {
+		return new PipelineBuilder();
+	}}

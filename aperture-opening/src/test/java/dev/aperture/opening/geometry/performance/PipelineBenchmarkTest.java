@@ -90,8 +90,8 @@ class PipelineBenchmarkTest {
             PipelineResult result = GenerationTestSupport.generateFixedWindowPipeline(params);
             long elapsedMs = (System.nanoTime() - startTime) / 1_000_000;
 
-            int width = params.requireLength("width").intValue();
-            int height = params.requireLength("height").intValue();
+            int width = (int) params.requireLength("width");
+            int height = (int) params.requireLength("height");
 
             System.out.printf("Window %dx%d: %d ms%n", width, height, elapsedMs);
 
@@ -181,4 +181,9 @@ class PipelineBenchmarkTest {
     }
 
     private ParameterSet createParams(double width, double height) {
-        r
+        return ParameterSet.builder()
+            .put("width", ParameterValue.length(width))
+            .put("height", ParameterValue.length(height))
+            .build();
+    }
+}

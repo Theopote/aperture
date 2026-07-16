@@ -65,4 +65,6 @@ class FrameRailUnionTest {
 
 		assertEquals(separateTriangles, unifiedTriangles);
 		assertInstanceOf(UnionRecipe.class,
-			((dev.aperture.geometry.recipe.
+			((dev.aperture.geometry.recipe.EmitSolidOp) unified.build().ops().getFirst()).shape());
+	}
+}

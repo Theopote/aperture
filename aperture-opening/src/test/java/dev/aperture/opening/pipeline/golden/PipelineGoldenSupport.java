@@ -118,8 +118,8 @@ public final class PipelineGoldenSupport {
 
 	private static Path goldenResourcePath(String resourcePath) {
 		Path cwd = Path.of(System.getProperty("user.dir"));
-		Path moduleRelative = cwd.resolve("aperture-opening").resolve("src").resolve("test").resolve("resources").resolve(resourcePath);
-		if (Files.exists(cwd.resolve("aperture-opening"))) {
+		Path moduleRelative = cwd.resolve("aperture-opening-geometry").resolve("src").resolve("test").resolve("resources").resolve(resourcePath);
+		if (Files.exists(cwd.resolve("aperture-opening-geometry"))) {
 			return moduleRelative;
 		}
 		return cwd.resolve("src").resolve("test").resolve("resources").resolve(resourcePath);
@@ -130,4 +130,10 @@ public final class PipelineGoldenSupport {
 	}
 
 	private static PipelineGoldenSnapshot.BoundsSnapshot boundsSnapshot(double width, double height, double depth) {
-		return new PipelineGoldenSnapshot
+		return new PipelineGoldenSnapshot.BoundsSnapshot(width, height, depth);
+	}
+
+	private static String layerName(GeometryLayer layer) {
+		return layer.name();
+	}
+}

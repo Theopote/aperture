@@ -56,4 +56,6 @@ public final class GenerationTestSupport {
 	}
 
 	public static GeometryResult generateCasementWindow(ParameterSet overrides) {
-		return genera
+		return generateCasementWindowPipeline(overrides).geometry();
+	}
+}

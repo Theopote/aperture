@@ -77,4 +77,7 @@ class OpeningRecipeExportTest {
 		);
 
 		JsonObject root = JsonParser.parseString(GeometryExport.toGltf(compiled.recipe())).getAsJsonObject();
-		assertEquals(GltfExporter.GENERATOR, root.getAsJsonObject("asset").get("generator").getAsStr
+		assertEquals(GltfExporter.GENERATOR, root.getAsJsonObject("asset").get("generator").getAsString());
+		assertFalse(root.getAsJsonArray("meshes").isEmpty());
+	}
+}

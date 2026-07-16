@@ -14,4 +14,6 @@ class HardwareGeneratorTest {
 		assertTrue(result.meshes().partsByPath().containsKey("hinges.hinge.1"));
 		assertTrue(result.meshes().partsByPath().containsKey("hinges.hinge.2"));
 		assertTrue(result.meshes().partsByPath().containsKey("hinges.hinge.3"));
-		assertTrue(result.meshes().partsByPath().containsKey("handle.mai
+		assertTrue(result.meshes().partsByPath().containsKey("handle.main"));
+	}
+}

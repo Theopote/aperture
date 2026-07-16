@@ -53,4 +53,6 @@ class OpeningPipelineTest {
 		assertTrue(result.meshes().partsByPath().containsKey("door_leaf.0.infill"));
 		assertTrue(result.meshes().partsByPath().containsKey("door_leaf.0.glazing"));
 		assertTrue(result.meshes().partsByPath().containsKey("threshold.main"));
-		assertTrue(result.meshes().par
+		assertTrue(result.meshes().partsByPath().containsKey("handle.main"));
+	}
+}

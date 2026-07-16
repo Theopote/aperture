@@ -2,6 +2,7 @@ package dev.aperture.pipeline.stage;
 
 import dev.aperture.core.constraint.ExpressionConstraintValidator;
 import dev.aperture.core.definition.OpeningTypeDefinition;
+import dev.aperture.core.validation.ValidationIssue;
 import dev.aperture.parameter.ParameterSet;
 import dev.aperture.pipeline.PipelineStage;
 import dev.aperture.pipeline.StageContext;
@@ -32,7 +33,7 @@ public final class ConstraintStage implements PipelineStage<ParameterStage.Resol
 		var result = validator.validateResolved(input.typeDefinition(), input.parameters());
 		if (!result.isValid()) {
 			String message = result.issues().stream()
-				.map(issue -> issue.message())
+				.map(ValidationIssue::message)
 				.reduce((left, right) -> left + "; " + right)
 				.orElse("Unknown constraint violation");
 			return new StageResult.Failure<>("Constraint validation failed: " + message);

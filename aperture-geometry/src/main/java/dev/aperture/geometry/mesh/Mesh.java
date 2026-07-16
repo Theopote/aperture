@@ -29,4 +29,34 @@ public record Mesh(float[] vertices, int[] indices, BoundingBox bounds) {
 	public int triangleCount() {
 		return indices.length / 3;
 	}
-}
+
+	/** Compatibility alias for callers that treat each triangle as a face. */
+	public int faceCount() {
+		return triangleCount();
+	}
+
+	/** Returns the position of a vertex by index. */
+	public dev.aperture.math.Vec3d vertex(int index) {
+		if (index < 0 || index >= vertexCount()) {
+			throw new IndexOutOfBoundsException(index);
+		}
+		int offset = index * FLOATS_PER_VERTEX;
+		return new dev.aperture.math.Vec3d(vertices[offset], vertices[offset + 1], vertices[offset + 2]);
+	}
+	public dev.aperture.math.Vec2d uv(int index) {
+		if (index < 0 || index >= vertexCount()) {
+			throw new IndexOutOfBoundsException(index);
+		}
+		int offset = index * FLOATS_PER_VERTEX;
+		return new dev.aperture.math.Vec2d(vertices[offset + 6], vertices[offset + 7]);
+	}
+
+	public int faceVertex(int faceIndex, int cornerIndex) {
+		if (faceIndex < 0 || faceIndex >= faceCount()) {
+			throw new IndexOutOfBoundsException(faceIndex);
+		}
+		if (cornerIndex < 0 || cornerIndex >= 3) {
+			throw new IndexOutOfBoundsException(cornerIndex);
+		}
+		return indices[faceIndex * 3 + cornerIndex];
+	}}

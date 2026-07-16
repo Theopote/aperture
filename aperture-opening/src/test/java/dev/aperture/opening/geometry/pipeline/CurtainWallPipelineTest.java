@@ -27,4 +27,6 @@ class CurtainWallPipelineTest {
 		long glazingCells = result.geometry().solids().stream()
 			.filter(solid -> solid.componentPath().startsWith("unit_glazing."))
 			.count();
-		assertEquals(
+		assertEquals(12, glazingCells);
+	}
+}

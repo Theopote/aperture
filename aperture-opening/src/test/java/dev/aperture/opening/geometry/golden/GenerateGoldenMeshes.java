@@ -3,7 +3,7 @@ package dev.aperture.opening.geometry.golden;
 import dev.aperture.parameter.ParameterSet;
 import dev.aperture.parameter.ParameterValue;
 import dev.aperture.geometry.mesh.Mesh;
-import dev.aperture.geometry.mesh.MeshAssembly;
+import dev.aperture.geometry.pipeline.mesh.MeshAssembly;
 import dev.aperture.geometry.pipeline.PipelineResult;
 import dev.aperture.opening.geometry.generator.GenerationTestSupport;
 import org.junit.jupiter.api.Test;
@@ -179,4 +179,11 @@ class GenerateGoldenMeshes {
         generateDoorDoublePanelGolden();
         System.out.println();
 
-        ge
+        generateDoorSolidGolden();
+        System.out.println();
+
+        generateCurtainWallGolden();
+
+        System.out.println("\n=== All Golden Meshes Generated ===");
+    }
+}

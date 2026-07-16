@@ -22,4 +22,6 @@ class ComponentPropertyResolverTest {
 			.put("hinge_side", ParameterValue.enumValue("right"))
 			.build());
 
-		assertEquals("right", ComponentPropertyResolver.panelHinge(context, "
+		assertEquals("right", ComponentPropertyResolver.panelHinge(context, "left"));
+	}
+}

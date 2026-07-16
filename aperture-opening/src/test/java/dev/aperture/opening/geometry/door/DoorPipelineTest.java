@@ -252,4 +252,11 @@ class DoorPipelineTest {
                 PipelineResult result = GenerationTestSupport.generateDoorPipeline(params);
 
                 // Then: Each should generate successfully
-                assertNotNull(result, String.format("Door %dx%d should 
+                assertNotNull(result, String.format("Door %dx%d should generate", (int)width, (int)height));
+                assertFalse(result.geometry().solids().isEmpty());
+            }
+        }
+
+        System.out.printf("Successfully generated %d door variations%n", widths.length * heights.length);
+    }
+}

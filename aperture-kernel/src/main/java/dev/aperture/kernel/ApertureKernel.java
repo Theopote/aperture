@@ -1,6 +1,8 @@
 package dev.aperture.kernel;
 
 import dev.aperture.core.definition.OpeningTypeDefinition;
+import dev.aperture.core.opening.OpeningId;
+import dev.aperture.parameter.ParameterSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -198,4 +200,9 @@ public interface ApertureKernel extends AutoCloseable {
 	 */
 	@Override
 	void close();
-}
+
+	default OpeningResult generate(OpeningId typeId, ParameterSet parameters) {
+		Map<String, Object> rawParameters = new java.util.LinkedHashMap<>();
+		parameters.asMap().forEach(rawParameters::put);
+		return generate(typeId.toString(), rawParameters);
+	}}

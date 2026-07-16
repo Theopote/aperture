@@ -199,4 +199,10 @@ class PipelineGoldenTest {
         ParameterSet params = ParameterSet.empty();
 
         // When: Generate pipeline result
-        PipelineResult result = GenerationTestSupport.generateCurtainWallPipeline(params
+        PipelineResult result = GenerationTestSupport.generateCurtainWallPipeline(params);
+
+        // Then: Should have frame and glazing components
+        assertFalse(result.geometry().solids().isEmpty());
+        assertFalse(result.meshes().partsByPath().isEmpty());
+    }
+}

@@ -177,8 +177,8 @@ class DoorKernelTest {
         assertTrue(resolved.has("height"), "Should have height");
         assertTrue(resolved.has("thickness"), "Should have thickness");
 
-        assertEquals(1200.0, resolved.get("width").asNumber(), "Width should use default");
-        assertEquals(2300.0, resolved.get("height").asNumber(), "Height should use default");
+        assertEquals(1200.0, resolved.require("width").asNumber(), "Width should use default");
+        assertEquals(2300.0, resolved.require("height").asNumber(), "Height should use default");
 
         System.out.println("✓ Empty parameter set resolved with defaults");
     }
@@ -199,12 +199,12 @@ class DoorKernelTest {
         var resolved = doorDef.resolveParameters(params);
 
         // Then: Should use custom values
-        assertEquals(900.0, resolved.get("width").asNumber(), "Width should use custom value");
-        assertEquals(2100.0, resolved.get("height").asNumber(), "Height should use custom value");
-        assertEquals(50.0, resolved.get("thickness").asNumber(), "Thickness should use custom value");
+        assertEquals(900.0, resolved.require("width").asNumber(), "Width should use custom value");
+        assertEquals(2100.0, resolved.require("height").asNumber(), "Height should use custom value");
+        assertEquals(50.0, resolved.require("thickness").asNumber(), "Thickness should use custom value");
 
         // Other parameters should still have defaults
-        assertEquals(2.0, resolved.get("panel_count").asNumber(), "Panel count should use default");
+        assertEquals(2.0, resolved.require("panel_count").asNumber(), "Panel count should use default");
 
         System.out.println("✓ Custom parameters override defaults correctly");
     }

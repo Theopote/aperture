@@ -116,4 +116,7 @@ public record PipelineMetrics(
 			);
 		}
 	}
-}
+
+	public int stageCount() {
+		return stagesExecuted + stagesSkipped;
+	}}

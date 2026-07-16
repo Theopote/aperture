@@ -377,4 +377,13 @@ class ComprehensiveBenchmarkTest {
         }
 
         void print(String name) {
-            System.out.printf("\n===
+            System.out.printf("\n=== %s ===%n", name);
+            System.out.printf("Median: %.1fms%n", median);
+            System.out.printf("Mean: %.1fms%n", mean);
+            System.out.printf("Min: %.1fms%n", min);
+            System.out.printf("Max: %.1fms%n", max);
+            System.out.printf("P95: %.1fms%n", p95);
+            System.out.printf("StdDev: %.1fms%n", stdDev);
+        }
+    }
+}
