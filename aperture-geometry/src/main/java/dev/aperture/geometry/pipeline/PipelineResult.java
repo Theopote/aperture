@@ -35,4 +35,17 @@ public record PipelineResult(
 	public PipelineResult withCollisionAndFootprint(BoundingBox collision, BoundingBox footprint) {
 		return new PipelineResult(geometry, meshes, recipe, collision, footprint);
 	}
+
+	/**
+	 * Returns an empty pipeline result (for testing/mocking).
+	 */
+	public static PipelineResult empty() {
+		return new PipelineResult(
+			GeometryResult.empty(),
+			MeshAssembly.empty(),
+			null,
+			null,
+			null
+		);
+	}
 }

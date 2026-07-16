@@ -15,4 +15,11 @@ public record MeshAssembly(
 	public MeshAssembly {
 		partsByPath = Map.copyOf(partsByPath);
 	}
+
+	/**
+	 * Returns an empty mesh assembly (for testing/mocking).
+	 */
+	public static MeshAssembly empty() {
+		return new MeshAssembly(Map.of(), BoundingBox.EMPTY);
+	}
 }

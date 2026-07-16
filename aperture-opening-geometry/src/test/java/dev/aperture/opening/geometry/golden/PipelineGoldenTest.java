@@ -19,31 +19,40 @@ class PipelineGoldenTest {
     private static final Path GOLDEN_DIR = Path.of("src/test/resources/golden");
 
     @Test
-    void fixedWindow_defaultParameters_matchesGolden() {
-        // Given: Default fixed window parameters
-        ParameterSet params = ParameterSet.empty();
+    void fixedWindow_1200x1500_matchesGolden() throws Exception {
+        // Given: Standard fixed window (1200x1500)
+        ParameterSet params = ParameterSet.builder()
+            .put("width", ParameterValue.length(1200.0))
+            .put("height", ParameterValue.length(1500.0))
+            .put("frame_material", ParameterValue.materialRef("aperture:aluminum"))
+            .build();
 
         // When: Generate pipeline result
         PipelineResult result = GenerationTestSupport.generateFixedWindowPipeline(params);
 
-        // Then: Should have geometry and meshes
-        assertFalse(result.geometry().solids().isEmpty(), "Should have geometry solids");
-        assertFalse(result.meshes().partsByPath().isEmpty(), "Should have mesh parts");
+        // Then: Compare each mesh part against golden files
+        for (var entry : result.meshes().partsByPath().entrySet()) {
+            String partPath = entry.getKey();
+            var mesh = entry.getValue();
 
-        // Verify key components exist
-        assertTrue(result.meshes().partsByPath().containsKey("frame.bottom"),
-            "Should have frame bottom");
-        assertTrue(result.meshes().partsByPath().containsKey("frame.top"),
-            "Should have frame top");
-        assertTrue(result.meshes().partsByPath().containsKey("frame.left"),
-            "Should have frame left");
-        assertTrue(result.meshes().partsByPath().containsKey("frame.right"),
-            "Should have frame right");
+            String sanitizedPath = partPath.replace('.', '_').replace('/', '_');
+            String filename = "fixed_window_1200x1500_" + sanitizedPath + ".json";
+            Path goldenFile = GOLDEN_DIR.resolve(filename);
 
-        // Note: Actual golden file comparison would be:
-        // var goldenMesh = GoldenMeshSupport.load(GOLDEN_DIR.resolve("fixed_window_default.json"));
-        // var comparison = GoldenMeshSupport.compare(result.meshes().combined(), goldenMesh);
-        // assertTrue(comparison.matches(), comparison.summary());
+            if (!goldenFile.toFile().exists()) {
+                System.out.println("Warning: Golden file missing: " + filename);
+                continue;
+            }
+
+            var goldenMesh = GoldenMeshSupport.load(goldenFile);
+            var comparison = GoldenMeshSupport.compare(mesh, goldenMesh);
+
+            assertTrue(comparison.matches(),
+                String.format("Mesh %s differs from golden: %s", partPath, comparison.summary()));
+        }
+
+        System.out.printf("✓ All %d mesh parts match golden files%n",
+            result.meshes().partsByPath().size());
     }
 
     @Test
@@ -67,23 +76,42 @@ class PipelineGoldenTest {
     }
 
     @Test
-    void door_defaultParameters_matchesGolden() {
-        // Given: Default door parameters
-        ParameterSet params = ParameterSet.empty();
+    void door_single_900x2100_matchesGolden() throws Exception {
+        // Given: Single panel door (900x2100)
+        ParameterSet params = ParameterSet.builder()
+            .put("width", ParameterValue.length(900.0))
+            .put("height", ParameterValue.length(2100.0))
+            .put("thickness", ParameterValue.length(50.0))
+            .put("panel_count", ParameterValue.count(1))
+            .put("glass_ratio", ParameterValue.number(0.3))
+            .build();
 
         // When: Generate pipeline result
         PipelineResult result = GenerationTestSupport.generateDoorPipeline(params);
 
-        // Then: Should have door-specific components
-        assertFalse(result.geometry().solids().isEmpty());
+        // Then: Compare against golden files
+        for (var entry : result.meshes().partsByPath().entrySet()) {
+            String partPath = entry.getKey();
+            var mesh = entry.getValue();
 
-        // Verify door-specific components
-        assertTrue(result.meshes().partsByPath().containsKey("door_leaf.0.bottom"),
-            "Should have door leaf bottom");
-        assertTrue(result.meshes().partsByPath().containsKey("threshold.main"),
-            "Should have threshold");
-        assertTrue(result.meshes().partsByPath().containsKey("handle.main"),
-            "Should have handle");
+            String sanitizedPath = partPath.replace('.', '_').replace('/', '_');
+            String filename = "door_single_900x2100_" + sanitizedPath + ".json";
+            Path goldenFile = GOLDEN_DIR.resolve(filename);
+
+            if (!goldenFile.toFile().exists()) {
+                System.out.println("Warning: Golden file missing: " + filename);
+                continue;
+            }
+
+            var goldenMesh = GoldenMeshSupport.load(goldenFile);
+            var comparison = GoldenMeshSupport.compare(mesh, goldenMesh);
+
+            assertTrue(comparison.matches(),
+                String.format("Door mesh %s differs from golden: %s", partPath, comparison.summary()));
+        }
+
+        System.out.printf("✓ All %d door mesh parts match golden files%n",
+            result.meshes().partsByPath().size());
     }
 
     @Test

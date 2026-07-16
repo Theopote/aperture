@@ -15,4 +15,15 @@ public record GeometryResult(
 	public GeometryResult {
 		solids = List.copyOf(solids);
 	}
+
+	/**
+	 * Returns an empty geometry result (for testing/mocking).
+	 */
+	public static GeometryResult empty() {
+		return new GeometryResult(
+			List.of(),
+			BoundingBox.EMPTY,
+			BoundingBox.EMPTY
+		);
+	}
 }
