@@ -1,247 +1,82 @@
 package dev.aperture.pipeline;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Unit tests for pipeline caching functionality.
- */
-@DisplayName("Pipeline Cache")
 class PipelineCacheTest {
-
-	private PipelineCache cache;
-
-	@BeforeEach
-	void setUp() {
-		cache = new PipelineCache(5); // Small capacity for testing
+	private static StageCacheKey key(StageId stage, String fingerprint) {
+		return new StageCacheKey(stage, "pipeline-v1", "aperture:test", 1L,
+			fingerprint, 2L, "compiler-v1", "normal");
 	}
 
 	@Test
-	@DisplayName("Store and retrieve cached value")
-	void testBasicCaching() {
-		// Arrange
-		String stageName = "test-stage";
-		Object input = "input-data";
-		Object output = "output-data";
-
-		// Act
-		cache.put(stageName, input, output);
-		Object retrieved = cache.get(stageName, input);
-
-		// Assert
-		assertNotNull(retrieved, "Should retrieve cached value");
-		assertEquals(output, retrieved, "Retrieved value should match stored value");
+	void storesValuesByExplicitStructuralKey() {
+		PipelineCache cache = new PipelineCache(5);
+		StageCacheKey key = key(StageId.GEOMETRY, "parameters-a");
+		cache.put(key, "geometry");
+		assertEquals("geometry", cache.get(key));
+		assertNull(cache.get(key(StageId.GEOMETRY, "parameters-b")));
+		assertNull(cache.get(key(StageId.MESH, "parameters-a")));
 	}
 
 	@Test
-	@DisplayName("Return null for cache miss")
-	void testCacheMiss() {
-		// Act
-		Object result = cache.get("stage", "input");
-
-		// Assert
-		assertNull(result, "Should return null for cache miss");
+	void keyIncludesEveryRevisionDimension() {
+		StageCacheKey base = key(StageId.GEOMETRY, "parameters");
+		assertNotEquals(base, new StageCacheKey(StageId.GEOMETRY, "pipeline-v2", "aperture:test", 1L,
+			"parameters", 2L, "compiler-v1", "normal"));
+		assertNotEquals(base, new StageCacheKey(StageId.GEOMETRY, "pipeline-v1", "aperture:test", 2L,
+			"parameters", 2L, "compiler-v1", "normal"));
+		assertNotEquals(base, new StageCacheKey(StageId.GEOMETRY, "pipeline-v1", "aperture:test", 1L,
+			"parameters", 3L, "compiler-v1", "normal"));
+		assertNotEquals(base, new StageCacheKey(StageId.GEOMETRY, "pipeline-v1", "aperture:test", 1L,
+			"parameters", 2L, "compiler-v2", "normal"));
 	}
 
 	@Test
-	@DisplayName("Different inputs produce different cache keys")
-	void testInputDifferentiation() {
-		// Arrange
-		String stageName = "stage";
-		cache.put(stageName, "input1", "output1");
-		cache.put(stageName, "input2", "output2");
-
-		// Act & Assert
-		assertEquals("output1", cache.get(stageName, "input1"));
-		assertEquals("output2", cache.get(stageName, "input2"));
+	void evictsLeastRecentlyUsedEntry() {
+		PipelineCache cache = new PipelineCache(2);
+		StageCacheKey a = key(StageId.GEOMETRY, "a");
+		StageCacheKey b = key(StageId.GEOMETRY, "b");
+		StageCacheKey c = key(StageId.GEOMETRY, "c");
+		cache.put(a, "a"); cache.put(b, "b"); cache.get(a); cache.put(c, "c");
+		assertEquals("a", cache.get(a));
+		assertNull(cache.get(b));
+		assertEquals("c", cache.get(c));
 	}
 
 	@Test
-	@DisplayName("Different stages produce different cache keys")
-	void testStageDifferentiation() {
-		// Arrange
-		Object input = "shared-input";
-		cache.put("stage1", input, "output1");
-		cache.put("stage2", input, "output2");
-
-		// Act & Assert
-		assertEquals("output1", cache.get("stage1", input));
-		assertEquals("output2", cache.get("stage2", input));
-	}
-
-	@Test
-	@DisplayName("LRU eviction removes least recently used entry")
-	void testLRUEviction() {
-		// Arrange - Fill cache to capacity
-		for (int i = 0; i < 5; i++) {
-			cache.put("stage", "input" + i, "output" + i);
-		}
-
-		// Act - Access input1 to make it recently used
-		cache.get("stage", "input1");
-
-		// Add new entry, should evict input0 (least recently used)
-		cache.put("stage", "input5", "output5");
-
-		// Assert
-		assertNull(cache.get("stage", "input0"), "input0 should be evicted");
-		assertNotNull(cache.get("stage", "input1"), "input1 should still be cached (was accessed)");
-		assertNotNull(cache.get("stage", "input5"), "input5 should be cached (just added)");
-	}
-
-	@Test
-	@DisplayName("Clear removes all entries")
-	void testClear() {
-		// Arrange
-		cache.put("stage1", "input1", "output1");
-		cache.put("stage2", "input2", "output2");
-		assertEquals(2, cache.size());
-
-		// Act
-		cache.clear();
-
-		// Assert
-		assertEquals(0, cache.size(), "Cache should be empty after clear");
-		assertNull(cache.get("stage1", "input1"), "Entries should be removed");
-		assertNull(cache.get("stage2", "input2"), "Entries should be removed");
-	}
-
-	@Test
-	@DisplayName("Size reflects number of entries")
-	void testSize() {
-		// Assert initial state
-		assertEquals(0, cache.size(), "Cache should start empty");
-
-		// Add entries
-		cache.put("stage", "input1", "output1");
-		assertEquals(1, cache.size());
-
-		cache.put("stage", "input2", "output2");
-		assertEquals(2, cache.size());
-
-		// Clear
-		cache.clear();
-		assertEquals(0, cache.size());
-	}
-
-	@Test
-	@DisplayName("Handles null inputs safely")
-	void testNullInputHandling() {
-		// Act & Assert - Should not throw
-		assertDoesNotThrow(() -> {
-			cache.put("stage", null, "output");
-			Object result = cache.get("stage", null);
-			assertEquals("output", result);
-		});
-	}
-
-	@Test
-	@DisplayName("Handles complex objects as input")
-	void testComplexInputObjects() {
-		// Arrange
-		record ComplexInput(String id, int value) {}
-		ComplexInput input1 = new ComplexInput("test", 42);
-		ComplexInput input2 = new ComplexInput("test", 42); // Equal but different instance
-
-		cache.put("stage", input1, "output1");
-
-		// Act
-		Object result = cache.get("stage", input2);
-
-		// Assert
-		assertEquals("output1", result, "Should match based on object equality");
-	}
-
-	@Test
-	@DisplayName("Capacity of zero disables caching")
-	void testZeroCapacity() {
-		// Arrange
-		PipelineCache noCache = new PipelineCache(0);
-
-		// Act
-		noCache.put("stage", "input", "output");
-
-		// Assert
-		assertEquals(0, noCache.size(), "Zero-capacity cache should not store entries");
-		assertNull(noCache.get("stage", "input"), "Should not retrieve from zero-capacity cache");
-	}
-
-	@Test
-	@DisplayName("Updating existing entry does not increase size")
-	void testUpdateExistingEntry() {
-		// Arrange
-		cache.put("stage", "input", "output1");
-		assertEquals(1, cache.size());
-
-		// Act
-		cache.put("stage", "input", "output2"); // Update same key
-
-		// Assert
-		assertEquals(1, cache.size(), "Size should not increase for updates");
-		assertEquals("output2", cache.get("stage", "input"), "Should have updated value");
-	}
-
-	@Test
-	@DisplayName("Access order affects eviction")
-	void testAccessOrderEviction() {
-		// Arrange - Fill cache
-		cache.put("stage", "a", "output-a");
-		cache.put("stage", "b", "output-b");
-		cache.put("stage", "c", "output-c");
-		cache.put("stage", "d", "output-d");
-		cache.put("stage", "e", "output-e");
-
-		// Act - Access 'a' to make it most recently used
-		cache.get("stage", "a");
-
-		// Add new entry - should evict 'b' (now least recently used)
-		cache.put("stage", "f", "output-f");
-
-		// Assert
-		assertNotNull(cache.get("stage", "a"), "a should remain (recently accessed)");
-		assertNull(cache.get("stage", "b"), "b should be evicted");
-		assertNotNull(cache.get("stage", "f"), "f should be present");
-	}
-
-	@Test
-	@DisplayName("Cache statistics track hits and misses")
-	void testCacheStatistics() {
-		// Arrange
-		cache.put("stage", "input1", "output1");
-
-		// Act
-		cache.get("stage", "input1"); // Hit
-		cache.get("stage", "input2"); // Miss
-		cache.get("stage", "input1"); // Hit
-
-		// Assert
-		assertEquals(2, cache.getHits(), "Should count cache hits");
-		assertEquals(1, cache.getMisses(), "Should count cache misses");
-
-		double hitRate = cache.getHitRate();
-		assertEquals(2.0 / 3.0, hitRate, 0.01, "Hit rate should be 66.7%");
-	}
-
-	@Test
-	@DisplayName("Reset statistics clears counters")
-	void testResetStatistics() {
-		// Arrange
-		cache.put("stage", "input", "output");
-		cache.get("stage", "input"); // Hit
-		cache.get("stage", "other"); // Miss
-
-		assertTrue(cache.getHits() > 0);
-		assertTrue(cache.getMisses() > 0);
-
-		// Act
+	void reportsRealStatisticsAndCanResetThem() {
+		PipelineCache cache = new PipelineCache(5);
+		StageCacheKey present = key(StageId.MESH, "present");
+		cache.put(present, "mesh");
+		cache.get(present);
+		cache.get(key(StageId.MESH, "missing"));
+		PipelineCache.CacheStats stats = cache.getStats();
+		assertEquals(1, stats.currentSize());
+		assertEquals(1, stats.hits());
+		assertEquals(1, stats.misses());
+		assertEquals(0.5, stats.hitRate());
 		cache.resetStatistics();
+		assertEquals(0, cache.getHits());
+		assertEquals(0, cache.getMisses());
+	}
 
-		// Assert
-		assertEquals(0, cache.getHits(), "Hits should be reset");
-		assertEquals(0, cache.getMisses(), "Misses should be reset");
-		assertEquals(0.0, cache.getHitRate(), "Hit rate should be reset");
+	@Test
+	void zeroCapacityDisablesStorage() {
+		PipelineCache cache = new PipelineCache(0);
+		StageCacheKey key = key(StageId.GEOMETRY, "parameters");
+		cache.put(key, "geometry");
+		assertEquals(0, cache.size());
+		assertNull(cache.get(key));
+	}
+
+	@Test
+	void rejectsImplicitOrInvalidKeys() {
+		PipelineCache cache = new PipelineCache(1);
+		assertThrows(NullPointerException.class, () -> cache.get(null));
+		assertThrows(NullPointerException.class, () -> cache.put(null, "value"));
+		assertThrows(NullPointerException.class,
+			() -> cache.put(key(StageId.GEOMETRY, "parameters"), null));
 	}
 }
