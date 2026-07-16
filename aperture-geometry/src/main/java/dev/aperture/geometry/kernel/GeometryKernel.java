@@ -4,7 +4,7 @@ package dev.aperture.geometry.kernel;
  * Entry marker for the domain-agnostic geometry kernel.
  *
  * <p>The kernel knows profiles, extrusion, booleans, and meshing — not Door, Window, or CurtainWall.
- * Opening-specific assembly lives in {@code aperture-opening-geometry}.
+ * Opening-specific assembly lives in {@code aperture-opening}.
  *
  * <ul>
  *   <li>{@link dev.aperture.geometry.profile.ProfileCurve} — 2D profiles (rectangle, polyline, arc)</li>

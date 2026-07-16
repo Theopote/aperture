@@ -1,8 +1,6 @@
 dependencies {
-	api project(':aperture-math')
 	api project(':aperture-core')
 	api project(':aperture-geometry')
-	api project(':aperture-opening')
 	implementation 'com.google.code.gson:gson:2.11.0'
 }
 
@@ -14,4 +12,5 @@ processTestResources {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	systemProperty 'aperture.updateGolden', System.getProperty('aperture.updateGolden', 'false')
 }
