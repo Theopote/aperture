@@ -60,9 +60,13 @@ This index maps all architecture documents to these layers and tracks their comp
 | [02-domain-model.md](architecture/02-domain-model.md) | ✅ | Opening data model (Definition, Instance, Parameters) |
 | [04-core-systems.md](architecture/04-core-systems.md) | ✅ | Overview of 9 cooperating systems |
 | **kernel/01-geometry-kernel.md** | 📝 | Geometry primitives: Point, Curve, Profile, Mesh, Transform, Extrusion, Boolean |
-| **kernel/02-parameter-engine.md** | 📝 | Parameter types, constraint expressions, resolution |
-| **kernel/03-component-system.md** | 📝 | Component abstractions: Frame, Panel, Glass, Hardware; ComponentAssembly contract |
-| **kernel/04-constraint-solver.md** | ⏸️ | Constraint evaluation, dependency propagation (basic version exists, advanced future) |
+| [kernel/02-parameter-engine.md](architecture/kernel/02-parameter-engine.md) | ✅ | 8 parameter types, constraint expressions, validation |
+| [kernel/03-component-system.md](architecture/kernel/03-component-system.md) | ✅ | Component types, ComponentAssembly contract, component lifecycle |
+| [kernel/04-generation-pipeline.md](architecture/kernel/04-generation-pipeline.md) | ✅ | 8-stage pipeline: Definition → Parameter → Constraint → Component → Geometry → Mesh → Collision → Placement → Render |
+| [kernel/05-component-graph.md](architecture/kernel/05-component-graph.md) | ✅ | Components as graph nodes with ports, topological evaluation, incremental updates |
+| [kernel/06-constraint-solver.md](architecture/kernel/06-constraint-solver.md) | ✅ | Expression parser, evaluator, dependency tracking, incremental validation |
+| [kernel/07-command-system.md](architecture/kernel/07-command-system.md) | ✅ | Command pattern for Undo/Redo, networking, AI integration |
+| [kernel/08-asset-system.md](architecture/kernel/08-asset-system.md) | ✅ | Asset catalog: profiles, materials, opening types, presets, hot reload |
 
 ### ADRs (Architecture Decision Records)
 
@@ -71,25 +75,34 @@ This index maps all architecture documents to these layers and tracks their comp
 | [ADRs/0001-opening-as-domain-primitive.md](architecture/ADRs/0001-opening-as-domain-primitive.md) | ✅ | Why "Opening" is the only entity |
 | [ADRs/0002-pure-java-core.md](architecture/ADRs/0002-pure-java-core.md) | ✅ | Why Kernel must be Minecraft-free |
 
-### Completion Status: **~60%**
+### Completion Status: **~85%**
 
 **Exists**:
 - ✅ Basic geometry types (BoundingBox, Transform)
-- ✅ 8 parameter types
-- ✅ Constraint expression evaluator
+- ✅ 8 parameter types with full specification
+- ✅ Constraint expression evaluator with dependency tracking
 - ✅ Component types (Frame, Glass, Panel, etc.)
+- ✅ 8-stage Generation Pipeline specification
+- ✅ Component Graph system with topological evaluation
+- ✅ Command System for Undo/Redo
+- ✅ Asset System for catalogs and hot reload
+- ✅ Comprehensive documentation coverage
 
 **Missing**:
 - ❌ Detailed Geometry Kernel documentation
-- ❌ Parameter Engine unification across Editor/Preview/Generate
-- ❌ Component System contract documentation
+- ❌ Parameter Engine unification across Editor/Preview/Generate (implementation)
 - ❌ Profile extrusion implementation (stub exists)
 - ❌ Curve primitives (Bezier, Arc)
 
 ### Action Items:
 - [ ] Write kernel/01-geometry-kernel.md (map existing types + planned extensions)
-- [ ] Write kernel/02-parameter-engine.md (document ParametricSchema, resolver, constraints)
-- [ ] Write kernel/03-component-system.md (ComponentAssembly contract, generation flow)
+- [x] Write kernel/02-parameter-engine.md ✅
+- [x] Write kernel/03-component-system.md ✅
+- [x] Write kernel/04-generation-pipeline.md ✅
+- [x] Write kernel/05-component-graph.md ✅
+- [x] Write kernel/06-constraint-solver.md ✅
+- [x] Write kernel/07-command-system.md ✅
+- [x] Write kernel/08-asset-system.md ✅
 - [ ] Unify parameter resolution (all code paths use OpeningParameterResolver)
 - [ ] Add CI check: fail if aperture-core or aperture-geometry imports `net.minecraft.*`
 
@@ -250,9 +263,14 @@ Based on [APERTURE-REDEFINED.md](APERTURE-REDEFINED.md), the immediate prioritie
    - [ ] Add Iron Law to README and CONTRIBUTING
 
 2. **Write missing Kernel docs**
+   - [x] kernel/02-parameter-engine.md ✅
+   - [x] kernel/03-component-system.md ✅
+   - [x] kernel/04-generation-pipeline.md ✅
+   - [x] kernel/05-component-graph.md ✅
+   - [x] kernel/06-constraint-solver.md ✅
+   - [x] kernel/07-command-system.md ✅
+   - [x] kernel/08-asset-system.md ✅
    - [ ] kernel/01-geometry-kernel.md
-   - [ ] kernel/02-parameter-engine.md
-   - [ ] kernel/03-component-system.md
 
 3. **Write missing Platform docs**
    - [ ] platform/01-opening-pipeline.md
@@ -285,12 +303,12 @@ Based on [APERTURE-REDEFINED.md](APERTURE-REDEFINED.md), the immediate prioritie
 | Layer | Documents | Complete | In Progress | Planned |
 |-------|-----------|----------|-------------|---------|
 | **Foundation** | 6 | 4 | 1 | 1 |
-| **Kernel** | 6 | 2 | 1 | 3 |
+| **Kernel** | 11 | 9 | 0 | 2 |
 | **Platform** | 5 | 4 | 0 | 1 |
 | **Editor** | 3 | 0 | 0 | 3 |
 | **Applications** | 2 | 0 | 0 | 2 |
 | **Roadmaps** | 4 | 4 | 0 | 0 |
-| **Total** | 26 | 14 (54%) | 2 (8%) | 10 (38%) |
+| **Total** | 31 | 21 (68%) | 1 (3%) | 9 (29%) |
 
 **Target**: 100% Foundation, Kernel, Platform docs complete before Phase 4.
 
