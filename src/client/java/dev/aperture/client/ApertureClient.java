@@ -8,13 +8,18 @@ import dev.aperture.client.editor.GizmoDragController;
 import dev.aperture.client.placement.ClientPlacementPreview;
 import dev.aperture.client.render.ApertureRenderers;
 import dev.aperture.client.render.ClientMaterialPreview;
+import dev.aperture.client.render.InstanceRenderCache;
 import dev.aperture.client.render.editor.EditorGizmoRenderer;
 import dev.aperture.client.render.placement.GhostPreviewMeshRenderer;
+import dev.aperture.client.render.placement.PlacementPreviewMeshService;
 import dev.aperture.client.render.placement.PlacementPreviewRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
@@ -54,6 +59,13 @@ public class ApertureClient implements ClientModInitializer {
 		});
 		ApertureEditor.init(new ApertureEditor(new EditorService(), new ParametricService()));
 		ApertureRenderers.registerAll();
+		ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(
+			Identifier.fromNamespaceAndPath(Aperture.MOD_ID, "render_cache"),
+			(ResourceManagerReloadListener) resourceManager -> {
+				InstanceRenderCache.get().clear();
+				PlacementPreviewMeshService.clear();
+			}
+		);
 		Aperture.LOGGER.info("Aperture client initialized — crosshair placement preview active");
 	}
 
