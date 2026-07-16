@@ -31,6 +31,10 @@ public final class ParameterSet {
 		return new ParameterSet(Map.of(key, value));
 	}
 
+	public static ParameterSet of(Map<String, ParameterValue> values) {
+		return new ParameterSet(values);
+	}
+
 	public static Builder builder() {
 		return new Builder();
 	}
