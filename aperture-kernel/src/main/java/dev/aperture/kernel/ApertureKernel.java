@@ -90,25 +90,6 @@ public interface ApertureKernel extends AutoCloseable {
 	CompletableFuture<OpeningResult> generateAsync(OpeningRequest request);
 
 	/**
-	 * Generate opening up to a specific stage.
-	 * <p>
-	 * Useful for debugging or when you only need partial results.
-	 * For example, to get only geometry without mesh/collision:
-	 * <pre>{@code
-	 * var result = kernel.generateUntil(request, "geometry");
-	 * CompositeGeometry geometry = result.getValue();
-	 * }</pre>
-	 *
-	 * @param request Opening generation request
-	 * @param stageName Target stage name (e.g., "geometry", "mesh")
-	 * @param <T> Expected output type
-	 * @return Stage result
-	 * @throws NullPointerException if request or stageName is null
-	 * @throws IllegalArgumentException if stage name is unknown
-	 */
-	<T> PartialResult<T> generateUntil(OpeningRequest request, String stageName);
-
-	/**
 	 * Get opening type definition.
 	 *
 	 * @param typeId Type identifier (e.g., "aperture:door_standard")

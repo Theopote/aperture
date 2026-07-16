@@ -18,7 +18,7 @@ import java.util.Objects;
  * }</pre>
  */
 public final class PipelineBuilder {
-	private final List<Pipeline.StageRegistration<?>> stages = new ArrayList<>();
+	private final List<Pipeline.StageRegistration> stages = new ArrayList<>();
 	private ExecutionOptions options = ExecutionOptions.DEFAULT;
 	private PipelineCache cache = new PipelineCache(100); // default capacity
 
@@ -32,7 +32,7 @@ public final class PipelineBuilder {
 	 */
 	public PipelineBuilder addStage(PipelineStage<?, ?> stage) {
 		Objects.requireNonNull(stage, "stage cannot be null");
-		stages.add(new Pipeline.StageRegistration<>(stage.name(), stage));
+		stages.add(new Pipeline.StageRegistration(stage.name(), stage));
 		return this;
 	}
 
@@ -46,7 +46,7 @@ public final class PipelineBuilder {
 	public PipelineBuilder addStage(String name, PipelineStage<?, ?> stage) {
 		Objects.requireNonNull(name, "name cannot be null");
 		Objects.requireNonNull(stage, "stage cannot be null");
-		stages.add(new Pipeline.StageRegistration<>(name, stage));
+		stages.add(new Pipeline.StageRegistration(name, stage));
 		return this;
 	}
 
@@ -114,8 +114,25 @@ public final class PipelineBuilder {
 	}
 
 	private void validateStageChain() {
-		// TODO: Could add runtime type checking here if needed
-		// For now, we rely on compile-time type safety where possible
+		java.util.Set<StageId> ids = new java.util.HashSet<>();
+		for (int index = 0; index < stages.size(); index++) {
+			PipelineStage<?, ?> stage = stages.get(index).stage();
+			if (stage.id() != StageId.CUSTOM && !ids.add(stage.id())) {
+				throw new IllegalStateException("Duplicate pipeline stage: " + stage.id());
+			}
+			if (index == stages.size() - 1) {
+				continue;
+			}
+			PipelineStage<?, ?> next = stages.get(index + 1).stage();
+			Class<?> output = stage.outputType();
+			Class<?> input = next.inputType();
+			if (output != Object.class && input != Object.class && !input.isAssignableFrom(output)) {
+				throw new IllegalStateException(
+					"Incompatible pipeline stages: " + stage.name() + " outputs "
+						+ output.getName() + " but " + next.name() + " requires " + input.getName()
+				);
+			}
+		}
 	}
 
 	/**

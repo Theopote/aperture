@@ -11,20 +11,23 @@ import dev.aperture.pipeline.StageResult;
 import java.util.Objects;
 
 /** Resolves sparse overrides and runtime state into effective generation parameters. */
-public final class ParameterStage implements PipelineStage<Object, ParameterStage.ResolvedParameters> {
+public final class ParameterStage implements PipelineStage<ParameterStage.ResolvedDefinition, ParameterStage.ResolvedParameters> {
 	@Override
 	public String name() {
 		return "parameter";
 	}
+	@Override
+	public dev.aperture.pipeline.StageId id() { return dev.aperture.pipeline.StageId.PARAMETER; }
 
 	@Override
-	public StageResult<ResolvedParameters> execute(Object input, StageContext ctx) {
-		Objects.requireNonNull(input, "input cannot be null");
-		if (!(input instanceof ResolvedDefinition resolved)) {
-			return new StageResult.Failure<>(
-				"ParameterStage requires ResolvedDefinition input but got: " + input.getClass().getSimpleName()
-			);
-		}
+	public Class<?> inputType() { return ResolvedDefinition.class; }
+
+	@Override
+	public Class<?> outputType() { return ResolvedParameters.class; }
+
+	@Override
+	public StageResult<ResolvedParameters> execute(ResolvedDefinition input, StageContext ctx) {
+		ResolvedDefinition resolved = Objects.requireNonNull(input, "input cannot be null");
 		try {
 			ParameterSet parameters = InstanceParameters.forGeneration(
 				resolved.typeDefinition(), resolved.userParameters(), resolved.state()

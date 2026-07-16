@@ -17,6 +17,15 @@ public final class PlacementStage implements PipelineStage<BoundingBox, Placemen
 	}
 
 	@Override
+	public dev.aperture.pipeline.StageId id() { return dev.aperture.pipeline.StageId.PLACEMENT; }
+
+	@Override
+	public Class<?> inputType() { return BoundingBox.class; }
+
+	@Override
+	public Class<?> outputType() { return PlacementInfo.class; }
+
+	@Override
 	public StageResult<PlacementInfo> execute(BoundingBox bounds, StageContext ctx) {
 		Objects.requireNonNull(bounds, "input cannot be null");
 		Vec3d dimensions = new Vec3d(bounds.width(), bounds.height(), bounds.depth());

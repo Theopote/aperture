@@ -26,6 +26,15 @@ public final class CollisionStage implements PipelineStage<MeshAssembly, Boundin
 	}
 
 	@Override
+	public dev.aperture.pipeline.StageId id() { return dev.aperture.pipeline.StageId.COLLISION; }
+
+	@Override
+	public Class<?> inputType() { return MeshAssembly.class; }
+
+	@Override
+	public Class<?> outputType() { return BoundingBox.class; }
+
+	@Override
 	public StageResult<BoundingBox> execute(MeshAssembly input, StageContext ctx) {
 		Objects.requireNonNull(input, "input cannot be null");
 		ctx.debug("Collision strategy " + strategy + " currently resolves to mesh bounds");

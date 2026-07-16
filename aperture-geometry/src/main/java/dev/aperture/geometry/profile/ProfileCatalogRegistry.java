@@ -10,9 +10,11 @@ import java.util.Optional;
  */
 public final class ProfileCatalogRegistry {
 	private final Map<String, ProfileDefinition> byId = new LinkedHashMap<>();
+	private long revision;
 
 	public void register(ProfileDefinition definition) {
 		byId.put(definition.id(), definition);
+		revision++;
 	}
 
 	public Optional<ProfileDefinition> findById(String profileId) {
@@ -22,6 +24,10 @@ public final class ProfileCatalogRegistry {
 	public ProfileDefinition requireById(String profileId) {
 		return findById(profileId)
 			.orElseThrow(() -> new IllegalArgumentException("Unknown catalog profile: " + profileId));
+	}
+
+	public long revision() {
+		return revision;
 	}
 
 	public Map<String, ProfileDefinition> all() {

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /** Resolves an opening type and validates raw parameter overrides. */
-public final class DefinitionStage implements PipelineStage<Object, ParameterStage.ResolvedDefinition> {
+public final class DefinitionStage implements PipelineStage<DefinitionStage.OpeningRequest, ParameterStage.ResolvedDefinition> {
 	private final OpeningTypeRegistry registry;
 
 
@@ -26,16 +26,18 @@ public final class DefinitionStage implements PipelineStage<Object, ParameterSta
 	public String name() {
 		return "definition";
 	}
+	@Override
+	public dev.aperture.pipeline.StageId id() { return dev.aperture.pipeline.StageId.DEFINITION; }
 
 	@Override
-	public StageResult<ParameterStage.ResolvedDefinition> execute(Object input, StageContext ctx) {
-		Objects.requireNonNull(input, "input cannot be null");
-		if (!(input instanceof OpeningRequest request)) {
-			return new StageResult.Failure<>(
-				"DefinitionStage requires OpeningRequest input but got: " + input.getClass().getSimpleName()
-			);
-		}
+	public Class<?> inputType() { return OpeningRequest.class; }
 
+	@Override
+	public Class<?> outputType() { return ParameterStage.ResolvedDefinition.class; }
+
+	@Override
+	public StageResult<ParameterStage.ResolvedDefinition> execute(OpeningRequest input, StageContext ctx) {
+		OpeningRequest request = Objects.requireNonNull(input, "input cannot be null");
 		String typeId = normalizeLegacyTypeId(request.typeId());
 		OpeningTypeDefinition typeDefinition;
 		try {

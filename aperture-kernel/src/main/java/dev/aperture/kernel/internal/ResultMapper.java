@@ -5,7 +5,7 @@ import dev.aperture.kernel.OpeningRequest;
 import dev.aperture.kernel.OpeningResult;
 import dev.aperture.geometry.pipeline.mesh.MeshAssembly;
 import dev.aperture.math.BoundingBox;
-import dev.aperture.opening.geometry.build.CompiledGeometry;
+import dev.aperture.pipeline.stage.GeometryStage;
 import dev.aperture.pipeline.PipelineResult;
 import dev.aperture.pipeline.stage.PlacementStage;
 
@@ -30,9 +30,10 @@ public final class ResultMapper {
 		PlacementStage.PlacementInfo placement = requireStage(
 			pipelineResult, "placement", PlacementStage.PlacementInfo.class
 		);
-		CompiledGeometry geometry = requireStage(
-			pipelineResult, "geometry", CompiledGeometry.class
+		GeometryStage.GeometryCompilation compilation = requireStage(
+			pipelineResult, "geometry", GeometryStage.GeometryCompilation.class
 		);
+		var geometry = compilation.geometry();
 		MeshAssembly meshes = requireStage(pipelineResult, "mesh", MeshAssembly.class);
 		BoundingBox collision = requireStage(pipelineResult, "collision", BoundingBox.class);
 		dev.aperture.geometry.pipeline.PipelineResult output =

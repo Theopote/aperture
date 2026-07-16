@@ -28,6 +28,15 @@ public final class ConstraintStage implements PipelineStage<ParameterStage.Resol
 	}
 
 	@Override
+	public dev.aperture.pipeline.StageId id() { return dev.aperture.pipeline.StageId.CONSTRAINT; }
+
+	@Override
+	public Class<?> inputType() { return ParameterStage.ResolvedParameters.class; }
+
+	@Override
+	public Class<?> outputType() { return ValidatedParameters.class; }
+
+	@Override
 	public StageResult<ValidatedParameters> execute(ParameterStage.ResolvedParameters input, StageContext ctx) {
 		Objects.requireNonNull(input, "input cannot be null");
 		var result = validator.validateResolved(input.typeDefinition(), input.parameters());

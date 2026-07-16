@@ -1,8 +1,0 @@
-dependencies {
-	api project(':aperture-runtime')
-	api project(':aperture-editor')
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
-}

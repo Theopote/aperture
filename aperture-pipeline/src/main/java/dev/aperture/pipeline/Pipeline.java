@@ -1,189 +1,147 @@
 package dev.aperture.pipeline;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
-/**
- * Pipeline executes a sequence of {@link PipelineStage}s.
- * <p>
- * Stages are executed in order, with each stage's output becoming
- * the next stage's input. Execution stops on first failure (short-circuit).
- * <p>
- * Features:
- * <ul>
- *   <li>Sequential execution with type safety</li>
- *   <li>Stage-level caching</li>
- *   <li>Short-circuit on failure</li>
- *   <li>Performance metrics</li>
- *   <li>Partial results on failure</li>
- * </ul>
- *
- * @see PipelineBuilder
- */
+/** Executes a validated sequence of typed generation stages. */
 public final class Pipeline {
-	private final List<StageRegistration<?>> stages;
+	private final List<StageRegistration> stages;
 	private final ExecutionOptions options;
 	private final PipelineCache cache;
 
-	Pipeline(List<StageRegistration<?>> stages, ExecutionOptions options, PipelineCache cache) {
+	Pipeline(List<StageRegistration> stages, ExecutionOptions options, PipelineCache cache) {
 		this.stages = List.copyOf(stages);
 		this.options = Objects.requireNonNull(options, "options cannot be null");
 		this.cache = Objects.requireNonNull(cache, "cache cannot be null");
 	}
 
-	/**
-	 * Execute the pipeline with given initial input.
-	 *
-	 * @param initialInput Initial input for first stage
-	 * @return Pipeline result (success or failure)
-	 */
 	public PipelineResult execute(Object initialInput) {
 		Objects.requireNonNull(initialInput, "initialInput cannot be null");
-
 		StageContext ctx = new StageContext(options);
 		Map<String, StageOutput> outputs = new LinkedHashMap<>();
-		PipelineMetrics.Builder metricsBuilder = new PipelineMetrics.Builder();
-
-		long pipelineStartTime = System.currentTimeMillis();
-
-		// Handle empty pipeline - return input unchanged
-		if (stages.isEmpty()) {
-			long totalTime = System.currentTimeMillis() - pipelineStartTime;
-			metricsBuilder.totalTime(totalTime);
-			return new PipelineResult.Success(outputs, metricsBuilder.build(), initialInput);
-		}
-
+		PipelineMetrics.Builder metrics = new PipelineMetrics.Builder();
+		long started = System.currentTimeMillis();
 		Object currentInput = initialInput;
 
 		ctx.log("Starting pipeline execution with " + stages.size() + " stages");
-
-		for (StageRegistration<?> registration : stages) {
+		for (StageRegistration registration : stages) {
 			String stageName = registration.stageName();
-
-			ctx.debug("Executing stage: " + stageName);
-
-			// Check cache
-			if (options.enableCache()) {
-				Object cached = cache.get(stageName, currentInput);
-				if (cached != null) {
-					ctx.debug("Cache hit for stage: " + stageName);
-					outputs.put(stageName, new StageOutput(stageName, cached, 0, true));
-					metricsBuilder.cacheHit().stageSkipped();
-					currentInput = cached;
-					continue;
-				}
-			}
-
-			// Execute stage
-			long stageStartTime = System.currentTimeMillis();
-			StageResult<?> result = executeStage(registration, currentInput, ctx);
-			long stageDuration = System.currentTimeMillis() - stageStartTime;
-
-			metricsBuilder.cacheMiss().stageTime(stageName, stageDuration);
-
-			if (!result.isSuccess()) {
-				// Stage failed - short circuit
-				ctx.error("Stage failed: " + stageName);
-				long totalTime = System.currentTimeMillis() - pipelineStartTime;
-				metricsBuilder.totalTime(totalTime);
-
-				String errorMessage = result.getErrorMessage().orElse("Unknown error");
-				Throwable cause = result.getCause().orElse(null);
-
-				return new PipelineResult.Failure(
+			PipelineStage<?, ?> stage = registration.stage();
+			if (!stage.inputType().isInstance(currentInput)) {
+				return failure(
 					stageName,
-					errorMessage,
-					cause,
-					outputs
+					"Stage " + stageName + " requires " + stage.inputType().getName()
+						+ " but received " + currentInput.getClass().getName(),
+					null,
+					outputs,
+					metrics,
+					started
 				);
 			}
 
-			Object stageOutput = result.getValue();
-			outputs.put(stageName, new StageOutput(stageName, stageOutput, stageDuration, false));
-			metricsBuilder.stageExecuted();
-
-			// Update cache
-			if (options.enableCache()) {
-				cache.put(stageName, currentInput, stageOutput);
+			Optional<StageCacheKey> cacheKey = options.enableCache()
+				? cacheKey(stage, currentInput, ctx)
+				: Optional.empty();
+			if (cacheKey.isPresent()) {
+				Object cached = cache.get(cacheKey.get());
+				if (cached != null) {
+					outputs.put(stageName, new StageOutput(stageName, cached, 0, true));
+					metrics.cacheHit().stageSkipped();
+					currentInput = cached;
+					continue;
+				}
+				metrics.cacheMiss();
 			}
 
-			currentInput = stageOutput;
+			long stageStarted = System.currentTimeMillis();
+			StageResult<?> result = executeStage(stage, currentInput, ctx);
+			long duration = System.currentTimeMillis() - stageStarted;
+			metrics.stageTime(stageName, duration);
+			if (!result.isSuccess()) {
+				return failure(
+					stageName,
+					result.getErrorMessage().orElse("Unknown error"),
+					result.getCause().orElse(null),
+					outputs,
+					metrics,
+					started
+				);
+			}
+
+			Object output = result.getValue();
+			if (output == null || !stage.outputType().isInstance(output)) {
+				return failure(
+					stageName,
+					"Stage " + stageName + " returned an invalid output type",
+					null,
+					outputs,
+					metrics,
+					started
+				);
+			}
+			outputs.put(stageName, new StageOutput(stageName, output, duration, false));
+			metrics.stageExecuted();
+			cacheKey.ifPresent(key -> cache.put(key, output));
+			currentInput = output;
 		}
 
-		long totalTime = System.currentTimeMillis() - pipelineStartTime;
-		metricsBuilder.totalTime(totalTime);
+		metrics.totalTime(System.currentTimeMillis() - started);
+		return new PipelineResult.Success(outputs, metrics.build(), currentInput);
+	}
 
-		ctx.log("Pipeline execution completed successfully in " + totalTime + "ms");
-
-		return new PipelineResult.Success(outputs, metricsBuilder.build());
+	private static PipelineResult.Failure failure(
+		String stage,
+		String message,
+		Throwable cause,
+		Map<String, StageOutput> outputs,
+		PipelineMetrics.Builder metrics,
+		long started
+	) {
+		metrics.totalTime(System.currentTimeMillis() - started);
+		return new PipelineResult.Failure(stage, message, cause, outputs);
 	}
 
 	@SuppressWarnings("unchecked")
-	private <I, O> StageResult<O> executeStage(
-		StageRegistration<?> registration,
+	private static Optional<StageCacheKey> cacheKey(
+		PipelineStage<?, ?> stage,
 		Object input,
-		StageContext ctx
+		StageContext context
+	) {
+		return ((PipelineStage<Object, ?>) stage).cacheKey(input, context);
+	}
+
+	@SuppressWarnings("unchecked")
+	private static StageResult<?> executeStage(
+		PipelineStage<?, ?> stage,
+		Object input,
+		StageContext context
 	) {
 		try {
-			PipelineStage<I, O> stage = (PipelineStage<I, O>) registration.stage();
-			I typedInput = (I) input;
-			return stage.execute(typedInput, ctx);
-		} catch (ClassCastException e) {
-			return new StageResult.Failure<>(
-				"Type mismatch in stage " + registration.stageName(),
-				e
-			);
-		} catch (Exception e) {
-			return new StageResult.Failure<>(
-				"Unexpected error in stage " + registration.stageName(),
-				e
-			);
+			return ((PipelineStage<Object, ?>) stage).execute(input, context);
+		} catch (Exception exception) {
+			return new StageResult.Failure<>("Unexpected error in stage " + stage.name(), exception);
 		}
 	}
 
-	/**
-	 * Get number of stages in this pipeline.
-	 */
-	public int stageCount() {
-		return stages.size();
-	}
+	public int stageCount() { return stages.size(); }
 
-	/**
-	 * Get list of stage names in execution order.
-	 */
 	public List<String> stageNames() {
-		return stages.stream()
-			.map(StageRegistration::stageName)
-			.toList();
+		return stages.stream().map(StageRegistration::stageName).toList();
 	}
 
-	/**
-	 * Clear the pipeline cache.
-	 */
-	public void clearCache() {
-		cache.clear();
-	}
+	public void clearCache() { cache.clear(); }
 
-	public PipelineCache.CacheStats cacheStats() {
-		return cache.getStats();
-	}
+	public PipelineCache.CacheStats cacheStats() { return cache.getStats(); }
 
-	/**
-	 * Record for internal stage registration.
-	 */
-	record StageRegistration<T>(
-		String stageName,
-		PipelineStage<?, ?> stage
-	) {
+	record StageRegistration(String stageName, PipelineStage<?, ?> stage) {
 		StageRegistration {
 			Objects.requireNonNull(stageName, "stageName cannot be null");
 			Objects.requireNonNull(stage, "stage cannot be null");
 		}
 	}
 
-	public static PipelineBuilder builder() {
-		return new PipelineBuilder();
-	}}
+	public static PipelineBuilder builder() { return new PipelineBuilder(); }
+}

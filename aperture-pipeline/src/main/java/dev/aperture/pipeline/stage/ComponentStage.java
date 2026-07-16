@@ -24,6 +24,15 @@ public final class ComponentStage implements PipelineStage<ConstraintStage.Valid
 	}
 
 	@Override
+	public dev.aperture.pipeline.StageId id() { return dev.aperture.pipeline.StageId.COMPONENT; }
+
+	@Override
+	public Class<?> inputType() { return ConstraintStage.ValidatedParameters.class; }
+
+	@Override
+	public Class<?> outputType() { return PlannedOpening.class; }
+
+	@Override
 	public StageResult<PlannedOpening> execute(ConstraintStage.ValidatedParameters input, StageContext ctx) {
 		Objects.requireNonNull(input, "input cannot be null");
 		try {
