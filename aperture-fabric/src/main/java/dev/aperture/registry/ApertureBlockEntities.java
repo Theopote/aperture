@@ -12,16 +12,16 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
  * Registers Aperture block entity types.
  */
 public final class ApertureBlockEntities {
-	public static final BlockEntityType<OpeningBlockEntity> OPENING = register(
-		"opening",
-		FabricBlockEntityTypeBuilder.create(OpeningBlockEntity::new, ApertureBlocks.OPENING).build()
-	);
+	public static BlockEntityType<OpeningBlockEntity> OPENING;
 
 	private ApertureBlockEntities() {
 	}
 
 	public static void registerAll() {
-		// Triggers static initialization.
+		OPENING = register(
+			"opening",
+			FabricBlockEntityTypeBuilder.create(OpeningBlockEntity::new, ApertureBlocks.OPENING).build()
+		);
 	}
 
 	private static BlockEntityType<OpeningBlockEntity> register(String path, BlockEntityType<OpeningBlockEntity> type) {
