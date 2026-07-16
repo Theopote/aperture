@@ -53,6 +53,16 @@ public record OpeningTypeDefinition(
 		return parametricSchema.extractOverrides(values);
 	}
 
+	/** Checks if a parameter with the given name exists in the schema. */
+	public boolean hasParameter(String name) {
+		return parametricSchema.get(name).isPresent();
+	}
+
+	/** Gets a parameter by name, or throws if not found. */
+	public Parameter getParameter(String name) {
+		return parametricSchema.require(name);
+	}
+
 	public static Builder builder(OpeningId id, OpeningCategory category, GeneratorId generator) {
 		return new Builder(id, category, generator);
 	}

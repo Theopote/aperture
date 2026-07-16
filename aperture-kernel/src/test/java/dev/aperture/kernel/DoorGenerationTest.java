@@ -176,7 +176,7 @@ class DoorGenerationTest {
         // Given: Left-hinged door
         OpeningId doorId = BuiltinOpeningTypes.DOOR_ID;
         ParameterSet params = ParameterSet.builder()
-            .put("hinge_side", ParameterValue.choice("left"))
+            .put("hinge_side", ParameterValue.enumValue("left"))
             .build();
 
         // When: Generate
@@ -194,7 +194,7 @@ class DoorGenerationTest {
         // Given: Right-hinged door
         OpeningId doorId = BuiltinOpeningTypes.DOOR_ID;
         ParameterSet params = ParameterSet.builder()
-            .put("hinge_side", ParameterValue.choice("right"))
+            .put("hinge_side", ParameterValue.enumValue("right"))
             .build();
 
         // When: Generate

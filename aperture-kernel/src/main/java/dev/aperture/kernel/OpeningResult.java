@@ -48,6 +48,11 @@ public sealed interface OpeningResult {
 		public GenerationMetrics getMetrics() {
 			return metrics;
 		}
+
+		@Override
+		public boolean isFailure() {
+			return false;
+		}
 	}
 
 	/**
@@ -84,10 +89,29 @@ public sealed interface OpeningResult {
 		}
 
 		/**
+		 * Get the failed stage name.
+		 */
+		public String stage() {
+			return failedStage;
+		}
+
+		/**
+		 * Get the error message.
+		 */
+		public String message() {
+			return errorMessage;
+		}
+
+		/**
 		 * Get optional cause.
 		 */
 		public Optional<Throwable> getCause() {
 			return Optional.ofNullable(cause);
+		}
+
+		@Override
+		public boolean isFailure() {
+			return true;
 		}
 	}
 
@@ -95,6 +119,13 @@ public sealed interface OpeningResult {
 	 * Check if generation was successful.
 	 */
 	boolean isSuccess();
+
+	/**
+	 * Check if generation failed.
+	 */
+	default boolean isFailure() {
+		return !isSuccess();
+	}
 
 	/**
 	 * Get the opening type ID.

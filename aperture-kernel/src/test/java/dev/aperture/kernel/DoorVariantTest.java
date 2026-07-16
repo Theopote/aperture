@@ -248,7 +248,7 @@ class DoorVariantTest {
         int successCount = 0;
         for (String side : sides) {
             ParameterSet params = ParameterSet.builder()
-                .put("hinge_side", ParameterValue.choice(side))
+                .put("hinge_side", ParameterValue.enumValue(side))
                 .build();
 
             OpeningResult result = kernel.generate(DOOR_ID, params);
@@ -412,7 +412,7 @@ class DoorVariantTest {
                 .put("height", ParameterValue.length(height))
                 .put("panel_count", ParameterValue.count(panelCount))
                 .put("glass_ratio", ParameterValue.number(glassRatio))
-                .put("hinge_side", ParameterValue.choice(hingeSide))
+                .put("hinge_side", ParameterValue.enumValue(hingeSide))
                 .put("has_transom", ParameterValue.bool(hasTransom))
                 .build();
         }

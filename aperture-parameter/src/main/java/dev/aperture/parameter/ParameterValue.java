@@ -50,6 +50,42 @@ public sealed interface ParameterValue permits
 		}
 	}
 
+	/** Extracts numeric value from LENGTH, ANGLE, COUNT, or NUMBER types. */
+	default double asNumber() {
+		return switch (this) {
+			case LengthValue l -> l.millimeters();
+			case AngleValue a -> a.degrees();
+			case CountValue c -> (double) c.value();
+			case NumberValue n -> n.value();
+			default -> throw new IllegalStateException("Cannot convert " + type() + " to number");
+		};
+	}
+
+	/** Extracts integer value from COUNT type. */
+	default int asInt() {
+		if (this instanceof CountValue c) {
+			return c.value();
+		}
+		throw new IllegalStateException("Cannot convert " + type() + " to int");
+	}
+
+	/** Extracts boolean value from BOOL type. */
+	default boolean asBoolean() {
+		if (this instanceof BoolValue b) {
+			return b.value();
+		}
+		throw new IllegalStateException("Cannot convert " + type() + " to boolean");
+	}
+
+	/** Extracts string value from ENUM or MATERIAL_REF types. */
+	default String asString() {
+		return switch (this) {
+			case EnumValue e -> e.value();
+			case MaterialRefValue m -> m.raw();
+			default -> throw new IllegalStateException("Cannot convert " + type() + " to string");
+		};
+	}
+
 	record LengthValue(double millimeters) implements ParameterValue {
 		public LengthValue {
 			if (millimeters < 0) {
