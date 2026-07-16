@@ -4,6 +4,8 @@ package dev.aperture.math;
  * Axis-aligned bounding box in logical millimeter space.
  */
 public record BoundingBox(Vec3d min, Vec3d max) {
+	public static final BoundingBox EMPTY = new BoundingBox(Vec3d.ZERO, Vec3d.ZERO);
+
 	public static BoundingBox fromSize(double width, double height, double depth) {
 		return new BoundingBox(Vec3d.ZERO, new Vec3d(width, height, depth));
 	}
@@ -18,6 +20,10 @@ public record BoundingBox(Vec3d min, Vec3d max) {
 
 	public double depth() {
 		return max.z() - min.z();
+	}
+
+	public boolean isEmpty() {
+		return this.equals(EMPTY);
 	}
 
 	public static BoundingBox ofPoints(Vec3d... points) {
