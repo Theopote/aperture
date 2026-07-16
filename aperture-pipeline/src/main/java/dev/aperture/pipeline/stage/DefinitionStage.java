@@ -1,6 +1,5 @@
 package dev.aperture.pipeline.stage;
 
-import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.opening.OpeningId;
@@ -17,19 +16,11 @@ import java.util.Objects;
 public final class DefinitionStage implements PipelineStage<Object, ParameterStage.ResolvedDefinition> {
 	private final OpeningTypeRegistry registry;
 
-	public DefinitionStage() {
-		this(defaultRegistry());
-	}
 
 	public DefinitionStage(OpeningTypeRegistry registry) {
 		this.registry = Objects.requireNonNull(registry, "registry cannot be null");
 	}
 
-	private static OpeningTypeRegistry defaultRegistry() {
-		OpeningTypeRegistry registry = new OpeningTypeRegistry();
-		BuiltinOpeningTypes.referenceDefinitions().forEach(registry::register);
-		return registry;
-	}
 
 	@Override
 	public String name() {

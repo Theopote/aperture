@@ -1,27 +1,21 @@
 package dev.aperture.pipeline.stage;
 
-import dev.aperture.geometry.pipeline.PipelineResult;
-import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
-import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
-import dev.aperture.opening.pipeline.OpeningGenerationPipeline;
+import dev.aperture.opening.compile.OpeningGeometryCompiler;
+import dev.aperture.opening.geometry.build.CompiledGeometry;
 import dev.aperture.pipeline.PipelineStage;
 import dev.aperture.pipeline.StageContext;
 import dev.aperture.pipeline.StageResult;
 
 import java.util.Objects;
 
-/** Executes the current recipe-based opening geometry pipeline. */
-public final class GeometryStage implements PipelineStage<ComponentStage.PlannedOpening, PipelineResult> {
-	private final OpeningGenerationPipeline geometryPipeline;
+/** Compiles the existing definition, parameters, and component plan into geometry. */
+public final class GeometryStage implements PipelineStage<ComponentStage.PlannedOpening, CompiledGeometry> {
+	private final OpeningGeometryCompiler compiler;
 	private final ProfileCatalogRegistry profiles;
 
-	public GeometryStage() {
-		this(OpeningGenerationPipeline.standard(), new ProfileCatalogLoader().loadClasspathCatalog());
-	}
-
-	public GeometryStage(OpeningGenerationPipeline geometryPipeline, ProfileCatalogRegistry profiles) {
-		this.geometryPipeline = Objects.requireNonNull(geometryPipeline, "geometryPipeline cannot be null");
+	public GeometryStage(OpeningGeometryCompiler compiler, ProfileCatalogRegistry profiles) {
+		this.compiler = Objects.requireNonNull(compiler, "compiler cannot be null");
 		this.profiles = Objects.requireNonNull(profiles, "profiles cannot be null");
 	}
 
@@ -31,15 +25,14 @@ public final class GeometryStage implements PipelineStage<ComponentStage.Planned
 	}
 
 	@Override
-	public StageResult<PipelineResult> execute(ComponentStage.PlannedOpening input, StageContext ctx) {
+	public StageResult<CompiledGeometry> execute(ComponentStage.PlannedOpening input, StageContext ctx) {
 		Objects.requireNonNull(input, "input cannot be null");
 		try {
-			GenerationContext generationContext = new GenerationContext(
-				input.typeDefinition(), input.parameters(), profiles
-			);
-			return new StageResult.Success<>(geometryPipeline.generate(generationContext));
+			return new StageResult.Success<>(compiler.compile(
+				input.typeDefinition(), input.parameters(), input.plan(), profiles
+			));
 		} catch (Exception exception) {
-			return new StageResult.Failure<>("Failed to generate geometry: " + exception.getMessage(), exception);
+			return new StageResult.Failure<>("Failed to compile geometry: " + exception.getMessage(), exception);
 		}
 	}
 }

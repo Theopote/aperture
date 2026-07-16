@@ -11,8 +11,8 @@ import java.util.Objects;
  * <pre>{@code
  * Pipeline pipeline = new PipelineBuilder()
  *     .addStage(new ParameterStage())
- *     .addStage(new GeometryStage())
- *     .addStage(new MeshStage())
+ *     .addStage(new GeometryStage(geometryCompiler, profiles))
+ *     .addStage(new MeshStage(meshCompiler))
  *     .withOptions(ExecutionOptions.DEFAULT.withCache(true))
  *     .build();
  * }</pre>

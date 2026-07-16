@@ -4,8 +4,8 @@ import dev.aperture.runtime.registry.MaterialResolverRegistry;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.parameter.ParameterSet;
-import dev.aperture.opening.geometry.generator.RectangularWindowGenerator;
-import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
+import dev.aperture.opening.compile.OpeningGeometryCompiler;
+import dev.aperture.opening.component.ComponentPlanBuilder;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.geometry.model.PartId;
 import dev.aperture.geometry.material.MaterialBindingSet;
@@ -21,11 +21,12 @@ class MaterialBindingBuilderTest {
 		var instance = OpeningInstance.builder(definition.id())
 			.parameters(ParameterSet.empty())
 			.build();
-		var geometry = new RectangularWindowGenerator().generate(new GenerationContext(
-			definition,
-			definition.resolveParameters(instance.parameters()),
-			new ProfileCatalogLoader().loadClasspathCatalog()
-		)).geometry();
+		var profiles = new ProfileCatalogLoader().loadClasspathCatalog();
+		var parameters = definition.resolveParameters(instance.parameters());
+		var plan = new ComponentPlanBuilder().build(definition.components());
+		var geometry = new OpeningGeometryCompiler()
+			.compile(definition, parameters, plan, profiles)
+			.result();
 		var materials = new MaterialResolverRegistry(VanillaMaterialResolver.INSTANCE);
 
 		MaterialBindingSet bindings = MaterialBindingBuilder.build(definition, instance, geometry, materials);

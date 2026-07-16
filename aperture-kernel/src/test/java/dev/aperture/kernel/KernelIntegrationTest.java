@@ -1,6 +1,9 @@
 package dev.aperture.kernel;
 
+import dev.aperture.core.catalog.BuiltinOpeningTypes;
+import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.instance.OpeningState;
+import dev.aperture.core.opening.OpeningId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,6 +75,23 @@ class KernelIntegrationTest {
 		assertEquals(1, kernel.getStats().failedRequests());
 	}
 
+	@Test
+	void registeredTypeIsImmediatelyVisibleToDefinitionStage() {
+		OpeningTypeDefinition source = BuiltinOpeningTypes.fixedWindow();
+		OpeningTypeDefinition custom = new OpeningTypeDefinition(
+			source.schemaVersion(),
+			OpeningId.parse("test:registered_window"),
+			source.category(),
+			source.parametricSchema(),
+			source.constraints(),
+			source.generator(),
+			source.components(),
+			source.materialSlots()
+		);
+
+		kernel.registerType(custom);
+		assertTrue(kernel.generate("test:registered_window", Map.of()).isSuccess());
+	}
 	@Test
 	void asyncRequestsUseKernelExecutor() {
 		CompletableFuture<OpeningResult> door = kernel.generateAsync(

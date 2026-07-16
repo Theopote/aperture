@@ -4,7 +4,7 @@ import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.math.BoundingBox;
 import dev.aperture.parameter.ParameterSet;
 import dev.aperture.parameter.ParameterValue;
-import dev.aperture.opening.geometry.generator.RectangularWindowGenerator;
+import dev.aperture.render.OpeningRenderTestSupport;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.model.GeometryResult;
@@ -103,6 +103,6 @@ class MeshBakeServiceTest {
 				.build()),
 			PROFILE_LOADER.loadClasspathCatalog()
 		);
-		return new RectangularWindowGenerator().generate(context);
+		return OpeningRenderTestSupport.compile(context);
 	}
 }

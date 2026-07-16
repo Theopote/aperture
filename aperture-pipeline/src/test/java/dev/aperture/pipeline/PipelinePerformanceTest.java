@@ -30,12 +30,12 @@ class PipelinePerformanceTest {
 		cache = new PipelineCache(1000);
 
 		pipeline = Pipeline.builder()
-			.addStage(new DefinitionStage())
+			.addStage(new DefinitionStage(PipelineTestFactory.registry()))
 			.addStage(new ParameterStage())
 			.addStage(new ConstraintStage())
-			.addStage(new ComponentStage())
-			.addStage(new GeometryStage())
-			.addStage(new MeshStage())
+			.addStage(PipelineTestFactory.componentStage())
+			.addStage(PipelineTestFactory.geometryStage())
+			.addStage(PipelineTestFactory.meshStage())
 			.addStage(new CollisionStage())
 			.addStage(new PlacementStage())
 			.withCache(cache)

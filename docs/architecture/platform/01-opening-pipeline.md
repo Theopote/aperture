@@ -455,7 +455,17 @@ public final class OpeningGenerationService {
 
 `OpeningInstanceRequestMapper` copies the type ID, sparse parameter overrides, and opening state into `OpeningRequest`. Default resolution and state-dependent parameter resolution happen in `ParameterStage`.
 
-The former Runtime `GeneratorRegistry` generation path has been removed. New runtime consumers must not call `OpeningGenerationPipeline` directly.
+The former Runtime `GeneratorRegistry` path and the nested `OpeningGenerationPipeline` have been removed. The stage contracts are now explicit:
+
+```text
+ComponentStage -> PlannedOpening(ComponentPlan)
+GeometryStage  -> CompiledGeometry(recipe + solids)
+MeshStage      -> MeshAssembly
+CollisionStage -> BoundingBox
+PlacementStage -> PlacementInfo
+```
+
+Stages receive their compilers and shared registries from `KernelBuilder`; they do not construct default registries, profile catalogs, or nested pipelines.
 
 **Current Status**: Complete - Kernel integrated into Runtime production path.
 

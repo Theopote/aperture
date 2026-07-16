@@ -3,7 +3,7 @@ package dev.aperture.render.data;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.parameter.ParameterSet;
 import dev.aperture.parameter.ParameterValue;
-import dev.aperture.opening.geometry.generator.RectangularWindowGenerator;
+import dev.aperture.render.OpeningRenderTestSupport;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.geometry.model.PartId;
@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RenderDeltaEngineTest {
-	private static final RectangularWindowGenerator GENERATOR = new RectangularWindowGenerator();
 	private static final ProfileCatalogLoader PROFILE_LOADER = new ProfileCatalogLoader();
 
 	@Test
@@ -85,6 +84,6 @@ class RenderDeltaEngineTest {
 				.build()),
 			PROFILE_LOADER.loadClasspathCatalog()
 		);
-		return GENERATOR.generate(context).geometry();
+		return OpeningRenderTestSupport.compile(context).geometry();
 	}
 }

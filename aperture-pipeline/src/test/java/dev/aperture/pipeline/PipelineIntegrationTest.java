@@ -24,12 +24,12 @@ class PipelineIntegrationTest {
 
 		// Build complete 8-stage pipeline
 		pipeline = Pipeline.builder()
-			.addStage(new DefinitionStage())
+			.addStage(new DefinitionStage(PipelineTestFactory.registry()))
 			.addStage(new ParameterStage())
 			.addStage(new ConstraintStage())
-			.addStage(new ComponentStage())
-			.addStage(new GeometryStage())
-			.addStage(new MeshStage())
+			.addStage(PipelineTestFactory.componentStage())
+			.addStage(PipelineTestFactory.geometryStage())
+			.addStage(PipelineTestFactory.meshStage())
 			.addStage(new CollisionStage())
 			.addStage(new PlacementStage())
 			.withCache(cache)
@@ -100,12 +100,12 @@ class PipelineIntegrationTest {
 	void testPipelineShortCircuit() {
 		// Arrange - Pipeline with failing stage at position 3
 		Pipeline failingPipeline = Pipeline.builder()
-			.addStage(new DefinitionStage())
+			.addStage(new DefinitionStage(PipelineTestFactory.registry()))
 			.addStage(new ParameterStage())
 			.addStage(new ConstraintStage()) // This will fail with invalid constraints
-			.addStage(new ComponentStage())
-			.addStage(new GeometryStage())
-			.addStage(new MeshStage())
+			.addStage(PipelineTestFactory.componentStage())
+			.addStage(PipelineTestFactory.geometryStage())
+			.addStage(PipelineTestFactory.meshStage())
 			.addStage(new CollisionStage())
 			.addStage(new PlacementStage())
 			.build();
@@ -199,7 +199,7 @@ class PipelineIntegrationTest {
 		// Arrange
 		PipelineCache smallCache = new PipelineCache(2); // Only 2 entries
 		Pipeline cachedPipeline = Pipeline.builder()
-			.addStage(new DefinitionStage())
+			.addStage(new DefinitionStage(PipelineTestFactory.registry()))
 			.withCache(smallCache)
 			.build();
 
@@ -223,7 +223,7 @@ class PipelineIntegrationTest {
 
 		Pipeline typedPipeline = Pipeline.builder()
 			// Stage 1: OpeningRequest -> ResolvedDefinition
-			.addStage(new DefinitionStage())
+			.addStage(new DefinitionStage(PipelineTestFactory.registry()))
 			// Stage 2: ResolvedDefinition -> ParameterSet
 			.addStage(new ParameterStage())
 			// If we tried to add a stage with incompatible types, this would not compile

@@ -12,7 +12,8 @@ import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 import dev.aperture.opening.component.ComponentPlan;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
-import dev.aperture.opening.pipeline.OpeningGenerationPipeline;
+import dev.aperture.opening.geometry.generator.GenerationTestSupport;
+
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +35,7 @@ public final class PipelineGoldenSupport {
 
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static final ProfileCatalogRegistry PROFILES = new ProfileCatalogLoader().loadClasspathCatalog();
-	private static final OpeningGenerationPipeline PIPELINE = OpeningGenerationPipeline.standard();
+
 
 	private PipelineGoldenSupport() {
 	}
@@ -48,8 +49,8 @@ public final class PipelineGoldenSupport {
 			InstanceParameters.resolve(definition, overrides),
 			PROFILES
 		);
-		PipelineResult result = PIPELINE.generate(context);
-		ComponentPlan plan = PIPELINE.planFor(context);
+		PipelineResult result = GenerationTestSupport.compile(context);
+		ComponentPlan plan = GenerationTestSupport.plan(context);
 		return from(definition.id().toString(), plan.stepIds(), result);
 	}
 

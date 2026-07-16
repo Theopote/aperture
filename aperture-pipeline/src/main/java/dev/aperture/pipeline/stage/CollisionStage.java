@@ -1,5 +1,6 @@
 package dev.aperture.pipeline.stage;
 
+import dev.aperture.geometry.pipeline.mesh.MeshAssembly;
 import dev.aperture.math.BoundingBox;
 import dev.aperture.pipeline.PipelineStage;
 import dev.aperture.pipeline.StageContext;
@@ -8,7 +9,7 @@ import dev.aperture.pipeline.StageResult;
 import java.util.Objects;
 
 /** Derives the platform-neutral collision bounds from the baked mesh assembly. */
-public final class CollisionStage implements PipelineStage<MeshStage.MeshCollection, BoundingBox> {
+public final class CollisionStage implements PipelineStage<MeshAssembly, BoundingBox> {
 	private final SimplificationStrategy strategy;
 
 	public CollisionStage() {
@@ -25,7 +26,7 @@ public final class CollisionStage implements PipelineStage<MeshStage.MeshCollect
 	}
 
 	@Override
-	public StageResult<BoundingBox> execute(MeshStage.MeshCollection input, StageContext ctx) {
+	public StageResult<BoundingBox> execute(MeshAssembly input, StageContext ctx) {
 		Objects.requireNonNull(input, "input cannot be null");
 		ctx.debug("Collision strategy " + strategy + " currently resolves to mesh bounds");
 		return new StageResult.Success<>(input.bounds());

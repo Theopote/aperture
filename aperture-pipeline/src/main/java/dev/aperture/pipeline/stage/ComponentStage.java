@@ -10,8 +10,14 @@ import dev.aperture.pipeline.StageResult;
 
 import java.util.Objects;
 
-/** Builds the component execution plan for a validated opening. */
+/** Builds exactly one component execution plan for a validated opening. */
 public final class ComponentStage implements PipelineStage<ConstraintStage.ValidatedParameters, ComponentStage.PlannedOpening> {
+	private final ComponentPlanBuilder planner;
+
+	public ComponentStage(ComponentPlanBuilder planner) {
+		this.planner = Objects.requireNonNull(planner, "planner cannot be null");
+	}
+
 	@Override
 	public String name() {
 		return "component";
@@ -21,7 +27,7 @@ public final class ComponentStage implements PipelineStage<ConstraintStage.Valid
 	public StageResult<PlannedOpening> execute(ConstraintStage.ValidatedParameters input, StageContext ctx) {
 		Objects.requireNonNull(input, "input cannot be null");
 		try {
-			ComponentPlan plan = ComponentPlanBuilder.buildPlan(input.typeDefinition().components());
+			ComponentPlan plan = planner.build(input.typeDefinition().components());
 			return new StageResult.Success<>(
 				new PlannedOpening(input.typeDefinition(), input.parameters(), plan)
 			);

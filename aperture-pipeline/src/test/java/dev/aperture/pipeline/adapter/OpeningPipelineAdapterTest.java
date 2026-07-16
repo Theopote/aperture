@@ -1,8 +1,11 @@
 package dev.aperture.pipeline.adapter;
 
 import dev.aperture.pipeline.PipelineResult;
+import dev.aperture.pipeline.PipelineTestFactory;
 import dev.aperture.pipeline.stage.DefinitionStage;
 import dev.aperture.pipeline.stage.PlacementStage;
+import dev.aperture.opening.geometry.build.CompiledGeometry;
+import dev.aperture.geometry.pipeline.mesh.MeshAssembly;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +22,7 @@ class OpeningPipelineAdapterTest {
 
 	@BeforeEach
 	void setUp() {
-		adapter = OpeningPipelineAdapter.standard();
+		adapter = PipelineTestFactory.adapter();
 	}
 
 	@Test
@@ -88,13 +91,14 @@ class OpeningPipelineAdapterTest {
 	void exposesGeometryAndPlacementStageOutputs() {
 		PipelineResult result = adapter.execute("aperture:door", Map.of());
 		PipelineResult.Success success = assertInstanceOf(PipelineResult.Success.class, result);
-		assertNotNull(success.getStageValue("geometry").orElse(null));
-		assertNotNull(success.getStageValue("placement").orElse(null));
+		assertInstanceOf(CompiledGeometry.class, success.getStageValue("geometry").orElseThrow());
+		assertInstanceOf(MeshAssembly.class, success.getStageValue("mesh").orElseThrow());
+		assertInstanceOf(PlacementStage.PlacementInfo.class, success.getStageValue("placement").orElseThrow());
 	}
 
 	@Test
 	void noCacheAdapterHasNoHits() {
-		OpeningPipelineAdapter noCache = OpeningPipelineAdapter.withoutCache();
+		OpeningPipelineAdapter noCache = OpeningPipelineAdapter.withoutCache(PipelineTestFactory.registry(), PipelineTestFactory.profiles());
 		PipelineResult result = noCache.execute("aperture:door", Map.of());
 		assertTrue(result.isSuccess(), result.getFailureMessage());
 		assertEquals(0, result.cacheHits());

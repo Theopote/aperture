@@ -5,6 +5,9 @@ import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 import dev.aperture.kernel.internal.KernelConfig;
+import dev.aperture.opening.compile.OpeningGeometryCompiler;
+import dev.aperture.opening.compile.OpeningMeshCompiler;
+import dev.aperture.opening.component.ComponentPlanBuilder;
 import dev.aperture.pipeline.adapter.OpeningPipelineAdapter;
 
 import java.util.concurrent.ExecutorService;
@@ -154,9 +157,17 @@ public final class KernelBuilder {
 			: new ProfileCatalogLoader().loadClasspathCatalog();
 
 		// Create pipeline with configured cache
-		OpeningPipelineAdapter pipeline = cacheCapacity == 0
-			? OpeningPipelineAdapter.withoutCache(finalRegistry, finalProfiles)
-			: OpeningPipelineAdapter.withCache(cacheCapacity, finalRegistry, finalProfiles);
+		ComponentPlanBuilder componentPlanner = new ComponentPlanBuilder();
+		OpeningGeometryCompiler geometryCompiler = new OpeningGeometryCompiler();
+		OpeningMeshCompiler meshCompiler = new OpeningMeshCompiler();
+		OpeningPipelineAdapter pipeline = OpeningPipelineAdapter.withCache(
+			cacheCapacity,
+			finalRegistry,
+			finalProfiles,
+			componentPlanner,
+			geometryCompiler,
+			meshCompiler
+		);
 
 		// Create or use executor service
 		ExecutorService finalExecutor = customExecutorService != null

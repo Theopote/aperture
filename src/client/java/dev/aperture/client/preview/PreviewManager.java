@@ -2,10 +2,10 @@ package dev.aperture.client.preview;
 
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.parameter.ParameterSet;
+import dev.aperture.core.parametric.ParameterBridge;
+import dev.aperture.kernel.OpeningRequest;
 import dev.aperture.geometry.pipeline.PipelineResult;
 import dev.aperture.geometry.pipeline.PipelineResultCache;
-import dev.aperture.opening.geometry.generator.RectangularWindowGenerator;
-import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
 import dev.aperture.runtime.ApertureRuntime;
 
 import java.util.concurrent.CompletableFuture;
@@ -25,7 +25,6 @@ public class PreviewManager {
     });
 
     private final PipelineResultCache cache = new PipelineResultCache(10);
-    private final RectangularWindowGenerator generator = new RectangularWindowGenerator();
 
     private CompletableFuture<PipelineResult> currentGeneration;
     private PreviewUpdateListener updateListener;
@@ -81,13 +80,13 @@ public class PreviewManager {
      * Generates preview without cache (actual generation).
      */
     private PipelineResult generateUncached(OpeningTypeDefinition definition, ParameterSet parameters) {
-        GenerationContext context = new GenerationContext(
-            definition,
-            definition.resolveParameters(parameters),
-            ApertureRuntime.get().profiles()
+        java.util.Map<String, Object> requestParameters = new java.util.LinkedHashMap<>();
+        parameters.asMap().forEach((name, value) ->
+            requestParameters.put(name, ParameterBridge.toExternalValue(value))
         );
-
-        return generator.generate(context);
+        return ApertureRuntime.get().generation().generate(
+            new OpeningRequest(definition.id().toString(), requestParameters)
+        ).asSuccess().output();
     }
 
     /**

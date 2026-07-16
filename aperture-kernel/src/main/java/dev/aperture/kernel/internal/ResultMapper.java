@@ -3,7 +3,9 @@ package dev.aperture.kernel.internal;
 import dev.aperture.kernel.GenerationMetrics;
 import dev.aperture.kernel.OpeningRequest;
 import dev.aperture.kernel.OpeningResult;
+import dev.aperture.geometry.pipeline.mesh.MeshAssembly;
 import dev.aperture.math.BoundingBox;
+import dev.aperture.opening.geometry.build.CompiledGeometry;
 import dev.aperture.pipeline.PipelineResult;
 import dev.aperture.pipeline.stage.PlacementStage;
 
@@ -28,16 +30,18 @@ public final class ResultMapper {
 		PlacementStage.PlacementInfo placement = requireStage(
 			pipelineResult, "placement", PlacementStage.PlacementInfo.class
 		);
-		dev.aperture.geometry.pipeline.PipelineResult output = requireStage(
-			pipelineResult, "geometry", dev.aperture.geometry.pipeline.PipelineResult.class
+		CompiledGeometry geometry = requireStage(
+			pipelineResult, "geometry", CompiledGeometry.class
 		);
+		MeshAssembly meshes = requireStage(pipelineResult, "mesh", MeshAssembly.class);
 		BoundingBox collision = requireStage(pipelineResult, "collision", BoundingBox.class);
+		dev.aperture.geometry.pipeline.PipelineResult output =
+			new dev.aperture.geometry.pipeline.PipelineResult(
+				geometry.result(), meshes, geometry.recipe(), collision, collision
+			);
 
 		return new OpeningResult.Success(
-			request.typeId(),
-			output.withCollisionAndFootprint(collision, collision),
-			placement,
-			buildMetrics(pipelineResult)
+			request.typeId(), output, placement, buildMetrics(pipelineResult)
 		);
 	}
 

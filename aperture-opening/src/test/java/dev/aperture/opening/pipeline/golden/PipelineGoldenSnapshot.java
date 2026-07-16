@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Stable, serializable snapshot of an {@link dev.aperture.opening.pipeline.OpeningGenerationPipeline} run.
+ * Stable, serializable snapshot of an opening compiler run.
  * Used by golden tests to lock assembly bounds, per-part bounds, and mesh counts.
  */
 public record PipelineGoldenSnapshot(
