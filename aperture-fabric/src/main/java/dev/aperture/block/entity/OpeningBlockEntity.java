@@ -43,17 +43,17 @@ public final class OpeningBlockEntity extends BlockEntity {
 	protected void saveAdditional(@NotNull ValueOutput output) {
 		super.saveAdditional(output);
 		if (instance != null) {
-			output.storeBoolean("hasInstance", true);
+			output.putBoolean("hasInstance", true);
 			OpeningInstanceNbtCodec.write(output, instance);
 		} else {
-			output.storeBoolean("hasInstance", false);
+			output.putBoolean("hasInstance", false);
 		}
 	}
 
 	@Override
 	protected void loadAdditional(@NotNull ValueInput input) {
 		super.loadAdditional(input);
-		boolean hasInstance = input.readBoolean("hasInstance").orElse(false);
+		boolean hasInstance = input.getBooleanOr("hasInstance", false);
 		if (hasInstance) {
 			instance = OpeningInstanceNbtCodec.read(input);
 		} else {
