@@ -42,6 +42,7 @@ class DoorVariantTest {
     @AfterAll
     static void cleanupKernel() throws Exception {
         if (kernel != null) {
+            printVariantSummary();
             kernel.close();
         }
     }
@@ -149,7 +150,7 @@ class DoorVariantTest {
         for (int panelCount = 1; panelCount <= 6; panelCount++) {
             ParameterSet params = ParameterSet.builder()
                 .put("panel_count", ParameterValue.count(panelCount))
-                .put("width", ParameterValue.length(600.0 * panelCount))  // Scale width
+                .put("width", ParameterValue.length(Math.min(600.0 * panelCount, 2400.0)))
                 .build();
 
             OpeningResult result = kernel.generate(DOOR_ID, params);
@@ -381,7 +382,6 @@ class DoorVariantTest {
         System.out.printf("Throughput: %.1f doors/sec%n", 1000.0 / avgMs);
     }
 
-    @AfterAll
     static void printVariantSummary() {
         KernelStats stats = kernel.getStats();
 

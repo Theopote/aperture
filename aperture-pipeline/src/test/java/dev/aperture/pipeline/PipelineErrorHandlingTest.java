@@ -133,16 +133,8 @@ class PipelineErrorHandlingTest {
 	@Test
 	@DisplayName("Handle empty pipeline")
 	void testEmptyPipeline() {
-		// Arrange
-		Pipeline pipeline = Pipeline.builder().build();
-
-		// Act
-		PipelineResult result = pipeline.execute("input");
-
-		// Assert
-		assertTrue(result.isSuccess(), "Empty pipeline should succeed");
-		assertEquals("input", result.getFinalOutput(), "Should return input unchanged");
-		assertEquals(0, result.stageCount(), "Should have zero stages");
+		assertThrows(IllegalStateException.class, () -> Pipeline.builder().build(),
+			"A generation pipeline must contain at least one stage" );
 	}
 
 	@Test
@@ -195,8 +187,8 @@ class PipelineErrorHandlingTest {
 		PipelineResult result = pipeline.execute("input");
 
 		// Assert
-		assertTrue(result.isSuccess(), "Null output should be allowed");
-		assertNull(result.getFinalOutput(), "Should return null");
+		assertFalse(result.isSuccess(), "Null output violates the typed stage contract");
+		assertEquals("custom", result.getFailedStageName());
 	}
 
 	@Test

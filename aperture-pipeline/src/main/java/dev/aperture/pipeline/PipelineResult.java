@@ -72,10 +72,10 @@ public sealed interface PipelineResult {
 	/**
 	 * Failed pipeline execution with error details and partial results.
 	 */
-	record Failure(PipelineDiagnostic diagnostic, Map<String, StageOutput> partialOutputs) implements PipelineResult {
-		public Failure { Objects.requireNonNull(diagnostic, "diagnostic"); Objects.requireNonNull(partialOutputs, "partialOutputs"); }
+	record Failure(PipelineDiagnostic diagnostic, Map<String, StageOutput> partialOutputs, PipelineMetrics metrics) implements PipelineResult {
+		public Failure { Objects.requireNonNull(diagnostic, "diagnostic"); Objects.requireNonNull(partialOutputs, "partialOutputs"); Objects.requireNonNull(metrics, "metrics"); }
 		public Failure(String failedStage, String errorMessage, Throwable cause, Map<String, StageOutput> outputs) {
-			this(PipelineDiagnostic.error(DiagnosticCode.INTERNAL_ERROR, StageId.fromExternalName(failedStage), errorMessage, cause), outputs);
+			this(PipelineDiagnostic.error(DiagnosticCode.INTERNAL_ERROR, StageId.fromExternalName(failedStage), errorMessage, cause), outputs, new PipelineMetrics.Builder().build());
 		}
 		public Failure(String failedStage, String errorMessage) { this(failedStage, errorMessage, null, Map.of()); }
 		public String failedStage() { return diagnostic.stage().externalName(); }
@@ -137,7 +137,7 @@ public sealed interface PipelineResult {
 		if (this instanceof Success success) {
 			return success.stageOutputs().size();
 		} else if (this instanceof Failure failure) {
-			return failure.partialOutputs().size();
+			return failure.partialOutputs().size() + 1;
 		}
 		return 0;
 	}
@@ -148,6 +148,8 @@ public sealed interface PipelineResult {
 	default java.time.Duration executionTime() {
 		if (this instanceof Success success) {
 			return success.metrics().totalExecutionTime();
+		} else if (this instanceof Failure failure) {
+			return failure.metrics().totalExecutionTime();
 		}
 		return java.time.Duration.ZERO;
 	}
@@ -163,11 +165,13 @@ public sealed interface PipelineResult {
 	}
 
 	/**
-	 * Get metrics (null for Failure).
+	 * Get metrics collected before completion or failure.
 	 */
 	default PipelineMetrics getMetrics() {
 		if (this instanceof Success success) {
 			return success.metrics();
+		} else if (this instanceof Failure failure) {
+			return failure.metrics();
 		}
 		return null;
 	}

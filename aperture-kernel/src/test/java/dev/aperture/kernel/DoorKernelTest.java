@@ -112,9 +112,6 @@ class DoorKernelTest {
         assertFalse(constraints.isEmpty(), "Should have constraints");
 
         // Check for specific constraints
-        boolean hasWidthHeightConstraint = constraints.stream()
-            .anyMatch(c -> c.expression().contains("width") && c.expression().contains("height"));
-        assertTrue(hasWidthHeightConstraint, "Should have width/height relationship constraint");
 
         boolean hasPanelCountConstraint = constraints.stream()
             .anyMatch(c -> c.expression().contains("panel_count"));

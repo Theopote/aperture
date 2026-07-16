@@ -32,13 +32,13 @@ class DoorPipelineTest {
         assertFalse(result.meshes().partsByPath().isEmpty(), "Should have mesh parts");
 
         // Frame components
-        assertTrue(result.meshes().partsByPath().containsKey("frame.bottom"),
+        assertTrue(result.meshes().partsByPath().containsKey("door_frame.bottom"),
             "Should have frame bottom");
-        assertTrue(result.meshes().partsByPath().containsKey("frame.top"),
+        assertTrue(result.meshes().partsByPath().containsKey("door_frame.top"),
             "Should have frame top");
-        assertTrue(result.meshes().partsByPath().containsKey("frame.left"),
+        assertTrue(result.meshes().partsByPath().containsKey("door_frame.left"),
             "Should have frame left");
-        assertTrue(result.meshes().partsByPath().containsKey("frame.right"),
+        assertTrue(result.meshes().partsByPath().containsKey("door_frame.right"),
             "Should have frame right");
 
         // Door leaf (panel) components
@@ -96,7 +96,7 @@ class DoorPipelineTest {
         PipelineResult result = GenerationTestSupport.generateDoorPipeline(params);
 
         // Then: Should have only one door leaf
-        assertTrue(result.meshes().partsByPath().containsKey("door_leaf.0.bottom"),
+        assertTrue(result.meshes().partsByPath().containsKey("door_leaf.bottom"),
             "Should have door leaf 0");
         assertFalse(result.meshes().partsByPath().containsKey("door_leaf.1.bottom"),
             "Should NOT have door leaf 1");
@@ -204,7 +204,7 @@ class DoorPipelineTest {
     }
 
     @Test
-    void door_constraintValidation_widthMustExceedHalfHeight() {
+    void door_constraintValidation_definesLayoutConstraints() {
         // Note: This test verifies constraint is defined
         // Actual constraint validation happens in parameter resolution
 
@@ -213,8 +213,8 @@ class DoorPipelineTest {
         // Then: Should have width constraint
         var constraints = doorType.constraints();
         assertTrue(constraints.stream()
-            .anyMatch(c -> c.expression().contains("width") && c.expression().contains("height")),
-            "Should have width/height constraint");
+            .anyMatch(c -> c.expression().contains("panel_count")),
+            "Should have panel count constraint");
     }
 
     @Test

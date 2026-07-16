@@ -146,7 +146,7 @@ class PipelineResultCacheTest {
         // Then: All entries should be removed
         assertEquals(0, cache.stats().size());
         assertEquals(0, cache.stats().hits());
-        assertEquals(0, cache.stats().misses());
+        assertEquals(2, cache.stats().misses(), "Clear should preserve lifetime diagnostics" );
     }
 
     @Test

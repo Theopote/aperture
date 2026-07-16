@@ -325,12 +325,12 @@ class DoorGenerationTest {
         assertTrue(metrics.totalTime().toNanos() > 0, "Should have total time");
 
         System.out.println("\n=== Generation Metrics ===");
-        System.out.printf("Total time: %d ms%n", metrics.totalTime().toNanos());
+        System.out.printf("Total time: %.3f ms%n", metrics.totalTime().toNanos() / 1_000_000.0);
 
         if (!metrics.stageTimings().isEmpty()) {
             System.out.println("Stage timings:");
             metrics.stageTimings().forEach((stage, time) ->
-                System.out.printf("  %s: %d ms%n", stage, time));
+                System.out.printf("  %s: %.3f ms%n", stage, time.toNanos() / 1_000_000.0));
         }
     }
 

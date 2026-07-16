@@ -104,7 +104,7 @@ class PipelinePerformanceTest {
 		for (int i = 0; i < batchSize; i++) {
 			inputs.add(new DefinitionStage.OpeningRequest(
 				"aperture:door_standard",
-				Map.of("width", 1.0 + (i * 0.1))
+				Map.of("width", 700.0 + (i % 18) * 90.0)
 			));
 		}
 
@@ -140,7 +140,7 @@ class PipelinePerformanceTest {
 		for (int i = 0; i < 10; i++) {
 			inputs.add(new DefinitionStage.OpeningRequest(
 				"aperture:door_standard",
-				Map.of("width", (double) i)
+				Map.of("width", 700.0 + i * 100.0)
 			));
 		}
 
@@ -181,7 +181,7 @@ class PipelinePerformanceTest {
 		for (int i = 0; i < iterations; i++) {
 			pipeline.execute(new DefinitionStage.OpeningRequest(
 				"aperture:door_standard",
-				Map.of("width", (double) (i % 100)) // Reuse 100 distinct values
+				Map.of("width", 700.0 + (i % 18) * 90.0) // Reuse 100 distinct values
 			));
 		}
 

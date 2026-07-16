@@ -1,19 +1,32 @@
 package dev.aperture.geometry.profile;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Collection;
 
 /**
  * Registry of catalog profile definitions.
  */
 public final class ProfileCatalogRegistry {
-	private final Map<String, ProfileDefinition> byId = new LinkedHashMap<>();
+	private volatile Map<String, ProfileDefinition> byId = Map.of();
 	private long revision;
 
-	public void register(ProfileDefinition definition) {
-		byId.put(definition.id(), definition);
+	public synchronized void register(ProfileDefinition definition) {
+		Map<String, ProfileDefinition> updated = new LinkedHashMap<>(byId);
+		updated.put(definition.id(), definition);
+		byId = Map.copyOf(updated);
+		revision++;
+	}
+
+	public synchronized void replaceAll(Collection<ProfileDefinition> replacements) {
+		Map<String, ProfileDefinition> updated = new LinkedHashMap<>();
+		for (ProfileDefinition definition : replacements) {
+			if (updated.put(definition.id(), definition) != null) {
+				throw new IllegalArgumentException("Duplicate catalog profile: " + definition.id());
+			}
+		}
+		byId = Map.copyOf(updated);
 		revision++;
 	}
 
@@ -31,6 +44,6 @@ public final class ProfileCatalogRegistry {
 	}
 
 	public Map<String, ProfileDefinition> all() {
-		return Collections.unmodifiableMap(byId);
+		return byId;
 	}
 }

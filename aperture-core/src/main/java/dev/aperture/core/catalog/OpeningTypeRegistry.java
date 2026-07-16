@@ -6,17 +6,30 @@ import dev.aperture.core.opening.OpeningId;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.LinkedHashMap;
 
 /**
  * In-memory registry of loaded opening type definitions.
  */
 public final class OpeningTypeRegistry {
-	private final Map<OpeningId, OpeningTypeDefinition> definitions = new ConcurrentHashMap<>();
+	private volatile Map<OpeningId, OpeningTypeDefinition> definitions = Map.of();
 	private final java.util.concurrent.atomic.AtomicLong revision = new java.util.concurrent.atomic.AtomicLong();
 
-	public void register(OpeningTypeDefinition definition) {
-		definitions.put(definition.id(), definition);
+	public synchronized void register(OpeningTypeDefinition definition) {
+		Map<OpeningId, OpeningTypeDefinition> updated = new LinkedHashMap<>(definitions);
+		updated.put(definition.id(), definition);
+		definitions = Map.copyOf(updated);
+		revision.incrementAndGet();
+	}
+
+	public synchronized void replaceAll(Collection<OpeningTypeDefinition> replacements) {
+		Map<OpeningId, OpeningTypeDefinition> updated = new LinkedHashMap<>();
+		for (OpeningTypeDefinition definition : replacements) {
+			if (updated.put(definition.id(), definition) != null) {
+				throw new IllegalArgumentException("Duplicate opening type: " + definition.id());
+			}
+		}
+		definitions = Map.copyOf(updated);
 		revision.incrementAndGet();
 	}
 
@@ -36,8 +49,8 @@ public final class OpeningTypeRegistry {
 		return revision.get();
 	}
 
-	public void clear() {
-		definitions.clear();
+	public synchronized void clear() {
+		definitions = Map.of();
 		revision.incrementAndGet();
 	}
 }

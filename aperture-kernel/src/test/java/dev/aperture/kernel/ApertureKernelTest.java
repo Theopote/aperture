@@ -110,7 +110,7 @@ class ApertureKernelTest {
 	}
 
 	@Test
-	@DisplayName("Generate with missing parameters fails")
+	@DisplayName("Generate with omitted parameters uses definition defaults")
 	void testGenerateMissingParameters() {
 		// Arrange
 		String typeId = "aperture:door_standard";
@@ -120,7 +120,7 @@ class ApertureKernelTest {
 		OpeningResult result = kernel.generate(typeId, emptyParams);
 
 		// Assert
-		assertFalse(result.isSuccess(), "Should fail with missing parameters");
+		assertTrue(result.isSuccess(), "Definition defaults should complete omitted parameters");
 	}
 
 	@Test

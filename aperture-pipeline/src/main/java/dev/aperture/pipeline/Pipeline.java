@@ -92,7 +92,7 @@ public final class Pipeline {
 		PipelineMetrics.Builder metrics, long started
 	) {
 		metrics.totalTime(System.nanoTime() - started);
-		return new PipelineResult.Failure(diagnostic, outputs);
+		return new PipelineResult.Failure(diagnostic, outputs, metrics.build());
 	}
 	private static PipelineResult.Failure failure(
 		String stage,
@@ -103,7 +103,11 @@ public final class Pipeline {
 		long started
 	) {
 		metrics.totalTime(System.nanoTime() - started);
-		return new PipelineResult.Failure(stage, message, cause, outputs);
+		return new PipelineResult.Failure(
+			PipelineDiagnostic.error(DiagnosticCode.INTERNAL_ERROR, StageId.fromExternalName(stage), message, cause),
+			outputs,
+			metrics.build()
+		);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -124,7 +128,11 @@ public final class Pipeline {
 		try {
 			return ((PipelineStage<Object, ?>) stage).execute(input, context);
 		} catch (Exception exception) {
-			return new StageResult.Failure<>(DiagnosticCode.INTERNAL_ERROR, "Unexpected error in stage " + stage.name(), exception);
+			return new StageResult.Failure<>(
+				DiagnosticCode.INTERNAL_ERROR,
+				"Unexpected error in stage " + stage.name() + ": " + exception.getMessage(),
+				exception
+			);
 		}
 	}
 

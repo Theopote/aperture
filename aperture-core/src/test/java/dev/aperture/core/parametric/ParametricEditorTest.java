@@ -74,14 +74,15 @@ class ParametricEditorTest {
 	}
 
 	@Test
-	void doorConstraintsValidateThroughParametricEditor() {
+	void invalidDoorParameterPatchIsRejected() {
 		var definition = BuiltinOpeningTypes.door();
 		var editor = ParametricEditor.fromDefinition(definition, ParameterSet.empty());
 
 		assertTrue(editor.validate(definition).isValid());
 
-		editor.patch(Map.of("width", 600, "height", 1500));
-		assertFalse(editor.validate(definition).isValid());
+		var result = editor.patch(Map.of("glass_ratio", 1.5));
+		assertFalse(result.success());
+		assertTrue(editor.validate(definition).isValid());
 	}
 
 	private static Object external(ParameterValue value) {
