@@ -88,6 +88,25 @@ public interface ApertureKernel extends AutoCloseable {
 	CompletableFuture<OpeningResult> generateAsync(OpeningRequest request);
 
 	/**
+	 * Generate opening up to a specific stage.
+	 * <p>
+	 * Useful for debugging or when you only need partial results.
+	 * For example, to get only geometry without mesh/collision:
+	 * <pre>{@code
+	 * var result = kernel.generateUntil(request, "geometry");
+	 * CompositeGeometry geometry = result.getValue();
+	 * }</pre>
+	 *
+	 * @param request Opening generation request
+	 * @param stageName Target stage name (e.g., "geometry", "mesh")
+	 * @param <T> Expected output type
+	 * @return Stage result
+	 * @throws NullPointerException if request or stageName is null
+	 * @throws IllegalArgumentException if stage name is unknown
+	 */
+	<T> PartialResult<T> generateUntil(OpeningRequest request, String stageName);
+
+	/**
 	 * Get opening type definition.
 	 *
 	 * @param typeId Type identifier (e.g., "aperture:door_standard")
@@ -138,6 +157,35 @@ public interface ApertureKernel extends AutoCloseable {
 	 * Does not affect the cache.
 	 */
 	void resetStats();
+
+	/**
+	 * Check if the kernel is healthy and performing well.
+	 * <p>
+	 * Returns true if:
+	 * <ul>
+	 *   <li>Success rate > 95%</li>
+	 *   <li>Cache hit rate > 70%</li>
+	 *   <li>Kernel is not closed</li>
+	 * </ul>
+	 *
+	 * @return true if kernel is healthy
+	 */
+	default boolean isHealthy() {
+		try {
+			KernelStats stats = getStats();
+			return stats.isHealthy();
+		} catch (IllegalStateException e) {
+			// Kernel is closed
+			return false;
+		}
+	}
+
+	/**
+	 * Check if the kernel has been closed.
+	 *
+	 * @return true if closed
+	 */
+	boolean isClosed();
 
 	/**
 	 * Close the kernel and release resources.

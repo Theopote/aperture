@@ -78,7 +78,7 @@ public final class ResultMapper {
 		);
 	}
 
-	private static GenerationMetrics buildMetrics(PipelineResult pipelineResult) {
+	static GenerationMetrics buildMetrics(PipelineResult pipelineResult) {
 		long totalTime = pipelineResult.executionTimeMs();
 		int cacheHits = pipelineResult.cacheHits();
 
