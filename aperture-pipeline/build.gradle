@@ -1,0 +1,34 @@
+plugins {
+	id 'java-library'
+}
+
+group = 'dev.aperture'
+version = '0.1.0'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// Aperture Kernel modules
+	api project(':aperture-math')
+	api project(':aperture-parameter')
+	api project(':aperture-core')
+	api project(':aperture-geometry')
+
+	// Testing
+	testImplementation platform('org.junit:junit-bom:5.10.0')
+	testImplementation 'org.junit.jupiter:junit-jupiter'
+	testImplementation 'org.assertj:assertj-core:3.24.2'
+}
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+	withSourcesJar()
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
