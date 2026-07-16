@@ -14,19 +14,21 @@ import java.util.Optional;
 public final class PipelineCache {
 	private final int capacity;
 	private final Map<CacheKey, Object> cache;
+	private long hits = 0;
+	private long misses = 0;
 
 	/**
 	 * Create cache with specified capacity.
 	 *
-	 * @param capacity Maximum number of cached entries
+	 * @param capacity Maximum number of cached entries (0 to disable caching)
 	 */
 	public PipelineCache(int capacity) {
-		if (capacity <= 0) {
-			throw new IllegalArgumentException("capacity must be positive");
+		if (capacity < 0) {
+			throw new IllegalArgumentException("capacity cannot be negative");
 		}
 		this.capacity = capacity;
 		// LinkedHashMap with access-order for LRU
-		this.cache = new LinkedHashMap<>(capacity, 0.75f, true) {
+		this.cache = new LinkedHashMap<>(capacity == 0 ? 1 : capacity, 0.75f, true) {
 			@Override
 			protected boolean removeEldestEntry(Map.Entry<CacheKey, Object> eldest) {
 				return size() > PipelineCache.this.capacity;
@@ -39,14 +41,24 @@ public final class PipelineCache {
 	 *
 	 * @param stageName Stage name
 	 * @param input Stage input
-	 * @return Cached output if present
+	 * @return Cached output if present, or null if not cached
 	 */
-	public synchronized Optional<Object> get(String stageName, Object input) {
-		Objects.requireNonNull(stageName, "stageName cannot be null");
-		Objects.requireNonNull(input, "input cannot be null");
+	public synchronized Object get(String stageName, Object input) {
+		if (capacity == 0) {
+			misses++;
+			return null;
+		}
 
 		CacheKey key = CacheKey.of(stageName, input);
-		return Optional.ofNullable(cache.get(key));
+		Object result = cache.get(key);
+
+		if (result != null) {
+			hits++;
+		} else {
+			misses++;
+		}
+
+		return result;
 	}
 
 	/**
@@ -57,6 +69,10 @@ public final class PipelineCache {
 	 * @param output Stage output
 	 */
 	public synchronized void put(String stageName, Object input, Object output) {
+		if (capacity == 0) {
+			return; // Caching disabled
+		}
+
 		Objects.requireNonNull(stageName, "stageName cannot be null");
 		Objects.requireNonNull(input, "input cannot be null");
 		Objects.requireNonNull(output, "output cannot be null");
@@ -117,19 +133,53 @@ public final class PipelineCache {
 	}
 
 	/**
+	 * Get number of cache hits.
+	 */
+	public synchronized long getHits() {
+		return hits;
+	}
+
+	/**
+	 * Get number of cache misses.
+	 */
+	public synchronized long getMisses() {
+		return misses;
+	}
+
+	/**
+	 * Get cache hit rate (hits / total accesses).
+	 */
+	public synchronized double getHitRate() {
+		long total = hits + misses;
+		return total == 0 ? 0.0 : (double) hits / total;
+	}
+
+	/**
+	 * Reset hit/miss statistics.
+	 */
+	public synchronized void resetStatistics() {
+		hits = 0;
+		misses = 0;
+	}
+
+	/**
 	 * Get cache statistics.
 	 */
 	public synchronized CacheStats getStats() {
-		// Simple stats - could be extended to track hits/misses
-		return new CacheStats(size(), capacity);
+		return new CacheStats(size(), capacity, hits, misses);
 	}
 
 	/**
 	 * Cache statistics.
 	 */
-	public record CacheStats(int currentSize, int capacity) {
+	public record CacheStats(int currentSize, int capacity, long hits, long misses) {
 		public double utilizationRate() {
 			return capacity == 0 ? 0.0 : (double) currentSize / capacity;
+		}
+
+		public double hitRate() {
+			long total = hits + misses;
+			return total == 0 ? 0.0 : (double) hits / total;
 		}
 	}
 }

@@ -32,10 +32,6 @@ public final class Pipeline {
 		this.stages = List.copyOf(stages);
 		this.options = Objects.requireNonNull(options, "options cannot be null");
 		this.cache = Objects.requireNonNull(cache, "cache cannot be null");
-
-		if (stages.isEmpty()) {
-			throw new IllegalArgumentException("Pipeline must have at least one stage");
-		}
 	}
 
 	/**
@@ -52,6 +48,14 @@ public final class Pipeline {
 		PipelineMetrics.Builder metricsBuilder = new PipelineMetrics.Builder();
 
 		long pipelineStartTime = System.currentTimeMillis();
+
+		// Handle empty pipeline - return input unchanged
+		if (stages.isEmpty()) {
+			long totalTime = System.currentTimeMillis() - pipelineStartTime;
+			metricsBuilder.totalTime(totalTime);
+			return new PipelineResult.Success(outputs, metricsBuilder.build(), initialInput);
+		}
+
 		Object currentInput = initialInput;
 
 		ctx.log("Starting pipeline execution with " + stages.size() + " stages");
@@ -63,12 +67,12 @@ public final class Pipeline {
 
 			// Check cache
 			if (options.enableCache()) {
-				var cached = cache.get(stageName, currentInput);
-				if (cached.isPresent()) {
+				Object cached = cache.get(stageName, currentInput);
+				if (cached != null) {
 					ctx.debug("Cache hit for stage: " + stageName);
-					outputs.put(stageName, new StageOutput(stageName, cached.get(), 0, true));
+					outputs.put(stageName, new StageOutput(stageName, cached, 0, true));
 					metricsBuilder.cacheHit().stageSkipped();
-					currentInput = cached.get();
+					currentInput = cached;
 					continue;
 				}
 			}

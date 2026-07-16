@@ -13,8 +13,13 @@ public sealed interface PipelineResult {
 	 */
 	record Success(
 		Map<String, StageOutput> stageOutputs,
-		PipelineMetrics metrics
+		PipelineMetrics metrics,
+		Object finalOutput
 	) implements PipelineResult {
+		public Success(Map<String, StageOutput> stageOutputs, PipelineMetrics metrics) {
+			this(stageOutputs, metrics, null);
+		}
+
 		public Success {
 			Objects.requireNonNull(stageOutputs, "stageOutputs cannot be null");
 			Objects.requireNonNull(metrics, "metrics cannot be null");
@@ -23,6 +28,23 @@ public sealed interface PipelineResult {
 		@Override
 		public boolean isSuccess() {
 			return true;
+		}
+
+		/**
+		 * Get the final output from the last stage, or null if no stages.
+		 */
+		public Object getFinalOutput() {
+			if (finalOutput != null) {
+				return finalOutput;
+			}
+			if (stageOutputs.isEmpty()) {
+				return null;
+			}
+			// Get last stage output
+			return stageOutputs.values().stream()
+				.reduce((first, second) -> second)
+				.map(StageOutput::value)
+				.orElse(null);
 		}
 
 		/**
@@ -90,4 +112,86 @@ public sealed interface PipelineResult {
 	 * Check if pipeline execution was successful.
 	 */
 	boolean isSuccess();
+
+	/**
+	 * Get the final output (last stage's output for Success, null for Failure).
+	 */
+	default Object getFinalOutput() {
+		if (this instanceof Success success) {
+			return success.getFinalOutput();
+		}
+		return null;
+	}
+
+	/**
+	 * Get failure message (null for Success).
+	 */
+	default String getFailureMessage() {
+		if (this instanceof Failure failure) {
+			return failure.errorMessage();
+		}
+		return null;
+	}
+
+	/**
+	 * Get failure cause (null for Success or if no cause).
+	 */
+	default Throwable getFailureCause() {
+		if (this instanceof Failure failure) {
+			return failure.cause();
+		}
+		return null;
+	}
+
+	/**
+	 * Get failed stage name (null for Success).
+	 */
+	default String getFailedStageName() {
+		if (this instanceof Failure failure) {
+			return failure.failedStage();
+		}
+		return null;
+	}
+
+	/**
+	 * Get number of stages executed.
+	 */
+	default int stageCount() {
+		if (this instanceof Success success) {
+			return success.stageOutputs().size();
+		} else if (this instanceof Failure failure) {
+			return failure.partialOutputs().size();
+		}
+		return 0;
+	}
+
+	/**
+	 * Get execution time in milliseconds.
+	 */
+	default long executionTimeMs() {
+		if (this instanceof Success success) {
+			return success.metrics().totalTimeMs();
+		}
+		return 0;
+	}
+
+	/**
+	 * Get number of cache hits.
+	 */
+	default int cacheHits() {
+		if (this instanceof Success success) {
+			return success.metrics().cacheHits();
+		}
+		return 0;
+	}
+
+	/**
+	 * Get metrics (null for Failure).
+	 */
+	default PipelineMetrics getMetrics() {
+		if (this instanceof Success success) {
+			return success.metrics();
+		}
+		return null;
+	}
 }
