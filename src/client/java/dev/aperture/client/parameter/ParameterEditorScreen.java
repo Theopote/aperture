@@ -73,7 +73,9 @@ public final class ParameterEditorScreen extends Screen {
 
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-		extractBackground(graphics, mouseX, mouseY, partialTick);
+		// Don't call extractBackground here - it causes blur conflicts
+		// Background rendering is handled by parent Screen class
+
 		graphics.text(font, title, width / 2 - font.width(title) / 2, 12, 0xFFFFFFFF, true);
 
 		for (ParameterWidgetFactory.ParameterField field : fields) {
