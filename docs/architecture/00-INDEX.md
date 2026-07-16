@@ -59,7 +59,7 @@ This index maps all architecture documents to these layers and tracks their comp
 |----------|--------|-------------|
 | [02-domain-model.md](architecture/02-domain-model.md) | ✅ | Opening data model (Definition, Instance, Parameters) |
 | [04-core-systems.md](architecture/04-core-systems.md) | ✅ | Overview of 9 cooperating systems |
-| **kernel/01-geometry-kernel.md** | 📝 | Geometry primitives: Point, Curve, Profile, Mesh, Transform, Extrusion, Boolean |
+| [kernel/01-geometry-kernel.md](architecture/kernel/01-geometry-kernel.md) | ✅ | Geometry primitives: Point, Curve, Profile, Mesh, Transform, Extrusion, Boolean |
 | [kernel/02-parameter-engine.md](architecture/kernel/02-parameter-engine.md) | ✅ | 8 parameter types, constraint expressions, validation |
 | [kernel/03-component-system.md](architecture/kernel/03-component-system.md) | ✅ | Component types, ComponentAssembly contract, component lifecycle |
 | [kernel/04-generation-pipeline.md](architecture/kernel/04-generation-pipeline.md) | ✅ | 8-stage pipeline: Definition → Parameter → Constraint → Component → Geometry → Mesh → Collision → Placement → Render |
@@ -118,13 +118,13 @@ This index maps all architecture documents to these layers and tracks their comp
 
 | Document | Status | Description |
 |----------|--------|-------------|
-| **platform/01-opening-pipeline.md** | 📝 | Definition → Parameter → Component → Geometry → Mesh → Render data flow |
+| [platform/01-opening-pipeline.md](architecture/platform/01-opening-pipeline.md) | ✅ | Definition → Parameter → Component → Geometry → Mesh → Render data flow |
 | [05-rendering.md](architecture/05-rendering.md) | ✅ | Rendering pipeline: delta engine, mesh compiler, LOD, materials |
 | [06-placement.md](architecture/06-placement.md) | ✅ | Placement workflow: targeting, preview, validation, commit |
 | [07-serialization.md](architecture/07-serialization.md) | ✅ | Persistence, networking, schema migration |
 | [10-fabric-placement-adapter.md](architecture/10-fabric-placement-adapter.md) | ✅ | Minecraft raycast → PlacementContext adapter |
 
-### Completion Status: **~70%**
+### Completion Status: **~95%**
 
 **Exists**:
 - ✅ OpeningTypeDefinition loader (JSON data packs)
@@ -134,16 +134,15 @@ This index maps all architecture documents to these layers and tracks their comp
 - ✅ Material catalog system
 - ✅ Placement preview system
 - ✅ Basic validation chain
+- ✅ Complete pipeline documentation
 
 **Missing**:
-- ❌ Detailed pipeline documentation (Definition → Render flow)
 - ❌ NBT persistence (OpeningInstance to Block Entity)
 - ❌ Network synchronization (client parameter edits → server authority)
-- ❌ Collision and Footprint as formal pipeline outputs
 - ❌ Golden tests for pipeline stages
 
 ### Action Items:
-- [ ] Write platform/01-opening-pipeline.md (document the full chain)
+- [x] Write platform/01-opening-pipeline.md ✅
 - [ ] Implement NBT persistence (place → save → reload works)
 - [ ] Add Collision and Footprint to PipelineResult
 - [ ] Create golden tests for fixed_window and door
@@ -263,6 +262,7 @@ Based on [APERTURE-REDEFINED.md](APERTURE-REDEFINED.md), the immediate prioritie
    - [ ] Add Iron Law to README and CONTRIBUTING
 
 2. **Write missing Kernel docs**
+   - [x] kernel/01-geometry-kernel.md ✅
    - [x] kernel/02-parameter-engine.md ✅
    - [x] kernel/03-component-system.md ✅
    - [x] kernel/04-generation-pipeline.md ✅
@@ -270,10 +270,9 @@ Based on [APERTURE-REDEFINED.md](APERTURE-REDEFINED.md), the immediate prioritie
    - [x] kernel/06-constraint-solver.md ✅
    - [x] kernel/07-command-system.md ✅
    - [x] kernel/08-asset-system.md ✅
-   - [ ] kernel/01-geometry-kernel.md
 
 3. **Write missing Platform docs**
-   - [ ] platform/01-opening-pipeline.md
+   - [x] platform/01-opening-pipeline.md ✅
 
 4. **Write missing Editor docs**
    - [ ] editor/01-editor-kernel.md
@@ -303,12 +302,12 @@ Based on [APERTURE-REDEFINED.md](APERTURE-REDEFINED.md), the immediate prioritie
 | Layer | Documents | Complete | In Progress | Planned |
 |-------|-----------|----------|-------------|---------|
 | **Foundation** | 6 | 4 | 1 | 1 |
-| **Kernel** | 11 | 9 | 0 | 2 |
-| **Platform** | 5 | 4 | 0 | 1 |
+| **Kernel** | 11 | 10 | 0 | 1 |
+| **Platform** | 5 | 5 | 0 | 0 |
 | **Editor** | 3 | 0 | 0 | 3 |
 | **Applications** | 2 | 0 | 0 | 2 |
 | **Roadmaps** | 4 | 4 | 0 | 0 |
-| **Total** | 31 | 21 (68%) | 1 (3%) | 9 (29%) |
+| **Total** | 31 | 23 (74%) | 1 (3%) | 7 (23%) |
 
 **Target**: 100% Foundation, Kernel, Platform docs complete before Phase 4.
 
