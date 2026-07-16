@@ -4,7 +4,6 @@ import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.geometry.pipeline.mesh.MeshAssembly;
 import dev.aperture.geometry.recipe.GeometryRecipe;
 import dev.aperture.math.BoundingBox;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Complete output of procedural geometry generation (solids + baked meshes + optional recipe IR).
@@ -12,9 +11,9 @@ import org.jspecify.annotations.Nullable;
 public record PipelineResult(
 	GeometryResult geometry,
 	MeshAssembly meshes,
-	@Nullable GeometryRecipe recipe,
-	@Nullable BoundingBox collision,
-	@Nullable BoundingBox footprint
+	GeometryRecipe recipe,
+	BoundingBox collision,
+	BoundingBox footprint
 ) {
 	public PipelineResult(GeometryResult geometry, MeshAssembly meshes) {
 		this(geometry, meshes, null, null, null);

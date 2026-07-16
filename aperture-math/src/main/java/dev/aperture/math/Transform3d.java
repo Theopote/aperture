@@ -31,6 +31,10 @@ public record Transform3d(
 		return Math.abs(rotationRadians) > 1.0e-9;
 	}
 
+	public boolean isIdentity() {
+		return this.equals(identity());
+	}
+
 	/**
 	 * Translates a local-space bounding box into world millimeter space.
 	 */
