@@ -2,13 +2,12 @@ package dev.aperture.opening.geometry.generator;
 
 import dev.aperture.opening.component.ComponentPlan;
 import dev.aperture.opening.geometry.generator.pipeline.GenerationContext;
-import dev.aperture.opening.geometry.pipeline.OpeningPipeline;
 import dev.aperture.opening.pipeline.OpeningGenerationPipeline;
 import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.geometry.pipeline.PipelineResult;
 
 /**
- * Compatibility registration for the component-driven opening pipeline.
+ * Generator entry point for the component-driven opening pipeline.
  * Window, door, and curtain wall all use this entry; they differ only by components.
  */
 public final class RectangularWindowGenerator implements OpeningGenerator {
@@ -34,9 +33,4 @@ public final class RectangularWindowGenerator implements OpeningGenerator {
 		return PIPELINE.planFor(context);
 	}
 
-	/** @deprecated Use {@link #planFor(GenerationContext)} */
-	@Deprecated
-	public OpeningPipeline pipelineFor(GenerationContext context) {
-		return OpeningPipeline.forAssembly(context.definition().components());
-	}
 }
