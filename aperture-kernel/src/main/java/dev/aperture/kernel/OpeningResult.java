@@ -16,11 +16,13 @@ public sealed interface OpeningResult {
 	 */
 	record Success(
 		String typeId,
+		dev.aperture.geometry.pipeline.PipelineResult output,
 		PlacementStage.PlacementInfo placement,
 		GenerationMetrics metrics
 	) implements OpeningResult {
 		public Success {
 			Objects.requireNonNull(typeId, "typeId cannot be null");
+			Objects.requireNonNull(output, "output cannot be null");
 			Objects.requireNonNull(placement, "placement cannot be null");
 			Objects.requireNonNull(metrics, "metrics cannot be null");
 		}

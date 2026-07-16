@@ -155,8 +155,8 @@ public final class KernelBuilder {
 
 		// Create pipeline with configured cache
 		OpeningPipelineAdapter pipeline = cacheCapacity == 0
-			? OpeningPipelineAdapter.withoutCache()
-			: OpeningPipelineAdapter.withCache(cacheCapacity);
+			? OpeningPipelineAdapter.withoutCache(finalRegistry, finalProfiles)
+			: OpeningPipelineAdapter.withCache(cacheCapacity, finalRegistry, finalProfiles);
 
 		// Create or use executor service
 		ExecutorService finalExecutor = customExecutorService != null

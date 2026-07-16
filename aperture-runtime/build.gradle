@@ -1,4 +1,5 @@
 dependencies {
+	api project(':aperture-kernel')
 	api project(':aperture-math')
 	api project(':aperture-core')
 	api project(':aperture-geometry')

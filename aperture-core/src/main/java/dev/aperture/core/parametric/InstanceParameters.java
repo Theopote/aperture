@@ -43,11 +43,19 @@ public final class InstanceParameters {
 	 * {@code open_angle} is not explicitly overridden on the instance.
 	 */
 	public static ParameterSet forGeneration(OpeningTypeDefinition definition, OpeningInstance instance) {
-		ParameterSet resolved = resolve(definition, instance.parameters());
-		if (instance.parameters().get("open_angle").isPresent()) {
+		return forGeneration(definition, instance.parameters(), instance.state());
+	}
+
+	public static ParameterSet forGeneration(
+		OpeningTypeDefinition definition,
+		ParameterSet overrides,
+		OpeningState state
+	) {
+		ParameterSet resolved = resolve(definition, overrides);
+		if (overrides.get("open_angle").isPresent()) {
 			return resolved;
 		}
-		return OpeningStateParameters.apply(definition, resolved, instance.state());
+		return OpeningStateParameters.apply(definition, resolved, state);
 	}
 
 	/**

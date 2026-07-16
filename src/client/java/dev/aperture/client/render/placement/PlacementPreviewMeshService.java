@@ -51,7 +51,7 @@ public final class PlacementPreviewMeshService {
 				currentHostAnchor = hostAnchor;
 			}
 
-			PipelineResult pipeline = runtime.generation().generatePipeline(session.previewInstance());
+			PipelineResult pipeline = runtime.generation().generate(session.previewInstance()).asSuccess().output();
 			GeometryResult geometry = pipeline.geometry();
 			RenderDelta delta = context.updateGeometry(geometry);
 			meshAsset = BAKE_SERVICE.applyDeltaFromAssembly(context.document(), meshAsset, delta, pipeline, LODLevel.FULL);

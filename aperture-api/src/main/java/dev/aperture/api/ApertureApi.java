@@ -9,7 +9,6 @@ import dev.aperture.editor.service.ParametricService;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 import dev.aperture.runtime.ApertureRuntime;
 import dev.aperture.runtime.catalog.MaterialCatalogRegistry;
-import dev.aperture.runtime.registry.GeneratorRegistry;
 import dev.aperture.runtime.registry.MaterialResolverRegistry;
 import dev.aperture.runtime.service.OpeningGenerationService;
 
@@ -26,7 +25,6 @@ public final class ApertureApi {
 
 	public ApertureApi(
 		OpeningTypeRegistry openingTypes,
-		GeneratorRegistry generators,
 		ProfileCatalogRegistry profiles,
 		MaterialCatalogRegistry materialCatalog,
 		MaterialResolverRegistry materials,
@@ -35,7 +33,7 @@ public final class ApertureApi {
 		PlacementService placement
 	) {
 		this(
-			new ApertureRuntime(openingTypes, generators, profiles, materialCatalog, materials, instances, generation, placement),
+			new ApertureRuntime(openingTypes, profiles, materialCatalog, materials, instances, generation, placement),
 			new ApertureEditor(new EditorService(), new ParametricService())
 		);
 	}
@@ -60,10 +58,6 @@ public final class ApertureApi {
 
 	public OpeningTypeRegistry openingTypes() {
 		return runtime.openingTypes();
-	}
-
-	public GeneratorRegistry generators() {
-		return runtime.generators();
 	}
 
 	public ProfileCatalogRegistry profiles() {

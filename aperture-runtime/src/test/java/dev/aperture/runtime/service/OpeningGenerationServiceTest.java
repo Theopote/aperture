@@ -2,51 +2,57 @@ package dev.aperture.runtime.service;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import dev.aperture.runtime.registry.GeneratorRegistry;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.core.instance.OpeningInstance;
-import dev.aperture.parameter.ParameterSet;
 import dev.aperture.geometry.export.gltf.GltfExporter;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;
-import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 import dev.aperture.geometry.recipe.EmitSolidOp;
 import dev.aperture.geometry.recipe.io.GeometryRecipeCodec;
 import dev.aperture.geometry.recipe.shape.BoxRecipe;
-import dev.aperture.opening.geometry.generator.RectangularWindowGenerator;
+import dev.aperture.kernel.ApertureKernel;
+import dev.aperture.parameter.ParameterSet;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OpeningGenerationServiceTest {
+	private ApertureKernel kernel;
 	private OpeningGenerationService service;
-	private OpeningTypeRegistry openingTypes;
 
 	@BeforeEach
 	void setUp() {
-		openingTypes = new OpeningTypeRegistry();
+		OpeningTypeRegistry openingTypes = new OpeningTypeRegistry();
 		openingTypes.register(BuiltinOpeningTypes.fixedWindow());
 		openingTypes.register(BuiltinOpeningTypes.door());
+		kernel = ApertureKernel.builder()
+			.withRegistry(openingTypes)
+			.withProfiles(new ProfileCatalogLoader().loadClasspathCatalog())
+			.withCacheCapacity(0)
+			.build();
+		service = new OpeningGenerationService(kernel);
+	}
 
-		GeneratorRegistry generators = new GeneratorRegistry();
-		generators.register(new RectangularWindowGenerator());
-
-		ProfileCatalogRegistry profiles = new ProfileCatalogLoader().loadClasspathCatalog();
-		service = new OpeningGenerationService(openingTypes, generators, profiles);
+	@AfterEach
+	void tearDown() {
+		kernel.close();
 	}
 
 	@Test
-	void generatePipelineIncludesRecipe() {
+	void generateReturnsKernelOutputWithRecipe() {
 		OpeningInstance instance = OpeningInstance.builder(BuiltinOpeningTypes.FIXED_WINDOW_ID)
 			.parameters(ParameterSet.empty())
 			.build();
 
-		var result = service.generatePipeline(instance);
+		var result = service.generate(instance).asSuccess().output();
 		assertNotNull(result.recipe());
 		assertFalse(result.recipe().ops().isEmpty());
+		assertNotNull(result.collision());
 	}
 
 	@Test
@@ -71,9 +77,5 @@ class OpeningGenerationServiceTest {
 		JsonObject gltf = JsonParser.parseString(service.exportGltf(instance)).getAsJsonObject();
 		assertEquals(GltfExporter.GENERATOR, gltf.getAsJsonObject("asset").get("generator").getAsString());
 		assertFalse(gltf.getAsJsonArray("meshes").isEmpty());
-	}
-
-	private static void assertEquals(String expected, String actual) {
-		org.junit.jupiter.api.Assertions.assertEquals(expected, actual);
 	}
 }

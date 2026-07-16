@@ -62,7 +62,7 @@ public final class DefinitionStage implements PipelineStage<Object, ParameterSta
 			return new StageResult.Failure<>("Invalid opening parameters: " + patchResult.issues());
 		}
 		return new StageResult.Success<>(
-			new ParameterStage.ResolvedDefinition(typeDefinition, editor.overridesOnly())
+			new ParameterStage.ResolvedDefinition(typeDefinition, editor.overridesOnly(), request.state())
 		);
 	}
 
@@ -74,14 +74,23 @@ public final class DefinitionStage implements PipelineStage<Object, ParameterSta
 		};
 	}
 
-	public record OpeningRequest(String typeId, Map<String, Object> userParameters) {
+	public record OpeningRequest(
+	String typeId,
+	Map<String, Object> userParameters,
+	dev.aperture.core.instance.OpeningState state
+) {
+		public OpeningRequest(String typeId, Map<String, Object> userParameters) {
+			this(typeId, userParameters, dev.aperture.core.instance.OpeningState.CLOSED);
+		}
+
 		public OpeningRequest {
 			Objects.requireNonNull(typeId, "typeId cannot be null");
 			Objects.requireNonNull(userParameters, "userParameters cannot be null");
+			Objects.requireNonNull(state, "state cannot be null");
 		}
 
 		public static OpeningRequest of(String typeId) {
-			return new OpeningRequest(typeId, Map.of());
+			return new OpeningRequest(typeId, Map.of(), dev.aperture.core.instance.OpeningState.CLOSED);
 		}
 	}
 }

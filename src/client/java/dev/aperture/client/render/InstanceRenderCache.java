@@ -42,7 +42,7 @@ public final class InstanceRenderCache {
 			id -> new CachedInstanceRender(RenderDocument.forInstance(id))
 		);
 
-		PipelineResult pipeline = runtime.generation().generatePipeline(instance);
+		PipelineResult pipeline = runtime.generation().generate(instance).asSuccess().output();
 		GeometryResult geometry = pipeline.geometry();
 		RenderDelta delta = cached.document().updateFrom(geometry);
 		if (!delta.isEmpty() || cached.meshAsset().partIds().isEmpty()) {

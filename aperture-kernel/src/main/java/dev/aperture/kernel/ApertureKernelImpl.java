@@ -57,7 +57,8 @@ final class ApertureKernelImpl implements ApertureKernel {
 			// Execute pipeline
 			PipelineResult pipelineResult = pipeline.execute(
 				request.typeId(),
-				request.parameters()
+				request.parameters(),
+				request.state()
 			);
 
 			// Map result
@@ -232,7 +233,8 @@ final class ApertureKernelImpl implements ApertureKernel {
 			// TODO: Enhance Pipeline to support partial execution
 			PipelineResult pipelineResult = pipeline.execute(
 				request.typeId(),
-				request.parameters()
+				request.parameters(),
+				request.state()
 			);
 
 			long duration = System.currentTimeMillis() - startTime;

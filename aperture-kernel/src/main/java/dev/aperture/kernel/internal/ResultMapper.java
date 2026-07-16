@@ -3,56 +3,59 @@ package dev.aperture.kernel.internal;
 import dev.aperture.kernel.GenerationMetrics;
 import dev.aperture.kernel.OpeningRequest;
 import dev.aperture.kernel.OpeningResult;
+import dev.aperture.math.BoundingBox;
 import dev.aperture.pipeline.PipelineResult;
 import dev.aperture.pipeline.stage.PlacementStage;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Maps Pipeline results to Kernel results.
- * <p>
- * Package-private, not part of public API.
- */
+/** Maps unified pipeline results to the public Kernel result contract. */
 public final class ResultMapper {
-
 	private ResultMapper() {
-		// Utility class
 	}
 
-	/**
-	 * Map PipelineResult to OpeningResult.
-	 */
 	public static OpeningResult map(OpeningRequest request, PipelineResult pipelineResult) {
-		if (pipelineResult.isSuccess()) {
-			return mapSuccess(request, pipelineResult);
-		} else {
-			return mapFailure(request, pipelineResult);
-		}
+		return pipelineResult.isSuccess()
+			? mapSuccess(request, (PipelineResult.Success) pipelineResult)
+			: mapFailure(request, pipelineResult);
 	}
 
 	private static OpeningResult.Success mapSuccess(
 		OpeningRequest request,
-		PipelineResult pipelineResult
+		PipelineResult.Success pipelineResult
 	) {
-		// Extract placement info from final output
-		Object finalOutput = pipelineResult.getFinalOutput();
-
-		if (!(finalOutput instanceof PlacementStage.PlacementInfo placement)) {
-			throw new IllegalStateException(
-				"Expected PlacementInfo but got: " +
-				(finalOutput == null ? "null" : finalOutput.getClass().getName())
-			);
-		}
-
-		// Build metrics
-		GenerationMetrics metrics = buildMetrics(pipelineResult);
+		PlacementStage.PlacementInfo placement = requireStage(
+			pipelineResult, "placement", PlacementStage.PlacementInfo.class
+		);
+		dev.aperture.geometry.pipeline.PipelineResult output = requireStage(
+			pipelineResult, "geometry", dev.aperture.geometry.pipeline.PipelineResult.class
+		);
+		BoundingBox collision = requireStage(pipelineResult, "collision", BoundingBox.class);
 
 		return new OpeningResult.Success(
 			request.typeId(),
+			output.withCollisionAndFootprint(collision, collision),
 			placement,
-			metrics
+			buildMetrics(pipelineResult)
 		);
+	}
+
+	private static <T> T requireStage(
+		PipelineResult.Success result,
+		String stageName,
+		Class<T> expectedType
+	) {
+		Object value = result.getStageValue(stageName).orElseThrow(
+			() -> new IllegalStateException("Missing pipeline stage output: " + stageName)
+		);
+		if (!expectedType.isInstance(value)) {
+			throw new IllegalStateException(
+				"Expected " + expectedType.getSimpleName() + " from " + stageName
+					+ " stage but got " + value.getClass().getName()
+			);
+		}
+		return expectedType.cast(value);
 	}
 
 	private static OpeningResult.Failure mapFailure(
@@ -61,42 +64,26 @@ public final class ResultMapper {
 	) {
 		String failedStage = pipelineResult.getFailedStageName();
 		String errorMessage = pipelineResult.getFailureMessage();
-		Throwable cause = pipelineResult.getFailureCause();
-
-		if (failedStage == null) {
-			failedStage = "unknown";
-		}
-		if (errorMessage == null) {
-			errorMessage = "Unknown error";
-		}
-
 		return new OpeningResult.Failure(
 			request.typeId(),
-			failedStage,
-			errorMessage,
-			cause
+			failedStage == null ? "unknown" : failedStage,
+			errorMessage == null ? "Unknown error" : errorMessage,
+			pipelineResult.getFailureCause()
 		);
 	}
 
 	public static GenerationMetrics buildMetrics(PipelineResult pipelineResult) {
 		long totalTime = pipelineResult.executionTimeMs();
 		int cacheHits = pipelineResult.cacheHits();
-
-		// Calculate cache misses (stages executed - cache hits)
-		int stagesExecuted = pipelineResult.stageCount();
-		int cacheMisses = stagesExecuted - cacheHits;
-
-		// Extract stage timings
+		int cacheMisses = pipelineResult.stageCount() - cacheHits;
 		Map<String, Long> stageTimings = new HashMap<>();
 		var metrics = pipelineResult.getMetrics();
 
 		if (metrics != null) {
-			// Get all stage names and their timings
 			String[] stageNames = {
 				"definition", "parameter", "constraint", "component",
 				"geometry", "mesh", "collision", "placement"
 			};
-
 			for (String stage : stageNames) {
 				long time = metrics.getStageTime(stage);
 				if (time > 0) {
@@ -105,11 +92,6 @@ public final class ResultMapper {
 			}
 		}
 
-		return new GenerationMetrics(
-			totalTime,
-			cacheHits,
-			cacheMisses,
-			stageTimings
-		);
+		return new GenerationMetrics(totalTime, cacheHits, cacheMisses, stageTimings);
 	}
 }
