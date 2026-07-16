@@ -10,7 +10,7 @@ import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.parameter.ParameterSet;
 
 /**
- * Public API for headless opening editing — manipulators, history, undo/redo.
+ * Public API for headless opening editing â€” manipulators, history, undo/redo.
  */
 public final class EditorService {
 	public EditorSession openSession(OpeningTypeRegistry openingTypes) {
