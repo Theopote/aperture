@@ -1,6 +1,7 @@
 package dev.aperture.pipeline.adapter;
 
 import dev.aperture.pipeline.Pipeline;
+import dev.aperture.pipeline.PipelineBuilder;
 import dev.aperture.pipeline.PipelineCache;
 import dev.aperture.pipeline.PipelineResult;
 import dev.aperture.pipeline.stage.*;
@@ -45,7 +46,7 @@ public final class OpeningPipelineAdapter {
 	public static OpeningPipelineAdapter withCache(int cacheCapacity) {
 		PipelineCache cache = new PipelineCache(cacheCapacity);
 
-		Pipeline pipeline = Pipeline.builder()
+		Pipeline pipeline = new PipelineBuilder()
 			.addStage(new DefinitionStage())
 			.addStage(new ParameterStage())
 			.addStage(new ConstraintStage())

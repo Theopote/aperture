@@ -18,7 +18,7 @@ import java.util.Objects;
  * Input: {@link ResolvedDefinition} (type definition + user parameters)
  * Output: {@link ParameterSet} (complete parameter values)
  */
-public final class ParameterStage implements PipelineStage<ResolvedDefinition, ParameterSet> {
+public final class ParameterStage implements PipelineStage<Object, ParameterSet> {
 
 	@Override
 	public String name() {
@@ -26,19 +26,24 @@ public final class ParameterStage implements PipelineStage<ResolvedDefinition, P
 	}
 
 	@Override
-	public StageResult<ParameterSet> execute(ResolvedDefinition input, StageContext ctx) {
+	public StageResult<ParameterSet> execute(Object input, StageContext ctx) {
 		Objects.requireNonNull(input, "input cannot be null");
+		if (!(input instanceof ResolvedDefinition resolvedDefinition)) {
+			return new StageResult.Failure<>(
+				"ParameterStage requires ResolvedDefinition input but got: " + input.getClass().getSimpleName()
+			);
+		}
 
-		ctx.debug("Resolving parameters for type: " + input.typeDefinition().id());
+		ctx.debug("Resolving parameters for type: " + resolvedDefinition.typeDefinition().id());
 
 		try {
 			// Resolve sparse overrides against type schema
 			ParameterSet resolved = InstanceParameters.resolve(
-				input.typeDefinition(),
-				input.userParameters()
+				resolvedDefinition.typeDefinition(),
+				resolvedDefinition.userParameters()
 			);
 
-			ctx.debug("Resolved " + resolved.size() + " parameters");
+			ctx.debug("Resolved " + resolved.asMap().size() + " parameters");
 
 			return new StageResult.Success<>(resolved);
 

@@ -15,6 +15,7 @@ dependencies {
 	api project(':aperture-parameter')
 	api project(':aperture-core')
 	api project(':aperture-geometry')
+	api project(':aperture-opening')
 
 	// Testing
 	testImplementation platform('org.junit:junit-bom:5.10.0')
