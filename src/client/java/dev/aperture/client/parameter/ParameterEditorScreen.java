@@ -51,9 +51,6 @@ public final class ParameterEditorScreen extends Screen implements PreviewManage
 		for (ParameterWidgetFactory.ParameterField field : fields) {
 			if (!field.isGroupHeader()) {
 				addRenderableWidget(field.widget());
-
-				// Add change listener to trigger preview update
-				field.widget().setOnChange(() -> onParameterChanged());
 			}
 		}
 
@@ -160,28 +157,7 @@ public final class ParameterEditorScreen extends Screen implements PreviewManage
 	 * Renders the preview in the right side of the screen.
 	 */
 	private void renderPreview(GuiGraphicsExtractor graphics, float partialTick) {
-		// Preview viewport (right side of screen)
-		float previewX = width * 0.65f;
-		float previewY = height * 0.5f;
-		float previewWidth = width * 0.3f;
-		float previewHeight = height * 0.6f;
-
-		// Compute appropriate scale
-		float scale = PreviewRenderer.computeFitScale(currentPreview, previewWidth, previewHeight);
-
-		// Render preview
-		var poseStack = graphics.pose();
-		var bufferSource = graphics.bufferSource();
-
-		PreviewRenderer.render(
-			poseStack,
-			bufferSource,
-			currentPreview,
-			previewX,
-			previewY,
-			scale,
-			false  // solid rendering
-		);
+		// TODO: update to Minecraft 26.1 render state API
 	}
 
 	@Override

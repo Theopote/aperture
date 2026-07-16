@@ -6,7 +6,7 @@ import dev.aperture.geometry.mesh.Mesh;
 import dev.aperture.geometry.pipeline.PipelineResult;
 import dev.aperture.math.Vec3d;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import org.joml.Matrix4f;
 
 /**
@@ -19,17 +19,6 @@ public class PreviewRenderer {
     private static final int WIREFRAME_COLOR = 0xFFFFFFFF;
     private static final int SOLID_COLOR = 0xFFCCCCCC;
 
-    /**
-     * Renders a pipeline result as a preview.
-     *
-     * @param poseStack Transformation stack
-     * @param bufferSource Buffer source for rendering
-     * @param result Pipeline result to render
-     * @param centerX Center X position in screen space
-     * @param centerY Center Y position in screen space
-     * @param scale Additional scale factor
-     * @param wireframe Whether to render as wireframe
-     */
     public static void render(
         PoseStack poseStack,
         MultiBufferSource bufferSource,
@@ -45,104 +34,55 @@ public class PreviewRenderer {
 
         poseStack.pushPose();
 
-        // Center and scale the preview
         poseStack.translate(centerX, centerY, 0);
         poseStack.scale(scale * PREVIEW_SCALE, -scale * PREVIEW_SCALE, scale * PREVIEW_SCALE);
 
-        // Center the geometry at origin
         var bounds = result.geometry().bounds();
         Vec3d center = bounds.min().add(bounds.max()).scale(0.5);
         poseStack.translate(-center.x(), -center.y(), -center.z());
 
-        // Render all mesh parts
-        RenderType renderType = wireframe ? RenderType.lines() : RenderType.solid();
-        VertexConsumer consumer = bufferSource.getBuffer(renderType);
+        VertexConsumer consumer = bufferSource.getBuffer(RenderTypes.lines());
 
         for (var entry : result.meshes().partsByPath().entrySet()) {
             Mesh mesh = entry.getValue();
-            renderMesh(poseStack, consumer, mesh, wireframe);
+            renderMeshWireframe(poseStack, consumer, mesh);
         }
 
         poseStack.popPose();
     }
 
-    /**
-     * Renders a single mesh.
-     */
-    private static void renderMesh(
-        PoseStack poseStack,
-        VertexConsumer consumer,
-        Mesh mesh,
-        boolean wireframe
-    ) {
+    private static void renderMeshWireframe(PoseStack poseStack, VertexConsumer consumer, Mesh mesh) {
         Matrix4f matrix = poseStack.last().pose();
+        int[] indices = mesh.indices();
+        float[] vertices = mesh.vertices();
+        int triangleCount = mesh.triangleCount();
+        int stride = Mesh.FLOATS_PER_VERTEX;
 
-        if (wireframe) {
-            renderWireframe(consumer, matrix, mesh);
-        } else {
-            renderSolid(consumer, matrix, mesh);
+        for (int t = 0; t < triangleCount; t++) {
+            int i0 = indices[t * 3] * stride;
+            int i1 = indices[t * 3 + 1] * stride;
+            int i2 = indices[t * 3 + 2] * stride;
+
+            float x0 = vertices[i0], y0 = vertices[i0 + 1], z0 = vertices[i0 + 2];
+            float x1 = vertices[i1], y1 = vertices[i1 + 1], z1 = vertices[i1 + 2];
+            float x2 = vertices[i2], y2 = vertices[i2 + 1], z2 = vertices[i2 + 2];
+
+            emitLine(consumer, matrix, x0, y0, z0, x1, y1, z1);
+            emitLine(consumer, matrix, x1, y1, z1, x2, y2, z2);
+            emitLine(consumer, matrix, x2, y2, z2, x0, y0, z0);
         }
     }
 
-    /**
-     * Renders mesh as wireframe.
-     */
-    private static void renderWireframe(VertexConsumer consumer, Matrix4f matrix, Mesh mesh) {
-        for (int i = 0; i < mesh.faceCount(); i++) {
-            int[] indices = mesh.faceIndices(i);
-
-            // Draw triangle edges
-            for (int j = 0; j < 3; j++) {
-                Vec3d v1 = mesh.vertex(indices[j]);
-                Vec3d v2 = mesh.vertex(indices[(j + 1) % 3]);
-
-                consumer.addVertex(matrix, (float) v1.x(), (float) v1.y(), (float) v1.z())
-                    .setColor(WIREFRAME_COLOR);
-
-                consumer.addVertex(matrix, (float) v2.x(), (float) v2.y(), (float) v2.z())
-                    .setColor(WIREFRAME_COLOR);
-            }
-        }
+    private static void emitLine(VertexConsumer consumer, Matrix4f matrix,
+                                  float x1, float y1, float z1,
+                                  float x2, float y2, float z2) {
+        float nx = x2 - x1, ny = y2 - y1, nz = z2 - z1;
+        float len = (float) Math.sqrt(nx * nx + ny * ny + nz * nz);
+        if (len > 0) { nx /= len; ny /= len; nz /= len; }
+        consumer.addVertex(matrix, x1, y1, z1).setColor(WIREFRAME_COLOR).setNormal(nx, ny, nz);
+        consumer.addVertex(matrix, x2, y2, z2).setColor(WIREFRAME_COLOR).setNormal(nx, ny, nz);
     }
 
-    /**
-     * Renders mesh as solid.
-     */
-    private static void renderSolid(VertexConsumer consumer, Matrix4f matrix, Mesh mesh) {
-        for (int i = 0; i < mesh.faceCount(); i++) {
-            int[] indices = mesh.faceIndices(i);
-
-            // Compute face normal (simple flat shading)
-            Vec3d v0 = mesh.vertex(indices[0]);
-            Vec3d v1 = mesh.vertex(indices[1]);
-            Vec3d v2 = mesh.vertex(indices[2]);
-
-            Vec3d edge1 = v1.subtract(v0);
-            Vec3d edge2 = v2.subtract(v0);
-            Vec3d normal = edge1.cross(edge2).normalize();
-
-            // Simple directional lighting (light from top-right)
-            Vec3d lightDir = new Vec3d(0.5, 0.8, 0.3).normalize();
-            double lighting = Math.max(0.3, normal.dot(lightDir));
-
-            int r = (int) ((SOLID_COLOR >> 16 & 0xFF) * lighting);
-            int g = (int) ((SOLID_COLOR >> 8 & 0xFF) * lighting);
-            int b = (int) ((SOLID_COLOR & 0xFF) * lighting);
-            int color = 0xFF000000 | (r << 16) | (g << 8) | b;
-
-            // Render triangle
-            for (int j = 0; j < 3; j++) {
-                Vec3d v = mesh.vertex(indices[j]);
-                consumer.addVertex(matrix, (float) v.x(), (float) v.y(), (float) v.z())
-                    .setColor(color)
-                    .setNormal((float) normal.x(), (float) normal.y(), (float) normal.z());
-            }
-        }
-    }
-
-    /**
-     * Computes appropriate scale to fit bounds in viewport.
-     */
     public static float computeFitScale(PipelineResult result, float viewportWidth, float viewportHeight) {
         if (result == null) {
             return 1.0f;
