@@ -33,17 +33,15 @@ This index maps all architecture documents to these layers and tracks their comp
 
 | Document | Status | Description |
 |----------|--------|-------------|
-| [APERTURE-REDEFINED.md](APERTURE-REDEFINED.md) | ✅ | Strategic framework: "Aperture is an Architectural Design Kernel" |
-| [DEVELOPMENT.md](DEVELOPMENT.md) | ✅ | Standard 8-step development process |
-| [01-vision.md](architecture/01-vision.md) | ✅ | Project vision, mission, design tenets with new positioning |
-| [03-module-architecture.md](architecture/03-module-architecture.md) | ✅ | Gradle module structure and dependency rules |
-| [09-folder-structure.md](architecture/09-folder-structure.md) | ✅ | Repository layout |
-| [00-dependency-rules.md](architecture/00-dependency-rules.md) | ✅ | Layer boundary enforcement with CI checks |
+| [01-vision.md](01-vision.md) | ✅ | Project vision, mission, design tenets with new positioning |
+| [03-module-architecture.md](03-module-architecture.md) | ✅ | Gradle module structure and dependency rules |
+| [09-folder-structure.md](09-folder-structure.md) | ✅ | Repository layout |
+| [00-dependency-rules.md](00-dependency-rules.md) | ✅ | Layer boundary enforcement with CI checks |
 
-### Action Items:
-- [x] Update 01-vision.md with new positioning ✅
-- [x] Create 00-dependency-rules.md ✅
-- [x] Add Iron Law to README and CONTRIBUTING ✅
+### Week 4 New Documents:
+- [x] Command History design (editor/03-command-history.md) ✅
+- [x] Preview Renderer design (editor/02-preview-renderer.md) ✅
+- [x] Block Entity Integration (platform/02-block-entity-integration.md) ✅
 
 ---
 
