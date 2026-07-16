@@ -1,22 +1,45 @@
 # Aperture
 
-**Architectural Opening Design System** for Minecraft (Fabric).
+**An Architectural Design Kernel running inside Minecraft.**
 
-Aperture is not a furniture or decoration mod. It is a procedural platform for designing, generating, editing, and placing architectural openings — doors, windows, curtain walls, skylights, and façade elements.
+Aperture is not a door mod or a furniture collection. It is a parametric design platform — a kernel for procedural architectural modeling that happens to run in Minecraft.
+
+Doors, windows, curtain walls, roofs, stairs, and future building components are all **applications** of the kernel, not the kernel itself.
+
+## The Iron Law
+
+> **Every new feature must improve the kernel before it improves a specific building component.**
+
+This ensures Aperture remains an extensible architectural design platform, not a collection of hard-coded Minecraft blocks.
 
 ## Philosophy
 
-Everything is an Opening. Every architectural element is generated from a data-driven, procedural opening definition.
+Everything is parametric. Everything is procedural. Everything is generated from data-driven definitions, never from fixed models.
 
-## Project Structure
+## Architecture
+
+Aperture is organized into four layers:
+
+**Layer 1: Kernel** — Pure abstractions (geometry, parameters, components, constraints)  
+**Layer 2: Platform** — Runtime system connecting Kernel to Minecraft  
+**Layer 3: Editor** — CAD-quality manipulation and design tools  
+**Layer 4: Applications** — Concrete opening and building types
+
+Dependencies flow downward only. The kernel has zero Minecraft dependencies.
 
 ```
-aperture-core/       Pure Java domain model (no Minecraft imports)
-aperture-geometry/   Procedural geometry generators
-aperture-api/        Public extension API for addon mods
-src/                 Fabric mod entrypoints and adapters
-aperture-data/       JSON opening type definitions
-docs/                Architecture documentation
+aperture-core/          Kernel: domain model, parameters, components
+aperture-geometry/      Kernel: geometry primitives (Point, Curve, Mesh, Transform)
+aperture-math/          Kernel: mathematical utilities
+aperture-opening-geometry/  Platform: opening generation pipeline
+aperture-render/        Platform: rendering engine (mesh compiler, delta updates)
+aperture-runtime/       Platform: instance lifecycle, persistence
+aperture-editor/        Editor: selection, manipulation, history
+aperture-fabric/        Platform: Minecraft integration (Fabric mod)
+aperture-api/           Platform: public extension API
+src/                    Fabric mod entrypoints and client rendering
+aperture-data/          Applications: JSON opening type definitions
+docs/                   Architecture documentation (see below)
 ```
 
 ## Documentation
