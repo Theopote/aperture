@@ -73,7 +73,7 @@ public final class ParameterEditorScreen extends Screen {
 
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+		extractBackground(graphics, mouseX, mouseY, partialTick);
 		graphics.text(font, title, width / 2 - font.width(title) / 2, 12, 0xFFFFFFFF, true);
 
 		for (ParameterWidgetFactory.ParameterField field : fields) {
@@ -87,6 +87,8 @@ public final class ParameterEditorScreen extends Screen {
 		if (!statusMessage.isEmpty()) {
 			graphics.text(font, statusMessage, width / 2 - font.width(statusMessage) / 2, height - 40, 0xFFFF5555, false);
 		}
+
+		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
 	}
 
 	@Override
