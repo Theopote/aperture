@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import dev.aperture.core.catalog.BuiltinOpeningTypes;
 import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.core.instance.OpeningInstance;
+import dev.aperture.core.instance.OpeningState;
 import dev.aperture.geometry.export.gltf.GltfExporter;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.geometry.recipe.EmitSolidOp;
@@ -12,6 +13,7 @@ import dev.aperture.geometry.recipe.io.GeometryRecipeCodec;
 import dev.aperture.geometry.recipe.shape.BoxRecipe;
 import dev.aperture.kernel.ApertureKernel;
 import dev.aperture.parameter.ParameterSet;
+import dev.aperture.parameter.ParameterValue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,6 +57,15 @@ class OpeningGenerationServiceTest {
 		assertNotNull(result.collision());
 	}
 
+	@Test
+	void mapsSparseOverridesAndOpeningStateIntoKernelRequest() {
+		OpeningInstance instance = OpeningInstance.builder(BuiltinOpeningTypes.DOOR_ID)
+			.parameters(ParameterSet.of("width", ParameterValue.length(1400.0)))
+			.state(new OpeningState(1.0))
+			.build();
+
+		assertTrue(service.generate(instance).isSuccess());
+	}
 	@Test
 	void exportRecipeJsonRoundTrips() {
 		OpeningInstance instance = OpeningInstance.builder(BuiltinOpeningTypes.FIXED_WINDOW_ID)

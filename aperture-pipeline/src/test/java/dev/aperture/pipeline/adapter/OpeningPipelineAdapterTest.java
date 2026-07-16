@@ -26,7 +26,7 @@ class OpeningPipelineAdapterTest {
 	void executesAllEightStagesWithMillimeterParameters() {
 		PipelineResult result = adapter.execute(
 			"aperture:door",
-			Map.of("width", 1000.0, "height", 2100.0)
+			Map.of("width", 1200.0, "height", 2100.0)
 		);
 
 		assertTrue(result.isSuccess(), result.getFailureMessage());
@@ -52,7 +52,7 @@ class OpeningPipelineAdapterTest {
 
 	@Test
 	void repeatedRequestUsesCacheAndClearInvalidatesIt() {
-		Map<String, Object> parameters = Map.of("width", 1000.0);
+		Map<String, Object> parameters = Map.of("width", 1200.0);
 		adapter.execute("aperture:door", parameters);
 		PipelineResult warm = adapter.execute("aperture:door", parameters);
 		assertTrue(warm.cacheHits() > 0);
@@ -64,7 +64,7 @@ class OpeningPipelineAdapterTest {
 
 	@Test
 	void adapterReportsAggregateCacheStatistics() {
-		Map<String, Object> parameters = Map.of("width", 1000.0);
+		Map<String, Object> parameters = Map.of("width", 1200.0);
 		adapter.execute("aperture:door", parameters);
 		adapter.execute("aperture:door", parameters);
 		assertTrue(adapter.getCacheStats().hits() > 0);

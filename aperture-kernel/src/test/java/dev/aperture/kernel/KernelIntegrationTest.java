@@ -37,7 +37,7 @@ class KernelIntegrationTest {
 	void completeWorkflowReturnsProductionPayload() {
 		OpeningResult result = kernel.generate(new OpeningRequest(
 			"aperture:door",
-			Map.of("width", 1000.0, "height", 2100.0)
+			Map.of("width", 1200.0, "height", 2100.0)
 		));
 
 		OpeningResult.Success success = result.asSuccess();
@@ -50,7 +50,7 @@ class KernelIntegrationTest {
 
 	@Test
 	void repeatedGenerationUpdatesKernelCacheStatistics() {
-		OpeningRequest request = new OpeningRequest("aperture:door", Map.of("width", 1000.0));
+		OpeningRequest request = new OpeningRequest("aperture:door", Map.of("width", 1200.0));
 		assertTrue(kernel.generate(request).isSuccess());
 		assertTrue(kernel.generate(request).isSuccess());
 		assertTrue(kernel.getStats().cacheStats().hits() > 0);
