@@ -414,50 +414,52 @@ public class OpeningRenderer {
 
 ## Pipeline Orchestration
 
-### OpeningGenerationPipeline
+### Kernel-owned production path
 
-**The coordinator that runs all stages**:
+`ApertureKernel` is the only production entry point for opening generation. The runtime does not resolve schemas, validate constraints, select generators, or build geometry.
+
+```text
+OpeningInstance
+    -> OpeningInstanceRequestMapper
+    -> OpeningRequest
+    -> ApertureKernel
+    -> DefinitionStage
+    -> ParameterStage
+    -> ConstraintStage
+    -> ComponentStage
+    -> GeometryStage
+    -> MeshStage
+    -> CollisionStage
+    -> PlacementStage
+    -> OpeningResult
+```
+
+`OpeningResult.Success.output()` contains the geometry pipeline result used by rendering, export, collision, and placement consumers. Intermediate stage data stays inside the unified pipeline.
+
+The production wiring must inject the same `OpeningTypeRegistry` and `ProfileCatalogRegistry` loaded by the platform into `ApertureKernel.builder()`. Creating another registry or profile catalog in Runtime would split the source of truth.
+
+### Runtime boundary
+
+`OpeningGenerationService` is intentionally a thin bridge:
 
 ```java
-public class OpeningGenerationPipeline {
-    private final OpeningParameterResolver paramResolver;
-    private final ComponentGraphBuilder graphBuilder;
-    private final ComponentGenerationOrchestrator componentGenerator;
-    private final MeshGenerator meshGenerator;
-    private final OpeningVoxelizer voxelizer;
-    private final CollisionCalculator collisionCalc;
-    
-    public PipelineResult execute(OpeningTypeDefinition type, Map<String, Object> userParams) {
-        // Stage 1: Already loaded (type definition)
-        
-        // Stage 2: Resolve parameters
-        var params = paramResolver.resolve(type, userParams);
-        
-        // Stage 3: Build component graph
-        var graph = graphBuilder.build(type.components());
-        
-        // Stage 4: Generate components
-        var solids = componentGenerator.generate(graph, params);
-        
-        // Stage 5: Generate mesh
-        var mesh = meshGenerator.generate(solids.values().toList());
-        
-        // Stage 6: Voxelize
-        var materials = resolveMaterials(params);
-        var blockGrid = voxelizer.voxelize(mesh, materials);
-        
-        // Stage 7: Calculate collision
-        var collision = collisionCalc.calculate(blockGrid);
-        
-        return new PipelineResult(mesh, blockGrid, collision, params);
+public final class OpeningGenerationService {
+    private final ApertureKernel kernel;
+    private final OpeningInstanceRequestMapper requestMapper;
+
+    public OpeningResult generate(OpeningInstance instance) {
+        return kernel.generate(requestMapper.map(instance));
     }
 }
 ```
 
-**Current Status**: ⏳ Skeleton exists, some stages incomplete
+`OpeningInstanceRequestMapper` copies the type ID, sparse parameter overrides, and opening state into `OpeningRequest`. Default resolution and state-dependent parameter resolution happen in `ParameterStage`.
+
+The former Runtime `GeneratorRegistry` generation path has been removed. New runtime consumers must not call `OpeningGenerationPipeline` directly.
+
+**Current Status**: Complete - Kernel integrated into Runtime production path.
 
 ---
-
 ## Caching Strategy
 
 ### Why Cache?

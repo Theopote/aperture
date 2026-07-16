@@ -30,6 +30,11 @@ java {
 	withSourcesJar()
 }
 
+processTestResources {
+	from("${rootProject.projectDir}/aperture-data/aperture") {
+		into "aperture"
+	}
+}
 tasks.named('test') {
 	useJUnitPlatform()
 }

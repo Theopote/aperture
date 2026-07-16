@@ -165,7 +165,7 @@ public final class KernelBuilder {
 				asyncThreadPoolSize,
 				runnable -> {
 					Thread thread = new Thread(runnable);
-					thread.setName("aperture-kernel-async-" + thread.getId());
+					thread.setName("aperture-kernel-async-" + thread.threadId());
 					thread.setDaemon(true);
 					return thread;
 				}

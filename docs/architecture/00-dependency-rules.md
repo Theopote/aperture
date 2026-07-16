@@ -20,7 +20,7 @@ The Kernel layer (pure abstractions) must remain Minecraft-free to ensure:
 
 ### Layer 1: Kernel (Pure Abstractions)
 
-**Modules**: `aperture-core`, `aperture-geometry`, `aperture-math`
+**Modules**: `aperture-math`, `aperture-parameter`, `aperture-core`, `aperture-geometry`, `aperture-opening`, `aperture-pipeline`, `aperture-kernel`
 
 **Allowed Dependencies**:
 - ✅ Java Standard Library
@@ -38,7 +38,7 @@ The Kernel layer (pure abstractions) must remain Minecraft-free to ensure:
 
 ### Layer 2: Platform (Runtime System)
 
-**Modules**: `aperture-runtime`, `aperture-fabric`, `aperture-opening-geometry`, `aperture-render`
+**Modules**: `aperture-runtime`, `aperture-render`, `aperture-fabric`
 
 **Allowed Dependencies**:
 - ✅ All Kernel modules

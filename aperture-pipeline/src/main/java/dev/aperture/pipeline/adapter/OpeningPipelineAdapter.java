@@ -65,6 +65,10 @@ public final class OpeningPipelineAdapter {
 		return withCache(0, registry, profiles);
 	}
 
+	public PipelineResult execute(String openingTypeId, java.util.Map<String, Object> userParameters) {
+		return execute(openingTypeId, userParameters, OpeningState.CLOSED);
+	}
+
 	public PipelineResult execute(
 		String openingTypeId,
 		java.util.Map<String, Object> userParameters,
