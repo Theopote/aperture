@@ -1,122 +1,41 @@
 package dev.aperture.pipeline;
 
+import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * Performance metrics collected during pipeline execution.
- */
-public record PipelineMetrics(
-	long totalExecutionTimeMs,
-	Map<String, Long> stageExecutionTimes,
-	int cacheHits,
-	int cacheMisses,
-	int stagesExecuted,
-	int stagesSkipped
-) {
-	public PipelineMetrics {
-		Objects.requireNonNull(stageExecutionTimes, "stageExecutionTimes cannot be null");
-		if (totalExecutionTimeMs < 0) {
-			throw new IllegalArgumentException("totalExecutionTimeMs cannot be negative");
-		}
-		if (cacheHits < 0 || cacheMisses < 0) {
-			throw new IllegalArgumentException("cache hits/misses cannot be negative");
-		}
-		if (stagesExecuted < 0 || stagesSkipped < 0) {
-			throw new IllegalArgumentException("stage counts cannot be negative");
-		}
+public final class PipelineMetrics {
+	private final long totalExecutionNanos;
+	private final Map<String, Long> stageExecutionNanos;
+	private final int cacheHits, cacheMisses, stagesExecuted, stagesSkipped;
+
+	public PipelineMetrics(long totalExecutionNanos, Map<String, Long> stageExecutionNanos,
+		int cacheHits, int cacheMisses, int stagesExecuted, int stagesSkipped) {
+		if (totalExecutionNanos < 0) throw new IllegalArgumentException("totalExecutionNanos cannot be negative");
+		this.totalExecutionNanos = totalExecutionNanos;
+		this.stageExecutionNanos = Map.copyOf(Objects.requireNonNull(stageExecutionNanos));
+		this.cacheHits = cacheHits; this.cacheMisses = cacheMisses;
+		this.stagesExecuted = stagesExecuted; this.stagesSkipped = stagesSkipped;
 	}
+	public Duration totalExecutionTime() { return Duration.ofNanos(totalExecutionNanos); }
+	public long totalExecutionNanos() { return totalExecutionNanos; }
+	public Map<String, Long> stageExecutionNanos() { return stageExecutionNanos; }
+	public Duration stageTime(String stage) { return Duration.ofNanos(stageExecutionNanos.getOrDefault(stage, 0L)); }
+	public int cacheHits() { return cacheHits; }
+	public int cacheMisses() { return cacheMisses; }
+	public int stagesExecuted() { return stagesExecuted; }
+	public int stagesSkipped() { return stagesSkipped; }
+	public int stageCount() { return stagesExecuted + stagesSkipped; }
+	public double cacheHitRate() { int total=cacheHits+cacheMisses; return total==0?0.0:(double)cacheHits/total; }
 
-	/**
-	 * Calculate cache hit rate (0.0 to 1.0).
-	 */
-	public double cacheHitRate() {
-		int total = cacheHits + cacheMisses;
-		return total == 0 ? 0.0 : (double) cacheHits / total;
+	public static final class Builder {
+		private long totalNanos; private final Map<String,Long> stageNanos=new LinkedHashMap<>();
+		private int hits, misses, executed, skipped;
+		public Builder totalTime(long nanos){totalNanos=nanos;return this;}
+		public Builder stageTime(String stage,long nanos){stageNanos.put(stage,nanos);return this;}
+		public Builder cacheHit(){hits++;return this;} public Builder cacheMiss(){misses++;return this;}
+		public Builder stageExecuted(){executed++;return this;} public Builder stageSkipped(){skipped++;return this;}
+		public PipelineMetrics build(){return new PipelineMetrics(totalNanos,stageNanos,hits,misses,executed,skipped);}
 	}
-
-	/**
-	 * Get execution time for a specific stage.
-	 */
-	public long getStageTime(String stageName) {
-		Objects.requireNonNull(stageName, "stageName cannot be null");
-		return stageExecutionTimes.getOrDefault(stageName, 0L);
-	}
-
-	/**
-	 * Format metrics as a human-readable report.
-	 */
-	public String formatReport() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("Pipeline Execution Report:\n");
-		sb.append(String.format("  Total Time: %dms\n", totalExecutionTimeMs));
-		sb.append(String.format("  Stages Executed: %d\n", stagesExecuted));
-		sb.append(String.format("  Stages Skipped: %d\n", stagesSkipped));
-		sb.append(String.format("  Cache Hit Rate: %.1f%%\n", cacheHitRate() * 100));
-		sb.append("  Stage Times:\n");
-
-		stageExecutionTimes.entrySet().stream()
-			.sorted(Map.Entry.comparingByKey())
-			.forEach(entry ->
-				sb.append(String.format("    %s: %dms\n", entry.getKey(), entry.getValue()))
-			);
-
-		return sb.toString();
-	}
-
-	/**
-	 * Builder for constructing metrics incrementally.
-	 */
-	public static class Builder {
-		private long totalTime = 0;
-		private final Map<String, Long> stageTimes = new java.util.LinkedHashMap<>();
-		private int cacheHits = 0;
-		private int cacheMisses = 0;
-		private int stagesExecuted = 0;
-		private int stagesSkipped = 0;
-
-		public Builder totalTime(long ms) {
-			this.totalTime = ms;
-			return this;
-		}
-
-		public Builder stageTime(String stageName, long ms) {
-			stageTimes.put(stageName, ms);
-			return this;
-		}
-
-		public Builder cacheHit() {
-			this.cacheHits++;
-			return this;
-		}
-
-		public Builder cacheMiss() {
-			this.cacheMisses++;
-			return this;
-		}
-
-		public Builder stageExecuted() {
-			this.stagesExecuted++;
-			return this;
-		}
-
-		public Builder stageSkipped() {
-			this.stagesSkipped++;
-			return this;
-		}
-
-		public PipelineMetrics build() {
-			return new PipelineMetrics(
-				totalTime,
-				Map.copyOf(stageTimes),
-				cacheHits,
-				cacheMisses,
-				stagesExecuted,
-				stagesSkipped
-			);
-		}
-	}
-
-	public int stageCount() {
-		return stagesExecuted + stagesSkipped;
-	}}
+}

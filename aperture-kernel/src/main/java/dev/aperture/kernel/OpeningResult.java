@@ -1,6 +1,6 @@
 package dev.aperture.kernel;
 
-import dev.aperture.pipeline.stage.PlacementStage;
+import dev.aperture.pipeline.stage.BasicPlacementMetadataStage;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -17,7 +17,7 @@ public sealed interface OpeningResult {
 	record Success(
 		String typeId,
 		dev.aperture.geometry.pipeline.PipelineResult output,
-		PlacementStage.PlacementInfo placement,
+		BasicPlacementMetadataStage.PlacementInfo placement,
 		GenerationMetrics metrics
 	) implements OpeningResult {
 		public Success {
@@ -40,7 +40,7 @@ public sealed interface OpeningResult {
 		/**
 		 * Get the final placement information.
 		 */
-		public PlacementStage.PlacementInfo getPlacement() {
+		public BasicPlacementMetadataStage.PlacementInfo getPlacement() {
 			return placement;
 		}
 
@@ -60,63 +60,18 @@ public sealed interface OpeningResult {
 	/**
 	 * Failed generation result.
 	 */
-	record Failure(
-		String typeId,
-		String failedStage,
-		String errorMessage,
-		Throwable cause
-	) implements OpeningResult {
-		public Failure {
-			Objects.requireNonNull(typeId, "typeId cannot be null");
-			Objects.requireNonNull(failedStage, "failedStage cannot be null");
-			Objects.requireNonNull(errorMessage, "errorMessage cannot be null");
-			// cause can be null
-		}
-
-		/**
-		 * Convenience constructor without cause.
-		 */
-		public Failure(String typeId, String failedStage, String errorMessage) {
-			this(typeId, failedStage, errorMessage, null);
-		}
-
-		@Override
-		public boolean isSuccess() {
-			return false;
-		}
-
-		@Override
-		public String typeId() {
-			return typeId;
-		}
-
-		/**
-		 * Get the failed stage name.
-		 */
-		public String stage() {
-			return failedStage;
-		}
-
-		/**
-		 * Get the error message.
-		 */
-		public String message() {
-			return errorMessage;
-		}
-
-		/**
-		 * Get optional cause.
-		 */
-		public Optional<Throwable> getCause() {
-			return Optional.ofNullable(cause);
-		}
-
-		@Override
-		public boolean isFailure() {
-			return true;
-		}
+	record Failure(String typeId, KernelDiagnostic diagnostic) implements OpeningResult {
+		public Failure { Objects.requireNonNull(typeId, "typeId"); Objects.requireNonNull(diagnostic, "diagnostic"); }
+		@Override public boolean isSuccess() { return false; }
+		@Override public String typeId() { return typeId; }
+		public String failedStage() { return diagnostic.stage().externalName(); }
+		public String errorMessage() { return diagnostic.message(); }
+		public Throwable cause() { return diagnostic.cause(); }
+		public String stage() { return failedStage(); }
+		public String message() { return diagnostic.message(); }
+		public Optional<Throwable> getCause() { return Optional.ofNullable(diagnostic.cause()); }
+		@Override public boolean isFailure() { return true; }
 	}
-
 	/**
 	 * Check if generation was successful.
 	 */

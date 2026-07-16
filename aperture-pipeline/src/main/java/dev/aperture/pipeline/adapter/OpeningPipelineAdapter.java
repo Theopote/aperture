@@ -10,14 +10,14 @@ import dev.aperture.pipeline.Pipeline;
 import dev.aperture.pipeline.PipelineBuilder;
 import dev.aperture.pipeline.PipelineCache;
 import dev.aperture.pipeline.PipelineResult;
-import dev.aperture.pipeline.stage.CollisionStage;
+import dev.aperture.pipeline.stage.BoundingBoxCollisionStage;
 import dev.aperture.pipeline.stage.ComponentStage;
 import dev.aperture.pipeline.stage.ConstraintStage;
 import dev.aperture.pipeline.stage.DefinitionStage;
 import dev.aperture.pipeline.stage.GeometryStage;
 import dev.aperture.pipeline.stage.MeshStage;
 import dev.aperture.pipeline.stage.ParameterStage;
-import dev.aperture.pipeline.stage.PlacementStage;
+import dev.aperture.pipeline.stage.BasicPlacementMetadataStage;
 
 /** Configures the sole production orchestration pipeline for opening generation. */
 public final class OpeningPipelineAdapter {
@@ -64,8 +64,8 @@ public final class OpeningPipelineAdapter {
 			.addStage(new ComponentStage(componentPlanner))
 			.addStage(new GeometryStage(geometryCompiler, profiles))
 			.addStage(new MeshStage(meshCompiler))
-			.addStage(new CollisionStage())
-			.addStage(new PlacementStage())
+			.addStage(new BoundingBoxCollisionStage())
+			.addStage(new BasicPlacementMetadataStage())
 			.withCache(new PipelineCache(cacheCapacity))
 			.build();
 		return new OpeningPipelineAdapter(pipeline);

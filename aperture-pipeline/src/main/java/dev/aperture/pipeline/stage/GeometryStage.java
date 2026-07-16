@@ -69,7 +69,7 @@ public final class GeometryStage implements PipelineStage<ComponentStage.Planned
 				geometry
 			));
 		} catch (Exception exception) {
-			return new StageResult.Failure<>("Failed to compile geometry: " + exception.getMessage(), exception);
+			return new StageResult.Failure<>(dev.aperture.pipeline.DiagnosticCode.GEOMETRY_COMPILATION_FAILED, "Failed to compile geometry: " + exception.getMessage(), exception);
 		}
 	}
 

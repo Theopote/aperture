@@ -7,20 +7,20 @@ import java.util.Objects;
  *
  * @param stageName Name of the stage that produced this output
  * @param value Output value (type depends on the stage)
- * @param executionTimeMs Time taken to execute this stage (milliseconds)
+ * @param executionTimeNanos Time taken to execute this stage (nanoseconds)
  * @param fromCache Whether this result came from cache (true) or fresh execution (false)
  */
 public record StageOutput(
 	String stageName,
 	Object value,
-	long executionTimeMs,
+	long executionTimeNanos,
 	boolean fromCache
 ) {
 	public StageOutput {
 		Objects.requireNonNull(stageName, "stageName cannot be null");
 		Objects.requireNonNull(value, "value cannot be null");
-		if (executionTimeMs < 0) {
-			throw new IllegalArgumentException("executionTimeMs cannot be negative");
+		if (executionTimeNanos < 0) {
+			throw new IllegalArgumentException("executionTimeNanos cannot be negative");
 		}
 	}
 

@@ -41,7 +41,7 @@ public final class ComponentStage implements PipelineStage<ConstraintStage.Valid
 				new PlannedOpening(input.typeDefinition(), input.parameters(), plan)
 			);
 		} catch (Exception exception) {
-			return new StageResult.Failure<>("Failed to build component plan: " + exception.getMessage(), exception);
+			return new StageResult.Failure<>(dev.aperture.pipeline.DiagnosticCode.COMPONENT_GRAPH_INVALID, "Failed to build component plan: " + exception.getMessage(), exception);
 		}
 	}
 

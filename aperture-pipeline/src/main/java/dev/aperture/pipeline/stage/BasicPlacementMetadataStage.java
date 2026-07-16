@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /** Calculates platform-neutral placement metadata from collision bounds. */
-public final class PlacementStage implements PipelineStage<BoundingBox, PlacementStage.PlacementInfo> {
+public final class BasicPlacementMetadataStage implements PipelineStage<BoundingBox, BasicPlacementMetadataStage.PlacementInfo> {
 	@Override
 	public String name() {
 		return "placement";

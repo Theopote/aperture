@@ -54,7 +54,7 @@ public final class MeshStage implements PipelineStage<GeometryStage.GeometryComp
 		try {
 			return new StageResult.Success<>(compiler.compile(input.geometry().result()));
 		} catch (Exception exception) {
-			return new StageResult.Failure<>("Failed to compile mesh: " + exception.getMessage(), exception);
+			return new StageResult.Failure<>(dev.aperture.pipeline.DiagnosticCode.MESH_COMPILATION_FAILED, "Failed to compile mesh: " + exception.getMessage(), exception);
 		}
 	}
 }

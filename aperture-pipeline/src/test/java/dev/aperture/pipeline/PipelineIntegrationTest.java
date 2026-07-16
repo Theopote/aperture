@@ -30,8 +30,8 @@ class PipelineIntegrationTest {
 			.addStage(PipelineTestFactory.componentStage())
 			.addStage(PipelineTestFactory.geometryStage())
 			.addStage(PipelineTestFactory.meshStage())
-			.addStage(new CollisionStage())
-			.addStage(new PlacementStage())
+			.addStage(new BoundingBoxCollisionStage())
+			.addStage(new BasicPlacementMetadataStage())
 			.withCache(cache)
 			.build();
 	}
@@ -60,7 +60,7 @@ class PipelineIntegrationTest {
 
 		// Verify final output is PlacementInfo
 		assertInstanceOf(
-			PlacementStage.PlacementInfo.class,
+			BasicPlacementMetadataStage.PlacementInfo.class,
 			result.getFinalOutput(),
 			"Final output should be PlacementInfo"
 		);
@@ -106,8 +106,8 @@ class PipelineIntegrationTest {
 			.addStage(PipelineTestFactory.componentStage())
 			.addStage(PipelineTestFactory.geometryStage())
 			.addStage(PipelineTestFactory.meshStage())
-			.addStage(new CollisionStage())
-			.addStage(new PlacementStage())
+			.addStage(new BoundingBoxCollisionStage())
+			.addStage(new BasicPlacementMetadataStage())
 			.build();
 
 		// Input with constraint violations

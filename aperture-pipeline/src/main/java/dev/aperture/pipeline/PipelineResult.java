@@ -72,42 +72,19 @@ public sealed interface PipelineResult {
 	/**
 	 * Failed pipeline execution with error details and partial results.
 	 */
-	record Failure(
-		String failedStage,
-		String errorMessage,
-		Throwable cause,
-		Map<String, StageOutput> partialOutputs
-	) implements PipelineResult {
-		public Failure {
-			Objects.requireNonNull(failedStage, "failedStage cannot be null");
-			Objects.requireNonNull(errorMessage, "errorMessage cannot be null");
-			Objects.requireNonNull(partialOutputs, "partialOutputs cannot be null");
+	record Failure(PipelineDiagnostic diagnostic, Map<String, StageOutput> partialOutputs) implements PipelineResult {
+		public Failure { Objects.requireNonNull(diagnostic, "diagnostic"); Objects.requireNonNull(partialOutputs, "partialOutputs"); }
+		public Failure(String failedStage, String errorMessage, Throwable cause, Map<String, StageOutput> outputs) {
+			this(PipelineDiagnostic.error(DiagnosticCode.INTERNAL_ERROR, StageId.fromExternalName(failedStage), errorMessage, cause), outputs);
 		}
-
-		public Failure(String failedStage, String errorMessage) {
-			this(failedStage, errorMessage, null, Map.of());
-		}
-
-		@Override
-		public boolean isSuccess() {
-			return false;
-		}
-
-		/**
-		 * Check if there are any partial outputs from stages before failure.
-		 */
-		public boolean hasPartialResults() {
-			return !partialOutputs.isEmpty();
-		}
-
-		/**
-		 * Get partial output from a specific stage (executed before failure).
-		 */
-		public Optional<StageOutput> getPartialOutput(String stageName) {
-			return Optional.ofNullable(partialOutputs.get(stageName));
-		}
+		public Failure(String failedStage, String errorMessage) { this(failedStage, errorMessage, null, Map.of()); }
+		public String failedStage() { return diagnostic.stage().externalName(); }
+		public String errorMessage() { return diagnostic.message(); }
+		public Throwable cause() { return diagnostic.cause(); }
+		@Override public boolean isSuccess() { return false; }
+		public boolean hasPartialResults() { return !partialOutputs.isEmpty(); }
+		public Optional<StageOutput> getPartialOutput(String stageName) { return Optional.ofNullable(partialOutputs.get(stageName)); }
 	}
-
 	/**
 	 * Check if pipeline execution was successful.
 	 */
@@ -168,11 +145,11 @@ public sealed interface PipelineResult {
 	/**
 	 * Get execution time in milliseconds.
 	 */
-	default long executionTimeMs() {
+	default java.time.Duration executionTime() {
 		if (this instanceof Success success) {
-			return success.metrics().totalExecutionTimeMs();
+			return success.metrics().totalExecutionTime();
 		}
-		return 0;
+		return java.time.Duration.ZERO;
 	}
 
 	/**

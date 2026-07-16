@@ -23,7 +23,7 @@ public final class Pipeline {
 		StageContext ctx = new StageContext(options);
 		Map<String, StageOutput> outputs = new LinkedHashMap<>();
 		PipelineMetrics.Builder metrics = new PipelineMetrics.Builder();
-		long started = System.currentTimeMillis();
+		long started = System.nanoTime();
 		Object currentInput = initialInput;
 
 		ctx.log("Starting pipeline execution with " + stages.size() + " stages");
@@ -56,9 +56,9 @@ public final class Pipeline {
 				metrics.cacheMiss();
 			}
 
-			long stageStarted = System.currentTimeMillis();
+			long stageStarted = System.nanoTime();
 			StageResult<?> result = executeStage(stage, currentInput, ctx);
-			long duration = System.currentTimeMillis() - stageStarted;
+			long duration = System.nanoTime() - stageStarted;
 			metrics.stageTime(stageName, duration);
 			if (!result.isSuccess()) {
 				return failure(
@@ -88,7 +88,7 @@ public final class Pipeline {
 			currentInput = output;
 		}
 
-		metrics.totalTime(System.currentTimeMillis() - started);
+		metrics.totalTime(System.nanoTime() - started);
 		return new PipelineResult.Success(outputs, metrics.build(), currentInput);
 	}
 
@@ -100,7 +100,7 @@ public final class Pipeline {
 		PipelineMetrics.Builder metrics,
 		long started
 	) {
-		metrics.totalTime(System.currentTimeMillis() - started);
+		metrics.totalTime(System.nanoTime() - started);
 		return new PipelineResult.Failure(stage, message, cause, outputs);
 	}
 

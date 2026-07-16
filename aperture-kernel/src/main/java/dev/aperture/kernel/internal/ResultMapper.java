@@ -7,7 +7,7 @@ import dev.aperture.geometry.pipeline.mesh.MeshAssembly;
 import dev.aperture.math.BoundingBox;
 import dev.aperture.pipeline.stage.GeometryStage;
 import dev.aperture.pipeline.PipelineResult;
-import dev.aperture.pipeline.stage.PlacementStage;
+import dev.aperture.pipeline.stage.BasicPlacementMetadataStage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,8 +27,8 @@ public final class ResultMapper {
 		OpeningRequest request,
 		PipelineResult.Success pipelineResult
 	) {
-		PlacementStage.PlacementInfo placement = requireStage(
-			pipelineResult, "placement", PlacementStage.PlacementInfo.class
+		BasicPlacementMetadataStage.PlacementInfo placement = requireStage(
+			pipelineResult, "placement", BasicPlacementMetadataStage.PlacementInfo.class
 		);
 		GeometryStage.GeometryCompilation compilation = requireStage(
 			pipelineResult, "geometry", GeometryStage.GeometryCompilation.class

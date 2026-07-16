@@ -3,7 +3,7 @@ package dev.aperture.pipeline.adapter;
 import dev.aperture.pipeline.PipelineResult;
 import dev.aperture.pipeline.PipelineTestFactory;
 import dev.aperture.pipeline.stage.DefinitionStage;
-import dev.aperture.pipeline.stage.PlacementStage;
+import dev.aperture.pipeline.stage.BasicPlacementMetadataStage;
 import dev.aperture.pipeline.stage.GeometryStage;
 import dev.aperture.geometry.pipeline.mesh.MeshAssembly;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +34,7 @@ class OpeningPipelineAdapterTest {
 
 		assertTrue(result.isSuccess(), result.getFailureMessage());
 		assertEquals(8, result.stageCount());
-		assertInstanceOf(PlacementStage.PlacementInfo.class, result.getFinalOutput());
+		assertInstanceOf(BasicPlacementMetadataStage.PlacementInfo.class, result.getFinalOutput());
 	}
 
 	@Test
@@ -88,12 +88,12 @@ class OpeningPipelineAdapterTest {
 	}
 
 	@Test
-	void exposesGeometryAndPlacementStageOutputs() {
+	void exposesGeometryAndBasicPlacementMetadataStageOutputs() {
 		PipelineResult result = adapter.execute("aperture:door", Map.of());
 		PipelineResult.Success success = assertInstanceOf(PipelineResult.Success.class, result);
 		assertInstanceOf(GeometryStage.GeometryCompilation.class, success.getStageValue("geometry").orElseThrow());
 		assertInstanceOf(MeshAssembly.class, success.getStageValue("mesh").orElseThrow());
-		assertInstanceOf(PlacementStage.PlacementInfo.class, success.getStageValue("placement").orElseThrow());
+		assertInstanceOf(BasicPlacementMetadataStage.PlacementInfo.class, success.getStageValue("placement").orElseThrow());
 	}
 
 	@Test

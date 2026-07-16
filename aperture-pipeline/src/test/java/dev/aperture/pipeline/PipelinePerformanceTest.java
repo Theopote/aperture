@@ -36,8 +36,8 @@ class PipelinePerformanceTest {
 			.addStage(PipelineTestFactory.componentStage())
 			.addStage(PipelineTestFactory.geometryStage())
 			.addStage(PipelineTestFactory.meshStage())
-			.addStage(new CollisionStage())
-			.addStage(new PlacementStage())
+			.addStage(new BoundingBoxCollisionStage())
+			.addStage(new BasicPlacementMetadataStage())
 			.withCache(cache)
 			.build();
 	}

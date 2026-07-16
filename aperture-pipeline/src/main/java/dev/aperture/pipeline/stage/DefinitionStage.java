@@ -43,16 +43,16 @@ public final class DefinitionStage implements PipelineStage<DefinitionStage.Open
 		try {
 			typeDefinition = registry.get(OpeningId.parse(typeId)).orElse(null);
 		} catch (IllegalArgumentException exception) {
-			return new StageResult.Failure<>("Invalid opening type ID: " + request.typeId(), exception);
+			return new StageResult.Failure<>(dev.aperture.pipeline.DiagnosticCode.INVALID_TYPE_ID, "Invalid opening type ID: " + request.typeId(), exception);
 		}
 		if (typeDefinition == null) {
-			return new StageResult.Failure<>("Unknown opening type: " + request.typeId());
+			return new StageResult.Failure<>(dev.aperture.pipeline.DiagnosticCode.TYPE_NOT_FOUND, "Unknown opening type: " + request.typeId());
 		}
 
 		ParametricEditor editor = ParametricEditor.fromDefinition(typeDefinition, ParameterSet.empty());
 		var patchResult = editor.patch(normalizeParameterValues(request.userParameters()));
 		if (!patchResult.success()) {
-			return new StageResult.Failure<>("Invalid opening parameters: " + patchResult.issues());
+			return new StageResult.Failure<>(dev.aperture.pipeline.DiagnosticCode.PARAMETER_OUT_OF_RANGE, "Invalid opening parameters: " + patchResult.issues());
 		}
 		return new StageResult.Success<>(
 			new ParameterStage.ResolvedDefinition(typeDefinition, editor.overridesOnly(), request.state())

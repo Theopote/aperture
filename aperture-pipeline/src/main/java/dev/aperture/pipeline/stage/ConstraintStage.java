@@ -45,7 +45,7 @@ public final class ConstraintStage implements PipelineStage<ParameterStage.Resol
 				.map(ValidationIssue::message)
 				.reduce((left, right) -> left + "; " + right)
 				.orElse("Unknown constraint violation");
-			return new StageResult.Failure<>("Constraint validation failed: " + message);
+			return new StageResult.Failure<>(dev.aperture.pipeline.DiagnosticCode.CONSTRAINT_VIOLATION, "Constraint validation failed: " + message);
 		}
 		return new StageResult.Success<>(new ValidatedParameters(input.parameters(), input.typeDefinition()));
 	}
