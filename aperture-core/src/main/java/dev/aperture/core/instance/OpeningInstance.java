@@ -82,6 +82,19 @@ public record OpeningInstance(
 		);
 	}
 
+	public OpeningInstance withState(OpeningState newState) {
+		return new OpeningInstance(
+			schemaVersion,
+			instanceId,
+			typeId,
+			parameters,
+			transform,
+			host,
+			newState,
+			revision
+		);
+	}
+
 	public static final class Builder {
 		private final OpeningId typeId;
 		private UUID instanceId = UUID.randomUUID();

@@ -6,6 +6,7 @@ import dev.aperture.core.placement.PlacementService;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 import dev.aperture.runtime.catalog.MaterialCatalogRegistry;
 import dev.aperture.runtime.registry.MaterialResolverRegistry;
+import dev.aperture.runtime.pipeline.RuntimePipeline;
 import dev.aperture.runtime.service.OpeningGenerationService;
 
 /**
@@ -22,6 +23,7 @@ public final class ApertureRuntime {
 	private final OpeningInstanceStore instances;
 	private final OpeningGenerationService generation;
 	private final PlacementService placement;
+	private final RuntimePipeline runtimePipeline;
 
 	public ApertureRuntime(
 		OpeningTypeRegistry openingTypes,
@@ -30,7 +32,8 @@ public final class ApertureRuntime {
 		MaterialResolverRegistry materials,
 		OpeningInstanceStore instances,
 		OpeningGenerationService generation,
-		PlacementService placement
+		PlacementService placement,
+		RuntimePipeline runtimePipeline
 	) {
 		this.openingTypes = openingTypes;
 		this.profiles = profiles;
@@ -39,6 +42,7 @@ public final class ApertureRuntime {
 		this.instances = instances;
 		this.generation = generation;
 		this.placement = placement;
+		this.runtimePipeline = runtimePipeline;
 	}
 
 	public static void init(ApertureRuntime runtime) {
@@ -78,5 +82,9 @@ public final class ApertureRuntime {
 
 	public PlacementService placement() {
 		return placement;
+	}
+
+	public RuntimePipeline runtimePipeline() {
+		return runtimePipeline;
 	}
 }

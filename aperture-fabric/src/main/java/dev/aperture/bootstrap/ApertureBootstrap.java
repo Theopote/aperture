@@ -22,6 +22,9 @@ import dev.aperture.runtime.catalog.MaterialCatalogRegistry;
 import dev.aperture.runtime.material.CatalogMaterialResolver;
 import dev.aperture.runtime.material.VanillaMaterialResolver;
 import dev.aperture.runtime.registry.MaterialResolverRegistry;
+import dev.aperture.runtime.pipeline.OpeningInstanceRepository;
+import dev.aperture.runtime.pipeline.OpeningRuntimeBehavior;
+import dev.aperture.runtime.pipeline.RuntimePipeline;
 import dev.aperture.runtime.service.OpeningGenerationService;
 import java.util.List;
 import org.slf4j.Logger;
@@ -47,6 +50,10 @@ public final class ApertureBootstrap {
 	private final OpeningGenerationService generation = new OpeningGenerationService(kernel);
 	private final PlacementService placement = new PlacementService(openingTypes, instances);
 	private final FabricPlacementAdapter fabricPlacement = new FabricPlacementAdapter();
+	private final RuntimePipeline runtimePipeline = new RuntimePipeline(
+		List.of(new OpeningRuntimeBehavior(openingTypes)),
+		new OpeningInstanceRepository(instances)
+	);
 
 	public void initialize() {
 		registerBlocks();
@@ -59,7 +66,8 @@ public final class ApertureBootstrap {
 			materials,
 			instances,
 			generation,
-			placement
+			placement,
+			runtimePipeline
 		));
 		verifyReferencePipeline();
 		LOGGER.info("Aperture runtime bootstrap complete - {} opening types", openingTypes.all().size());
