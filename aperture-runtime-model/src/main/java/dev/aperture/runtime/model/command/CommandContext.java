@@ -3,7 +3,7 @@ package dev.aperture.runtime.model.command;
 import dev.aperture.runtime.model.capability.CapabilityProvider;
 import dev.aperture.runtime.model.object.ArchitecturalObjectInstance;
 import dev.aperture.runtime.model.state.RuntimeState;
-import dev.aperture.runtime.model.world.WorldQuery;
+import dev.aperture.runtime.model.world.WorldQueryExecutor;
 
 import java.util.Objects;
 
@@ -12,7 +12,7 @@ public record CommandContext(
 	ArchitecturalObjectInstance instance,
 	RuntimeState state,
 	CapabilityProvider capabilities,
-	WorldQuery worldQuery
+	WorldQueryExecutor worldQuery
 ) {
 	public CommandContext {
 		Objects.requireNonNull(instance, "instance");

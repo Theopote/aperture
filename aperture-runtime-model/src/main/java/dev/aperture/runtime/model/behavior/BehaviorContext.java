@@ -6,7 +6,7 @@ import dev.aperture.runtime.model.event.ArchitecturalEvent;
 import dev.aperture.runtime.model.event.EventEnvelope;
 import dev.aperture.runtime.model.object.ArchitecturalObjectInstance;
 import dev.aperture.runtime.model.state.RuntimeState;
-import dev.aperture.runtime.model.world.WorldQuery;
+import dev.aperture.runtime.model.world.WorldQueryExecutor;
 
 import java.util.Objects;
 
@@ -17,7 +17,7 @@ public record BehaviorContext(
 	ParameterSet parameters,
 	CapabilityProvider capabilities,
 	EventEnvelope<? extends ArchitecturalEvent> event,
-	WorldQuery worldQuery
+	WorldQueryExecutor worldQuery
 ) {
 	public BehaviorContext {
 		Objects.requireNonNull(instance, "instance");
