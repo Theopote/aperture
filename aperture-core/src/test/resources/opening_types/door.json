@@ -2,6 +2,19 @@
   "schemaVersion": 1,
   "id": "aperture:door",
   "category": "door",
+  "stateSchema": {
+    "openRatio": { "type": "number", "default": 0, "min": 0, "max": 1, "persistent": true },
+    "locked": { "type": "boolean", "default": false, "persistent": true },
+    "enabled": { "type": "boolean", "default": true, "persistent": true },
+    "operatingMode": { "type": "enum", "default": "manual", "values": ["manual", "automatic", "redstone", "maintenance"], "persistent": true },
+    "durability": { "type": "number", "default": 1, "min": 0, "max": 1, "persistent": true },
+    "accessPolicy": { "type": "string", "default": "public", "persistent": true },
+    "targetOpenRatio": { "type": "number", "default": 0, "min": 0, "max": 1, "persistent": false },
+    "velocity": { "type": "number", "default": 0, "persistent": false },
+    "motion": { "type": "enum", "default": "idle", "values": ["idle", "opening", "closing", "blocked"], "persistent": false },
+    "activeInteractor": { "type": "string", "default": "", "persistent": false },
+    "lastEventTime": { "type": "number", "default": 0, "min": 0, "persistent": false }
+  },
   "generator": "aperture:rectangular_window_v1",
   "parameters": {
     "width": {

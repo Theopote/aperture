@@ -12,6 +12,8 @@ import dev.aperture.core.instance.HostBinding;
 import dev.aperture.core.instance.HostType;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.instance.OpeningState;
+import dev.aperture.core.instance.OpeningStateSchemas;
+import dev.aperture.core.state.RuntimeState;
 import dev.aperture.core.opening.OpeningId;
 import dev.aperture.core.parametric.ParameterSetJson;
 import dev.aperture.parameter.ParameterSet;
@@ -97,9 +99,12 @@ public final class OpeningInstanceCodec implements JsonCodec<OpeningInstance> {
 			? readHost(root.getAsJsonObject("host"))
 			: HostBinding.freeStanding();
 
+		var stateSchema = definition.stateSchema().properties().isEmpty()
+			? OpeningStateSchemas.OPERABLE
+			: definition.stateSchema();
 		OpeningState state = root.has("state")
-			? readState(root.getAsJsonObject("state"))
-			: OpeningState.CLOSED;
+			? readState(root.getAsJsonObject("state"), stateSchema)
+			: new OpeningState(RuntimeState.initial(stateSchema));
 
 		long revision = root.has("revision") ? root.get("revision").getAsLong() : 0L;
 
@@ -146,13 +151,10 @@ public final class OpeningInstanceCodec implements JsonCodec<OpeningInstance> {
 	}
 
 	private static JsonObject writeState(OpeningState state) {
-		JsonObject object = new JsonObject();
-		object.addProperty("openRatio", state.openRatio());
-		return object;
+		return RuntimeStateJson.writePersistent(state.runtimeState());
 	}
 
-	private static OpeningState readState(JsonObject object) {
-		double openRatio = object.has("openRatio") ? object.get("openRatio").getAsDouble() : 0.0;
-		return new OpeningState(openRatio);
+	private static OpeningState readState(JsonObject object, dev.aperture.core.state.StateSchema schema) {
+		return new OpeningState(RuntimeStateJson.readPersistent(schema, object));
 	}
 }

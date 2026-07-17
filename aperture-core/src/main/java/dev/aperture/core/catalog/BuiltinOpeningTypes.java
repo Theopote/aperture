@@ -2,6 +2,7 @@ package dev.aperture.core.catalog;
 
 import dev.aperture.core.component.ComponentAssemblyPresets;
 import dev.aperture.core.definition.OpeningTypeDefinition;
+import dev.aperture.core.instance.OpeningStateSchemas;
 import dev.aperture.core.opening.GeneratorId;
 import dev.aperture.core.opening.OpeningCategory;
 import dev.aperture.core.opening.OpeningId;
@@ -88,6 +89,7 @@ public final class BuiltinOpeningTypes {
 	 */
 	public static OpeningTypeDefinition door() {
 		return OpeningTypeDefinition.builder(DOOR_ID, OpeningCategory.DOOR, RECTANGULAR_WINDOW_GENERATOR)
+			.stateSchema(OpeningStateSchemas.OPERABLE)
 			.parameter("width", RangeParameter.builder(NumberUnit.LENGTH_MM)
 				.defaultNumber(1200)
 				.min(600)

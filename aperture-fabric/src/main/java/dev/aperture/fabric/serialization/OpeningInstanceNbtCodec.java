@@ -4,7 +4,11 @@ import dev.aperture.core.instance.HostBinding;
 import dev.aperture.core.instance.HostType;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.instance.OpeningState;
+import dev.aperture.core.instance.OpeningStateSchemas;
 import dev.aperture.core.opening.OpeningId;
+import dev.aperture.core.state.RuntimeState;
+import dev.aperture.core.state.StatePropertyType;
+import dev.aperture.core.state.StatePropertyDefinition;
 import dev.aperture.math.Facing;
 import dev.aperture.math.Transform3d;
 import dev.aperture.math.Vec3d;
@@ -14,6 +18,8 @@ import dev.aperture.parameter.ParameterValue;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -33,7 +39,7 @@ output.putString("typeId", instance.typeId().namespace() + ":" + instance.typeId
 writeParameters(output, instance.parameters());
 writeTransform(output, instance.transform());
 writeHostBinding(output, instance.host());
-output.putDouble("openRatio", instance.state().openRatio());
+writeRuntimeState(output, instance.state().runtimeState());
 output.putLong("revision", instance.revision());
 }
 
@@ -46,9 +52,73 @@ OpeningId typeId = OpeningId.parse(input.getStringOr("typeId", "aperture:unknown
 ParameterSet parameters = readParameters(input);
 Transform3d transform = readTransform(input);
 HostBinding host = readHostBinding(input);
-OpeningState state = new OpeningState(input.getDoubleOr("openRatio", 0.0));
+OpeningState state = readRuntimeState(input);
 long revision = input.getLongOr("revision", 0L);
 return new OpeningInstance(schemaVersion, instanceId, typeId, parameters, transform, host, state, revision);
+}
+
+// --- Runtime state ---
+
+private static void writeRuntimeState(ValueOutput output, RuntimeState state) {
+output.putLong("stateRevision", state.revision());
+output.putString("stateTimestamp", state.timestamp().toString());
+int index = 0;
+for (Map.Entry<String, Object> entry : state.persistentProperties().entrySet()) {
+String prefix = "state_" + index + "_";
+StatePropertyType type = state.schema().require(entry.getKey()).type();
+output.putString(prefix + "key", entry.getKey());
+output.putString(prefix + "type", type.name());
+switch (type) {
+case NUMBER -> output.putDouble(prefix + "number", ((Number) entry.getValue()).doubleValue());
+case BOOLEAN -> output.putBoolean(prefix + "boolean", (Boolean) entry.getValue());
+case STRING, ENUM -> output.putString(prefix + "string", (String) entry.getValue());
+}
+index++;
+}
+output.putInt("statePropertyCount", index);
+}
+
+private static OpeningState readRuntimeState(ValueInput input) {
+int count = input.getIntOr("statePropertyCount", 0);
+if (count == 0) {
+return new OpeningState(input.getDoubleOr("openRatio", 0.0));
+}
+
+Map<String, Object> persistent = new LinkedHashMap<>();
+for (int i = 0; i < count; i++) {
+String prefix = "state_" + i + "_";
+String key = input.getString(prefix + "key").orElse(null);
+StatePropertyType type = parseStatePropertyType(input.getString(prefix + "type").orElse(null));
+StatePropertyDefinition definition = key == null ? null : OpeningStateSchemas.OPERABLE.property(key).orElse(null);
+if (definition == null || !definition.persistent() || definition.type() != type) continue;
+Object value = switch (type) {
+case NUMBER -> input.getDoubleOr(prefix + "number", 0.0);
+case BOOLEAN -> input.getBooleanOr(prefix + "boolean", false);
+case STRING, ENUM -> input.getStringOr(prefix + "string", "");
+};
+persistent.put(key, value);
+}
+
+long revision = Math.max(0L, input.getLongOr("stateRevision", 0L));
+Instant timestamp = parseTimestamp(input.getStringOr("stateTimestamp", Instant.EPOCH.toString()));
+return new OpeningState(RuntimeState.restore(OpeningStateSchemas.OPERABLE, persistent, revision, timestamp));
+}
+
+private static StatePropertyType parseStatePropertyType(String value) {
+if (value == null) return null;
+try {
+return StatePropertyType.valueOf(value);
+} catch (IllegalArgumentException ignored) {
+return null;
+}
+}
+
+private static Instant parseTimestamp(String value) {
+try {
+return Instant.parse(value);
+} catch (DateTimeParseException ignored) {
+return Instant.EPOCH;
+}
 }
 
 // --- Parameters ---
