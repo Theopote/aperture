@@ -6,5 +6,5 @@ package dev.aperture.core.serialization;
 public interface JsonCodec<T> {
 	String toJson(T value);
 
-	T fromJson(String json, MigrationContext context);
+	T fromJson(String json, DecodeContext context);
 }

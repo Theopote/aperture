@@ -5,12 +5,9 @@ import dev.aperture.core.catalog.OpeningTypeCatalogLoader;
 import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.core.definition.OpeningTypeDefinition;
 import dev.aperture.core.instance.InMemoryOpeningInstanceStore;
-import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.instance.OpeningInstanceStore;
-import dev.aperture.parameter.ParameterSet;
 import dev.aperture.core.placement.PlacementService;
 import dev.aperture.fabric.placement.FabricPlacementAdapter;
-import dev.aperture.geometry.model.GeometryResult;
 import dev.aperture.kernel.ApertureKernel;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
@@ -89,7 +86,6 @@ public final class ApertureBootstrap {
 			runtimePipeline,
 			runtimeEnvironment
 		));
-		verifyReferencePipeline();
 		LOGGER.info("Aperture runtime bootstrap complete - {} opening types", openingTypes.all().size());
 	}
 
@@ -136,21 +132,6 @@ public final class ApertureBootstrap {
 		LOGGER.info("Loaded {} catalog materials", materialCatalog.all().size());
 	}
 
-	private void verifyReferencePipeline() {
-		OpeningTypeDefinition definition = openingTypes.require(BuiltinOpeningTypes.FIXED_WINDOW_ID);
-		OpeningInstance instance = OpeningInstance.builder(definition.id())
-			.parameters(ParameterSet.empty())
-			.build();
-
-		instances.put(instance);
-		GeometryResult geometry = generation.generate(instance).asSuccess().output().geometry();
-
-		LOGGER.info("Reference window geometry: {} solids, bounds {}x{}x{} mm",
-			geometry.solids().size(),
-			geometry.bounds().width(),
-			geometry.bounds().height(),
-			geometry.bounds().depth());
-	}
 
 	public OpeningTypeRegistry openingTypes() {
 		return openingTypes;

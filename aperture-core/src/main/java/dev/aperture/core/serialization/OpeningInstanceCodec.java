@@ -24,6 +24,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -32,16 +33,25 @@ import java.util.UUID;
  */
 public final class OpeningInstanceCodec implements JsonCodec<OpeningInstance> {
 	private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	private static final String RESOURCE_KIND = "opening-instance";
 
 	public OpeningInstance read(Path path, OpeningTypeDefinition definition) throws IOException {
+		return read(path, contextFor(definition));
+	}
+
+	public OpeningInstance read(Path path, DecodeContext context) throws IOException {
 		try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-			return parse(JsonParser.parseReader(reader).getAsJsonObject(), definition);
+			return decode(JsonParser.parseReader(reader).getAsJsonObject(), context);
 		}
 	}
 
 	public OpeningInstance read(InputStream inputStream, OpeningTypeDefinition definition) throws IOException {
+		return read(inputStream, contextFor(definition));
+	}
+
+	public OpeningInstance read(InputStream inputStream, DecodeContext context) throws IOException {
 		try (Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-			return parse(JsonParser.parseReader(reader).getAsJsonObject(), definition);
+			return decode(JsonParser.parseReader(reader).getAsJsonObject(), context);
 		}
 	}
 
@@ -52,14 +62,43 @@ public final class OpeningInstanceCodec implements JsonCodec<OpeningInstance> {
 	}
 
 	@Override
-	public OpeningInstance fromJson(String json, MigrationContext context) {
-		throw new UnsupportedOperationException(
-			"Use fromJson(String, OpeningTypeDefinition) or parse(JsonObject, OpeningTypeDefinition)"
-		);
+	public OpeningInstance fromJson(String json, DecodeContext context) {
+		return decode(JsonParser.parseString(json).getAsJsonObject(), context);
 	}
 
 	public OpeningInstance fromJson(String json, OpeningTypeDefinition definition) {
-		return parse(JsonParser.parseString(json).getAsJsonObject(), definition);
+		return fromJson(json, contextFor(definition));
+	}
+
+	private OpeningInstance decode(JsonObject source, DecodeContext context) {
+		try {
+			JsonObject migrated = context.migrations().migrate(
+				RESOURCE_KIND,
+				source,
+				SchemaVersion.OPENING_INSTANCE,
+				context.diagnostics()
+			);
+			OpeningId typeId = OpeningId.parse(migrated.get("typeId").getAsString());
+			OpeningTypeDefinition definition = context.definitions().require(
+				typeId.toString(),
+				OpeningTypeDefinition.class
+			);
+			return parse(migrated, definition);
+		} catch (RuntimeException failure) {
+			context.diagnostics().report(new DecodeDiagnostic(
+				"opening-instance.decode-failed",
+				DecodeDiagnostic.Severity.ERROR,
+				"Failed to decode OpeningInstance: " + failure.getMessage(),
+				failure
+			));
+			throw failure;
+		}
+	}
+
+	private static DecodeContext contextFor(OpeningTypeDefinition definition) {
+		return DecodeContext.of(id -> definition.id().toString().equals(id)
+			? Optional.of(definition)
+			: Optional.empty());
 	}
 
 	public JsonObject toJsonObject(OpeningInstance instance) {
