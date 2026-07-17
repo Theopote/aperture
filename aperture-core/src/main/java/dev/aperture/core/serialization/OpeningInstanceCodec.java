@@ -9,7 +9,6 @@ import dev.aperture.math.Facing;
 import dev.aperture.math.Transform3d;
 import dev.aperture.math.Vec3d;
 import dev.aperture.core.instance.HostBinding;
-import dev.aperture.core.instance.HostType;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.instance.OpeningState;
 import dev.aperture.core.instance.OpeningStateSchemas;
@@ -136,18 +135,11 @@ public final class OpeningInstanceCodec implements JsonCodec<OpeningInstance> {
 	}
 
 	private static JsonObject writeHost(HostBinding host) {
-		JsonObject object = new JsonObject();
-		object.addProperty("type", host.type().id());
-		if (!host.anchor().isEmpty()) {
-			object.addProperty("anchor", host.anchor());
-		}
-		return object;
+		return HostBindingJson.write(host);
 	}
 
 	private static HostBinding readHost(JsonObject object) {
-		HostType type = HostType.fromId(object.get("type").getAsString());
-		String anchor = object.has("anchor") ? object.get("anchor").getAsString() : "";
-		return new HostBinding(type, anchor);
+		return HostBindingJson.read(object);
 	}
 
 	private static JsonObject writeState(OpeningState state) {

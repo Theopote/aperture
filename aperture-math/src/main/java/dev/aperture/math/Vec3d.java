@@ -4,6 +4,12 @@ package dev.aperture.math;
  * 3D vector in logical millimeter space.
  */
 public record Vec3d(double x, double y, double z) {
+	public Vec3d {
+		if (x == 0.0) x = 0.0;
+		if (y == 0.0) y = 0.0;
+		if (z == 0.0) z = 0.0;
+	}
+
 	public static final Vec3d ZERO = new Vec3d(0, 0, 0);
 
 	public Vec3d add(Vec3d other) {

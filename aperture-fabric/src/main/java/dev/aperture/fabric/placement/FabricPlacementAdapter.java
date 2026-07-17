@@ -86,7 +86,7 @@ public final class FabricPlacementAdapter {
 	}
 
 	private static boolean sameHostRegion(HostBinding left, HostBinding right) {
-		return left.type() == right.type() && left.anchor().equals(right.anchor());
+		return left.sameHostFeature(right);
 	}
 
 	private static Transform3d suggestTransform(HostPlaneScanner.HostRegion region, Direction hitFace) {

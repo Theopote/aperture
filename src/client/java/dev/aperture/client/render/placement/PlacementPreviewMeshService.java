@@ -42,7 +42,7 @@ public final class PlacementPreviewMeshService {
 	public static void update(PlacementSession session) {
 		try {
 			ApertureRuntime runtime = ApertureRuntime.get();
-			String hostAnchor = session.targetHost().anchor();
+			String hostAnchor = session.targetHost().stableKey();
 			if (context == null || !hostAnchor.equals(currentHostAnchor)) {
 				context = new PreviewRenderContext(previewToken(hostAnchor));
 				context.bind(session);

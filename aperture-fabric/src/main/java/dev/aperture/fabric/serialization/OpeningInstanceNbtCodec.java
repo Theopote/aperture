@@ -1,10 +1,14 @@
 package dev.aperture.fabric.serialization;
 
+import dev.aperture.core.instance.HostAttachmentMode;
 import dev.aperture.core.instance.HostBinding;
+import dev.aperture.core.instance.HostFeatureId;
+import dev.aperture.core.instance.HostFeatureType;
 import dev.aperture.core.instance.HostType;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.core.instance.OpeningState;
 import dev.aperture.core.instance.OpeningStateSchemas;
+import dev.aperture.core.object.ArchitecturalObjectId;
 import dev.aperture.core.opening.OpeningId;
 import dev.aperture.core.state.RuntimeState;
 import dev.aperture.core.state.StatePropertyType;
@@ -12,6 +16,7 @@ import dev.aperture.core.state.StatePropertyDefinition;
 import dev.aperture.math.Facing;
 import dev.aperture.math.Transform3d;
 import dev.aperture.math.Vec3d;
+import dev.aperture.math.LocalFrame;
 import dev.aperture.parameter.ParameterSet;
 import dev.aperture.parameter.ParameterType;
 import dev.aperture.parameter.ParameterValue;
@@ -226,18 +231,78 @@ rotRadians
 // --- HostBinding ---
 
 private static void writeHostBinding(ValueOutput output, HostBinding host) {
-output.putString("hostType", host.type().name());
-output.putString("hostAnchor", host.anchor());
+output.putString("hostId", host.hostId().toString());
+output.putString("hostFeatureType", host.featureId().type().name());
+output.putString("hostFeatureId", host.featureId().value());
+output.putString("hostAttachmentMode", host.mode().name());
+output.putLong("hostRevision", host.hostRevision());
+writeHostVector(output, "hostFrameOrigin", host.insertionFrame().origin());
+writeHostVector(output, "hostFrameX", host.insertionFrame().xAxis());
+writeHostVector(output, "hostFrameY", host.insertionFrame().yAxis());
+writeHostVector(output, "hostFrameZ", host.insertionFrame().zAxis());
+int index = 0;
+for (Map.Entry<String, ParameterValue> entry : host.attachmentParameters().asMap().entrySet()) {
+String prefix = "hostParam_" + index + "_";
+output.putString(prefix + "key", entry.getKey());
+writeParameterValue(output, prefix, entry.getValue());
+index++;
+}
+output.putInt("hostParamCount", index);
 }
 
 private static HostBinding readHostBinding(ValueInput input) {
+String hostId = input.getString("hostId").orElse(null);
+if (hostId == null) return readLegacyHostBinding(input);
+try {
+ParameterSet.Builder parameters = ParameterSet.builder();
+for (int i = 0; i < input.getIntOr("hostParamCount", 0); i++) {
+String prefix = "hostParam_" + i + "_";
+String key = input.getString(prefix + "key").orElse(null);
+ParameterValue value = readParameterValue(input, prefix);
+if (key != null && value != null) parameters.put(key, value);
+}
+return new HostBinding(
+ArchitecturalObjectId.parse(hostId),
+new HostFeatureId(
+HostFeatureType.valueOf(input.getStringOr("hostFeatureType", HostFeatureType.NAMED_ANCHOR.name())),
+input.getStringOr("hostFeatureId", "default")
+),
+new LocalFrame(
+readHostVector(input, "hostFrameOrigin", Vec3d.ZERO),
+readHostVector(input, "hostFrameX", new Vec3d(1, 0, 0)),
+readHostVector(input, "hostFrameY", new Vec3d(0, 1, 0)),
+readHostVector(input, "hostFrameZ", new Vec3d(0, 0, 1))
+),
+HostAttachmentMode.valueOf(input.getStringOr("hostAttachmentMode", HostAttachmentMode.FREE_STANDING.name())),
+parameters.build(),
+Math.max(0L, input.getLongOr("hostRevision", 0L))
+);
+} catch (IllegalArgumentException invalidStructuredBinding) {
+return readLegacyHostBinding(input);
+}
+}
+
+private static HostBinding readLegacyHostBinding(ValueInput input) {
 HostType type;
 try {
 type = HostType.valueOf(input.getStringOr("hostType", HostType.FREE_STANDING.name()));
-} catch (IllegalArgumentException e) {
+} catch (IllegalArgumentException invalidType) {
 type = HostType.FREE_STANDING;
 }
-String anchor = input.getStringOr("hostAnchor", "");
-return new HostBinding(type, anchor);
+return new HostBinding(type, input.getStringOr("hostAnchor", ""));
+}
+
+private static void writeHostVector(ValueOutput output, String key, Vec3d value) {
+output.putDouble(key + "X", value.x());
+output.putDouble(key + "Y", value.y());
+output.putDouble(key + "Z", value.z());
+}
+
+private static Vec3d readHostVector(ValueInput input, String key, Vec3d fallback) {
+return new Vec3d(
+input.getDoubleOr(key + "X", fallback.x()),
+input.getDoubleOr(key + "Y", fallback.y()),
+input.getDoubleOr(key + "Z", fallback.z())
+);
 }
 }

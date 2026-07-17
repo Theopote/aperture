@@ -56,8 +56,7 @@ public final class NoOverlapValidator implements PlacementValidator {
 	}
 
 	private static boolean sameHost(OpeningInstance left, OpeningInstance right) {
-		return left.host().type() == right.host().type()
-			&& left.host().anchor().equals(right.host().anchor());
+		return left.host().sameHostFeature(right.host());
 	}
 
 	private static boolean intersects(BoundingBox left, BoundingBox right) {

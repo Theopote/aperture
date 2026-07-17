@@ -18,6 +18,10 @@ import java.util.UUID;
  * pretending to be openings.
  */
 public interface ArchitecturalObject {
+	default ArchitecturalObjectId objectId() {
+		return new ArchitecturalObjectId(instanceId());
+	}
+
 	int schemaVersion();
 
 	UUID instanceId();

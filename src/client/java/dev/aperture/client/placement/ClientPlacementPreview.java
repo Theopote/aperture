@@ -119,7 +119,7 @@ public final class ClientPlacementPreview {
 	}
 
 	private static Object targetKey(FabricPlacementTarget target) {
-		return target.host().anchor();
+		return target.host().stableKey();
 	}
 
 	private static ParameterSet overridesFromInstance(OpeningTypeDefinition definition, OpeningInstance instance) {
@@ -157,7 +157,7 @@ public final class ClientPlacementPreview {
 			if (client.level != null) {
 				OpeningWorldPlacement.placeCommittedInstance(client.level, committed);
 			}
-			LOGGER.info("Committed opening at host {}", currentTarget.host().anchor());
+			LOGGER.info("Committed opening at host {}", currentTarget.host().stableKey());
 			return true;
 		} catch (IllegalStateException exception) {
 			LOGGER.warn("Failed to commit placement preview", exception);
