@@ -9,7 +9,7 @@ import java.util.UUID;
  * Explicit output consumed by platform adapters after a runtime transition.
  * The runtime describes effects but never imports or mutates a Minecraft world.
  */
-public sealed interface RuntimeEffect {
+public interface RuntimeEffect {
 	record GeometryInvalidated(UUID objectId) implements RuntimeEffect {
 		public GeometryInvalidated {
 			Objects.requireNonNull(objectId, "objectId");

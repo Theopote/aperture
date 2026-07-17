@@ -5,6 +5,7 @@ import dev.aperture.core.object.ArchitecturalObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Platform-neutral runtime pipeline: capability resolution, behavior evaluation,
@@ -24,6 +25,12 @@ public final class RuntimePipeline {
 		Objects.requireNonNull(interaction, "interaction");
 
 		RuntimeBehavior<ArchitecturalObject> behavior = behaviorFor(object);
+		Set<RuntimeCapability> available = behavior.capabilities(object);
+		if (available.stream().noneMatch(capability -> capability.id().equals(interaction.action()))) {
+			throw new IllegalArgumentException(
+				"Object does not expose capability " + interaction.action() + ": " + object.instanceId()
+			);
+		}
 		RuntimeTransition<ArchitecturalObject> transition = behavior.evaluate(object, interaction);
 		ArchitecturalObject current = transition.object();
 		validateTransition(object, current);
