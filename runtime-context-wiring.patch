@@ -1,0 +1,98 @@
+diff --git a/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/RuntimeInteraction.java b/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/RuntimeInteraction.java
+--- a/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/RuntimeInteraction.java
++++ b/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/RuntimeInteraction.java
+@@ -7 +7 @@
+-public record RuntimeInteraction(String action, Map<String, Object> inputs) {
++public record RuntimeInteraction(String action, RuntimeActor actor, Map<String, Object> inputs) {
+@@ -9,0 +10 @@
++		Objects.requireNonNull(actor, "actor");
+@@ -17 +18,5 @@
+-		return new RuntimeInteraction(action, Map.of());
++		return new RuntimeInteraction(action, RuntimeActor.SYSTEM, Map.of());
++	}
++
++	public static RuntimeInteraction by(String action, RuntimeActor actor) {
++		return new RuntimeInteraction(action, actor, Map.of());
+diff --git a/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/RuntimeBehavior.java b/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/RuntimeBehavior.java
+--- a/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/RuntimeBehavior.java
++++ b/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/RuntimeBehavior.java
+@@ -11,0 +12,4 @@
++	default Set<RuntimeCapability> capabilities(T object, RuntimeEvaluationContext context) {
++		return capabilities(object);
++	}
++
+@@ -13,0 +18,7 @@
++
++	default RuntimeTransition<T> evaluate(
++		T object,
++		RuntimeInteraction interaction,
++		RuntimeEvaluationContext context
++	) {
++		return evaluate(object, interaction);
++	}
+diff --git a/aperture-runtime/src/main/java/dev/aperture/runtime/behavior/RuntimeBehaviorEngine.java b/aperture-runtime/src/main/java/dev/aperture/runtime/behavior/RuntimeBehaviorEngine.java
+--- a/aperture-runtime/src/main/java/dev/aperture/runtime/behavior/RuntimeBehaviorEngine.java
++++ b/aperture-runtime/src/main/java/dev/aperture/runtime/behavior/RuntimeBehaviorEngine.java
+@@ -6,0 +7 @@
++import dev.aperture.runtime.pipeline.RuntimeEvaluationContext;
+@@ -21 +22,5 @@
+-		return behaviorFor(object).capabilities(object);
++		return capabilities(object, RuntimeEvaluationContext.empty());
++	}
++
++	public Set<RuntimeCapability> capabilities(ArchitecturalObject object, RuntimeEvaluationContext context) {
++		return behaviorFor(object).capabilities(object, context);
+@@ -26 +31,2 @@
+-		RuntimeInteraction interaction
++		RuntimeInteraction interaction,
++		RuntimeEvaluationContext context
+@@ -29 +35 @@
+-		Set<RuntimeCapability> available = behavior.capabilities(object);
++		Set<RuntimeCapability> available = behavior.capabilities(object, context);
+@@ -35 +41 @@
+-		return behavior.evaluate(object, interaction);
++		return behavior.evaluate(object, interaction, context);
+diff --git a/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/RuntimePipeline.java b/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/RuntimePipeline.java
+--- a/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/RuntimePipeline.java
++++ b/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/RuntimePipeline.java
+@@ -25 +25,5 @@
+-		return behaviorEngine.capabilities(Objects.requireNonNull(object, "object"));
++		return capabilities(object, RuntimeEvaluationContext.empty());
++	}
++
++	public Set<RuntimeCapability> capabilities(ArchitecturalObject object, RuntimeEvaluationContext context) {
++		return behaviorEngine.capabilities(Objects.requireNonNull(object, "object"), context);
+@@ -29,0 +34,8 @@
++		return process(object, interaction, RuntimeEvaluationContext.empty());
++	}
++
++	public RuntimeResult process(
++		ArchitecturalObject object,
++		RuntimeInteraction interaction,
++		RuntimeEvaluationContext context
++	) {
+@@ -32 +45 @@
+-		RuntimeTransition<ArchitecturalObject> transition = behaviorEngine.evaluate(object, interaction);
++		RuntimeTransition<ArchitecturalObject> transition = behaviorEngine.evaluate(object, interaction, context);
+@@ -37 +50 @@
+-			return new RuntimeResult(object, current, behaviorEngine.capabilities(current), List.of());
++			return new RuntimeResult(object, current, behaviorEngine.capabilities(current, context), List.of());
+@@ -44 +57 @@
+-		return new RuntimeResult(object, current, behaviorEngine.capabilities(current), effects);
++		return new RuntimeResult(object, current, behaviorEngine.capabilities(current, context), effects);
+diff --git a/aperture-runtime/src/main/java/dev/aperture/runtime/ArchitecturalRuntimeEnvironment.java b/aperture-runtime/src/main/java/dev/aperture/runtime/ArchitecturalRuntimeEnvironment.java
+--- a/aperture-runtime/src/main/java/dev/aperture/runtime/ArchitecturalRuntimeEnvironment.java
++++ b/aperture-runtime/src/main/java/dev/aperture/runtime/ArchitecturalRuntimeEnvironment.java
+@@ -8,0 +9 @@
++import dev.aperture.runtime.pipeline.RuntimeEvaluationContext;
+@@ -65 +66 @@
+-		return pipeline.capabilities(objects.require(objectId));
++		return pipeline.capabilities(objects.require(objectId), evaluationContext());
+@@ -74 +75 @@
+-				RuntimeResult result = pipeline.process(current, interaction);
++				RuntimeResult result = pipeline.process(current, interaction, evaluationContext());
+@@ -110,0 +112,4 @@
++
++	private RuntimeEvaluationContext evaluationContext() {
++		return new RuntimeEvaluationContext(scheduler.currentTick(), world);
++	}

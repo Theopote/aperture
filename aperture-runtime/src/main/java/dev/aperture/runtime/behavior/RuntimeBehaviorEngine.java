@@ -4,6 +4,7 @@ import dev.aperture.core.object.ArchitecturalObject;
 import dev.aperture.runtime.pipeline.RuntimeBehavior;
 import dev.aperture.runtime.pipeline.RuntimeCapability;
 import dev.aperture.runtime.pipeline.RuntimeInteraction;
+import dev.aperture.runtime.pipeline.RuntimeEvaluationContext;
 import dev.aperture.runtime.pipeline.RuntimeTransition;
 
 import java.util.List;
@@ -18,21 +19,26 @@ public final class RuntimeBehaviorEngine {
 	}
 
 	public Set<RuntimeCapability> capabilities(ArchitecturalObject object) {
-		return behaviorFor(object).capabilities(object);
+		return capabilities(object, RuntimeEvaluationContext.empty());
+	}
+
+	public Set<RuntimeCapability> capabilities(ArchitecturalObject object, RuntimeEvaluationContext context) {
+		return behaviorFor(object).capabilities(object, context);
 	}
 
 	public RuntimeTransition<ArchitecturalObject> evaluate(
 		ArchitecturalObject object,
-		RuntimeInteraction interaction
+		RuntimeInteraction interaction,
+		RuntimeEvaluationContext context
 	) {
 		RuntimeBehavior<ArchitecturalObject> behavior = behaviorFor(object);
-		Set<RuntimeCapability> available = behavior.capabilities(object);
+		Set<RuntimeCapability> available = behavior.capabilities(object, context);
 		if (available.stream().noneMatch(capability -> capability.id().equals(interaction.action()))) {
 			throw new IllegalArgumentException(
 				"Object does not expose capability " + interaction.action() + ": " + object.instanceId()
 			);
 		}
-		return behavior.evaluate(object, interaction);
+		return behavior.evaluate(object, interaction, context);
 	}
 
 	@SuppressWarnings("unchecked")

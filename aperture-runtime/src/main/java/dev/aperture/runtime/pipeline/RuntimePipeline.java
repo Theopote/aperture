@@ -22,26 +22,40 @@ public final class RuntimePipeline {
 	}
 
 	public Set<RuntimeCapability> capabilities(ArchitecturalObject object) {
-		return behaviorEngine.capabilities(Objects.requireNonNull(object, "object"));
+		return capabilities(object, RuntimeEvaluationContext.empty());
+	}
+
+	public Set<RuntimeCapability> capabilities(ArchitecturalObject object, RuntimeEvaluationContext context) {
+		return behaviorEngine.capabilities(Objects.requireNonNull(object, "object"), context);
 	}
 
 	public RuntimeResult process(ArchitecturalObject object, RuntimeInteraction interaction) {
 		Objects.requireNonNull(object, "object");
+		return process(object, interaction, RuntimeEvaluationContext.empty());
+	}
+
+		Objects.requireNonNull(object, "object");
+	public RuntimeResult process(
+		Objects.requireNonNull(context, "context");
+		ArchitecturalObject object,
+		RuntimeInteraction interaction,
+		RuntimeEvaluationContext context
+	) {
 		Objects.requireNonNull(interaction, "interaction");
 
-		RuntimeTransition<ArchitecturalObject> transition = behaviorEngine.evaluate(object, interaction);
+		RuntimeTransition<ArchitecturalObject> transition = behaviorEngine.evaluate(object, interaction, context);
 		ArchitecturalObject current = transition.object();
 		validateTransition(object, current);
 
 		if (object.equals(current)) {
-			return new RuntimeResult(object, current, behaviorEngine.capabilities(current), List.of());
+			return new RuntimeResult(object, current, behaviorEngine.capabilities(current, context), List.of());
 		}
 
 		repository.save(current);
 		List<RuntimeEffect> effects = new ArrayList<>(transition.worldEffects());
 		effects.add(new RuntimeEffect.PersistenceRequested(current));
 		effects.add(new RuntimeEffect.ReplicationRequested(current));
-		return new RuntimeResult(object, current, behaviorEngine.capabilities(current), effects);
+		return new RuntimeResult(object, current, behaviorEngine.capabilities(current, context), effects);
 	}
 
 

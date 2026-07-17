@@ -6,6 +6,7 @@ import dev.aperture.runtime.event.RuntimeEvent;
 import dev.aperture.runtime.event.RuntimeEventBus;
 import dev.aperture.runtime.pipeline.RuntimeCapability;
 import dev.aperture.runtime.pipeline.RuntimeInteraction;
+import dev.aperture.runtime.pipeline.RuntimeEvaluationContext;
 import dev.aperture.runtime.pipeline.RuntimePipeline;
 import dev.aperture.runtime.pipeline.RuntimeResult;
 import dev.aperture.runtime.replication.RuntimeReplicator;
@@ -62,23 +63,18 @@ public final class ArchitecturalRuntimeEnvironment {
 	}
 
 	public Set<RuntimeCapability> capabilities(UUID objectId) {
-		return pipeline.capabilities(objects.require(objectId));
+		return pipeline.capabilities(objects.require(objectId), evaluationContext());
 	}
 
 	public RuntimeResult interact(UUID objectId, RuntimeInteraction interaction) {
 		Objects.requireNonNull(objectId, "objectId");
 		Objects.requireNonNull(interaction, "interaction");
+		RuntimeResult result;
 		try {
-			RuntimeResult result = transactions.execute(objectId, () -> {
+			result = transactions.execute(objectId, () -> {
 				ArchitecturalObject current = objects.require(objectId);
-				return pipeline.process(current, interaction);
+				return pipeline.process(current, interaction, evaluationContext());
 			});
-			diagnostics.recordInteraction(result.changed());
-			if (result.changed()) {
-				replicator.replicate(result.previous(), result.current());
-			}
-			events.publish(new RuntimeEvent.InteractionCompleted(result));
-			return result;
 		} catch (RuntimeException failure) {
 			diagnostics.recordRejected(failure);
 			events.publish(new RuntimeEvent.InteractionRejected(
@@ -88,6 +84,13 @@ public final class ArchitecturalRuntimeEnvironment {
 			));
 			throw failure;
 		}
+		diagnostics.recordInteraction(result.changed());
+		if (result.changed()) {
+			replicator.replicate(result.previous(), result.current());
+		}
+		events.publish(new RuntimeEvent.InteractionCompleted(result));
+		return result;
+
 	}
 
 	public void scheduleInteraction(long delayTicks, UUID objectId, RuntimeInteraction interaction) {
@@ -109,6 +112,10 @@ public final class ArchitecturalRuntimeEnvironment {
 		return world;
 	}
 
+
+	private RuntimeEvaluationContext evaluationContext() {
+		return new RuntimeEvaluationContext(scheduler.currentTick(), world);
+	}
 	public RuntimeDiagnostics.Snapshot diagnostics() {
 		return diagnostics.snapshot();
 	}
