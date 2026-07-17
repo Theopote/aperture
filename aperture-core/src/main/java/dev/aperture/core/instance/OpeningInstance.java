@@ -1,6 +1,7 @@
 package dev.aperture.core.instance;
 
 import dev.aperture.math.Transform3d;
+import dev.aperture.core.object.ArchitecturalObject;
 import dev.aperture.core.opening.OpeningId;
 import dev.aperture.parameter.ParameterSet;
 
@@ -22,7 +23,7 @@ public record OpeningInstance(
 	HostBinding host,
 	OpeningState state,
 	long revision
-) {
+) implements ArchitecturalObject {
 	public OpeningInstance {
 		if (schemaVersion < 1) {
 			throw new IllegalArgumentException("schemaVersion must be >= 1");

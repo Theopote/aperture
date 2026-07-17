@@ -29,6 +29,22 @@
 
 ## Core Entities
 
+### ArchitecturalObject
+
+The family-neutral runtime contract for anything placed and operated by Aperture. It exposes only stable cross-family concerns: schema version, instance identity, sparse parameters, transform, and revision. Concrete families retain typed definition IDs, hosting rules, operational state, and generation outputs.
+
+```text
+ArchitecturalObject
+├── OpeningInstance               (implemented)
+├── StructuralObjectInstance      (future)
+├── CirculationObjectInstance     (future)
+├── EquipmentObjectInstance       (future)
+├── SpatialObjectInstance         (future)
+└── SystemObjectInstance          (future)
+```
+
+This is a runtime polymorphism boundary, not a single universal geometry pipeline. Opening generation remains typed around `OpeningTypeDefinition`, `OpeningRequest`, and `OpeningResult`.
+
 ### OpeningTypeDefinition
 
 Describes *what* an opening type is — the procedural recipe (Revit "family").
@@ -85,7 +101,8 @@ OpeningCategory (enum)
 └── FACADE_ELEMENT
 
 OpeningTypeDefinition     // data, not deep inheritance
-OpeningInstance           // all categories share this type
+ArchitecturalObject       // all architectural families share the runtime contract
+OpeningInstance           // all Opening categories share this concrete type
 
 Generator (interface)
 ├── RectangularFrameGenerator

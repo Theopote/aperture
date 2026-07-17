@@ -35,15 +35,11 @@ This means:
 
 ## Core Philosophy
 
-**Everything is an Opening.**
+**Everything placed and operated by Aperture is an Architectural Object.**
 
-- Door is an Opening.
-- Window is an Opening.
-- Curtain Wall is an Opening.
-- Garage Door is an Opening.
-- French Window is an Opening.
+`ArchitecturalObject` is the universal runtime primitive. `Opening` is the first implemented architectural family, so doors, windows, curtain walls, garage doors, and French windows continue to share the Opening pipeline. Future structural, circulation, equipment, spatial, and system families must not pretend to be openings.
 
-Nothing is implemented as an isolated block. Every architectural element is generated from a procedural Opening definition through the Generation Pipeline.
+Nothing is implemented as an isolated Minecraft block. Each architectural family owns its definitions and generation strategy while sharing runtime identity, persistence, synchronization, editing, interaction, and simulation infrastructure.
 
 ## Four-Layer Architecture
 
@@ -111,7 +107,7 @@ The project must be:
 
 ## Architectural Tenets
 
-1. **Opening is the only first-class entity** — no special-case door block logic.
+1. **ArchitecturalObject is the universal runtime primitive** — Opening is the first implemented family; no special-case door block logic and no forcing unrelated families into the Opening model.
 2. **Core is Minecraft-agnostic** — geometry, parameters, definitions live in pure Java modules (aperture-core, aperture-geometry, aperture-math).
 3. **The Iron Law** — aperture-core and aperture-geometry SHALL NOT import net.minecraft.*
 4. **Adapters at the edges** — Minecraft blocks, rendering, networking are Platform layer concerns.
