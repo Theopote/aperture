@@ -1,6 +1,7 @@
 package dev.aperture.runtime.pipeline;
 
 import dev.aperture.core.object.ArchitecturalObject;
+import dev.aperture.runtime.behavior.RuntimeBehaviorEngine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,56 +13,37 @@ import java.util.Set;
  * state transition, repository commit, and persistence/replication requests.
  */
 public final class RuntimePipeline {
-	private final List<RuntimeBehavior<?>> behaviors;
+	private final RuntimeBehaviorEngine behaviorEngine;
 	private final RuntimeObjectRepository repository;
 
 	public RuntimePipeline(List<RuntimeBehavior<?>> behaviors, RuntimeObjectRepository repository) {
-		this.behaviors = List.copyOf(behaviors);
+		this.behaviorEngine = new RuntimeBehaviorEngine(behaviors);
 		this.repository = Objects.requireNonNull(repository, "repository");
+	}
+
+	public Set<RuntimeCapability> capabilities(ArchitecturalObject object) {
+		return behaviorEngine.capabilities(Objects.requireNonNull(object, "object"));
 	}
 
 	public RuntimeResult process(ArchitecturalObject object, RuntimeInteraction interaction) {
 		Objects.requireNonNull(object, "object");
 		Objects.requireNonNull(interaction, "interaction");
 
-		RuntimeBehavior<ArchitecturalObject> behavior = behaviorFor(object);
-		Set<RuntimeCapability> available = behavior.capabilities(object);
-		if (available.stream().noneMatch(capability -> capability.id().equals(interaction.action()))) {
-			throw new IllegalArgumentException(
-				"Object does not expose capability " + interaction.action() + ": " + object.instanceId()
-			);
-		}
-		RuntimeTransition<ArchitecturalObject> transition = behavior.evaluate(object, interaction);
+		RuntimeTransition<ArchitecturalObject> transition = behaviorEngine.evaluate(object, interaction);
 		ArchitecturalObject current = transition.object();
 		validateTransition(object, current);
 
 		if (object.equals(current)) {
-			return new RuntimeResult(object, current, behavior.capabilities(current), List.of());
+			return new RuntimeResult(object, current, behaviorEngine.capabilities(current), List.of());
 		}
 
 		repository.save(current);
 		List<RuntimeEffect> effects = new ArrayList<>(transition.worldEffects());
 		effects.add(new RuntimeEffect.PersistenceRequested(current));
 		effects.add(new RuntimeEffect.ReplicationRequested(current));
-		return new RuntimeResult(object, current, behavior.capabilities(current), effects);
+		return new RuntimeResult(object, current, behaviorEngine.capabilities(current), effects);
 	}
 
-	@SuppressWarnings("unchecked")
-	private RuntimeBehavior<ArchitecturalObject> behaviorFor(ArchitecturalObject object) {
-		RuntimeBehavior<?> match = null;
-		for (RuntimeBehavior<?> candidate : behaviors) {
-			if (candidate.objectType().isInstance(object)) {
-				if (match != null) {
-					throw new IllegalStateException("Multiple runtime behaviors match " + object.getClass().getName());
-				}
-				match = candidate;
-			}
-		}
-		if (match == null) {
-			throw new IllegalArgumentException("No runtime behavior for " + object.getClass().getName());
-		}
-		return (RuntimeBehavior<ArchitecturalObject>) match;
-	}
 
 	private static void validateTransition(ArchitecturalObject previous, ArchitecturalObject current) {
 		if (!previous.instanceId().equals(current.instanceId())) {

@@ -1,0 +1,107 @@
+diff --git a/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/RuntimePipeline.java b/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/RuntimePipeline.java
+--- a/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/RuntimePipeline.java
++++ b/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/RuntimePipeline.java
+@@ -1,5 +1,6 @@
+ package dev.aperture.runtime.pipeline;
+ 
+ import dev.aperture.core.object.ArchitecturalObject;
++import dev.aperture.runtime.behavior.RuntimeBehaviorEngine;
+ 
+ import java.util.ArrayList;
+@@ -12,12 +13,16 @@ import java.util.Set;
+  * state transition, repository commit, and persistence/replication requests.
+  */
+ public final class RuntimePipeline {
+-	private final List<RuntimeBehavior<?>> behaviors;
++	private final RuntimeBehaviorEngine behaviorEngine;
+ 	private final RuntimeObjectRepository repository;
+ 
+ 	public RuntimePipeline(List<RuntimeBehavior<?>> behaviors, RuntimeObjectRepository repository) {
+-		this.behaviors = List.copyOf(behaviors);
++		this.behaviorEngine = new RuntimeBehaviorEngine(behaviors);
+ 		this.repository = Objects.requireNonNull(repository, "repository");
+ 	}
++
++	public Set<RuntimeCapability> capabilities(ArchitecturalObject object) {
++		return behaviorEngine.capabilities(Objects.requireNonNull(object, "object"));
++	}
+ 
+ 	public RuntimeResult process(ArchitecturalObject object, RuntimeInteraction interaction) {
+@@ -24,16 +29,7 @@ public final class RuntimePipeline {
+ 		Objects.requireNonNull(object, "object");
+ 		Objects.requireNonNull(interaction, "interaction");
+ 
+-		RuntimeBehavior<ArchitecturalObject> behavior = behaviorFor(object);
+-		Set<RuntimeCapability> available = behavior.capabilities(object);
+-		if (available.stream().noneMatch(capability -> capability.id().equals(interaction.action()))) {
+-			throw new IllegalArgumentException(
+-				"Object does not expose capability " + interaction.action() + ": " + object.instanceId()
+-			);
+-		}
+-		RuntimeTransition<ArchitecturalObject> transition = behavior.evaluate(object, interaction);
++		RuntimeTransition<ArchitecturalObject> transition = behaviorEngine.evaluate(object, interaction);
+ 		ArchitecturalObject current = transition.object();
+ 		validateTransition(object, current);
+ 
+ 		if (object.equals(current)) {
+-			return new RuntimeResult(object, current, behavior.capabilities(current), List.of());
++			return new RuntimeResult(object, current, behaviorEngine.capabilities(current), List.of());
+@@ -43,25 +39,7 @@ public final class RuntimePipeline {
+ 		List<RuntimeEffect> effects = new ArrayList<>(transition.worldEffects());
+ 		effects.add(new RuntimeEffect.PersistenceRequested(current));
+ 		effects.add(new RuntimeEffect.ReplicationRequested(current));
+-		return new RuntimeResult(object, current, behavior.capabilities(current), effects);
+-	}
+-
+-	@SuppressWarnings("unchecked")
+-	private RuntimeBehavior<ArchitecturalObject> behaviorFor(ArchitecturalObject object) {
+-		RuntimeBehavior<?> match = null;
+-		for (RuntimeBehavior<?> candidate : behaviors) {
+-			if (candidate.objectType().isInstance(object)) {
+-				if (match != null) {
+-					throw new IllegalStateException("Multiple runtime behaviors match " + object.getClass().getName());
+-				}
+-				match = candidate;
+-			}
+-		}
+-		if (match == null) {
+-			throw new IllegalArgumentException("No runtime behavior for " + object.getClass().getName());
+-		}
+-		return (RuntimeBehavior<ArchitecturalObject>) match;
++		return new RuntimeResult(object, current, behaviorEngine.capabilities(current), effects);
+ 	}
+ 
+ 	private static void validateTransition(ArchitecturalObject previous, ArchitecturalObject current) {
+diff --git a/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/OpeningInstanceRepository.java b/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/OpeningInstanceRepository.java
+--- a/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/OpeningInstanceRepository.java
++++ b/aperture-runtime/src/main/java/dev/aperture/runtime/pipeline/OpeningInstanceRepository.java
+@@ -3,11 +3,15 @@ package dev.aperture.runtime.pipeline;
+ import dev.aperture.core.instance.OpeningInstance;
+ import dev.aperture.core.instance.OpeningInstanceStore;
+ import dev.aperture.core.object.ArchitecturalObject;
++import dev.aperture.runtime.state.RuntimeStateStore;
+ 
++import java.util.Collection;
++import java.util.List;
+ import java.util.Objects;
++import java.util.Optional;
++import java.util.UUID;
+ 
+ /** Adapts the existing opening store to the family-neutral runtime repository port. */
+-public final class OpeningInstanceRepository implements RuntimeObjectRepository {
++public final class OpeningInstanceRepository implements RuntimeStateStore {
+@@ -23,4 +27,14 @@ public final class OpeningInstanceRepository implements RuntimeObjectRepository {
+ 		}
+ 		store.put(opening);
+ 	}
++
++	@Override
++	public Optional<ArchitecturalObject> find(UUID objectId) {
++		return store.findById(objectId).map(object -> object);
++	}
++
++	@Override
++	public Collection<ArchitecturalObject> all() {
++		return List.copyOf(store.all());
++	}
+ }

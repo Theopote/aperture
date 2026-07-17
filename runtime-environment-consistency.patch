@@ -1,0 +1,43 @@
+diff --git a/aperture-runtime/src/main/java/dev/aperture/runtime/ArchitecturalRuntimeEnvironment.java b/aperture-runtime/src/main/java/dev/aperture/runtime/ArchitecturalRuntimeEnvironment.java
+--- a/aperture-runtime/src/main/java/dev/aperture/runtime/ArchitecturalRuntimeEnvironment.java
++++ b/aperture-runtime/src/main/java/dev/aperture/runtime/ArchitecturalRuntimeEnvironment.java
+@@ -71,11 +71,7 @@
+ 		try {
+-			return transactions.execute(objectId, () -> {
++			RuntimeResult result = transactions.execute(objectId, () -> {
+ 				ArchitecturalObject current = objects.require(objectId);
+-				RuntimeResult result = pipeline.process(current, interaction);
+-				if (result.changed()) {
+-					replicator.replicate(result.previous(), result.current());
+-				}
+-				diagnostics.recordInteraction(result.changed());
+-				events.publish(new RuntimeEvent.InteractionCompleted(result));
+-				return result;
++				return pipeline.process(current, interaction);
+ 			});
++			diagnostics.recordInteraction(result.changed());
++			if (result.changed()) {
++				replicator.replicate(result.previous(), result.current());
++			}
++			events.publish(new RuntimeEvent.InteractionCompleted(result));
++			return result;
+ 		} catch (RuntimeException failure) {
+diff --git a/aperture-runtime/src/main/java/dev/aperture/runtime/state/RuntimeObjectRegistry.java b/aperture-runtime/src/main/java/dev/aperture/runtime/state/RuntimeObjectRegistry.java
+--- a/aperture-runtime/src/main/java/dev/aperture/runtime/state/RuntimeObjectRegistry.java
++++ b/aperture-runtime/src/main/java/dev/aperture/runtime/state/RuntimeObjectRegistry.java
+@@ -25,6 +25,10 @@
+-		ArchitecturalObject existing = liveObjects.putIfAbsent(object.instanceId(), object);
+-		if (existing != null && !existing.equals(object)) {
+-			throw new IllegalStateException("Runtime object already registered: " + object.instanceId());
+-		}
+-		stateStore.save(object);
++		liveObjects.compute(object.instanceId(), (id, existing) -> {
++			if (existing != null && !existing.equals(object)) {
++				throw new IllegalStateException("Runtime object already registered: " + id);
++			}
++			if (existing == null) {
++				stateStore.save(object);
++			}
++			return object;
++		});
+ 		return object;

@@ -7,7 +7,11 @@ import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 import dev.aperture.runtime.catalog.MaterialCatalogRegistry;
 import dev.aperture.runtime.registry.MaterialResolverRegistry;
 import dev.aperture.runtime.pipeline.RuntimePipeline;
+import dev.aperture.runtime.pipeline.RuntimeInteraction;
+import dev.aperture.runtime.pipeline.RuntimeResult;
 import dev.aperture.runtime.service.OpeningGenerationService;
+
+import java.util.UUID;
 
 /**
  * Server-safe runtime facade: opening generation, placement, persistence, and render data.
@@ -23,6 +27,7 @@ public final class ApertureRuntime {
 	private final OpeningInstanceStore instances;
 	private final OpeningGenerationService generation;
 	private final PlacementService placement;
+	private final ArchitecturalRuntimeEnvironment environment;
 	private final RuntimePipeline runtimePipeline;
 
 	public ApertureRuntime(
@@ -33,7 +38,8 @@ public final class ApertureRuntime {
 		OpeningInstanceStore instances,
 		OpeningGenerationService generation,
 		PlacementService placement,
-		RuntimePipeline runtimePipeline
+		RuntimePipeline runtimePipeline,
+		ArchitecturalRuntimeEnvironment environment
 	) {
 		this.openingTypes = openingTypes;
 		this.profiles = profiles;
@@ -43,6 +49,7 @@ public final class ApertureRuntime {
 		this.generation = generation;
 		this.placement = placement;
 		this.runtimePipeline = runtimePipeline;
+		this.environment = environment;
 	}
 
 	public static void init(ApertureRuntime runtime) {
@@ -86,5 +93,21 @@ public final class ApertureRuntime {
 
 	public RuntimePipeline runtimePipeline() {
 		return runtimePipeline;
+	}
+
+	public ArchitecturalRuntimeEnvironment environment() {
+		return environment;
+	}
+
+	public RuntimeResult interact(UUID objectId, RuntimeInteraction interaction) {
+		return environment.interact(objectId, interaction);
+	}
+
+	public void scheduleInteraction(long delayTicks, UUID objectId, RuntimeInteraction interaction) {
+		environment.scheduleInteraction(delayTicks, objectId, interaction);
+	}
+
+	public int tick() {
+		return environment.tick();
 	}
 }

@@ -17,14 +17,22 @@ import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 import dev.aperture.registry.ApertureBlockEntities;
 import dev.aperture.registry.ApertureBlocks;
 import dev.aperture.runtime.ApertureRuntime;
+import dev.aperture.runtime.ArchitecturalRuntimeEnvironment;
 import dev.aperture.runtime.catalog.MaterialCatalogLoader;
+import dev.aperture.runtime.diagnostic.RuntimeDiagnostics;
 import dev.aperture.runtime.catalog.MaterialCatalogRegistry;
+import dev.aperture.runtime.event.RuntimeEventBus;
 import dev.aperture.runtime.material.CatalogMaterialResolver;
 import dev.aperture.runtime.material.VanillaMaterialResolver;
 import dev.aperture.runtime.registry.MaterialResolverRegistry;
 import dev.aperture.runtime.pipeline.OpeningInstanceRepository;
 import dev.aperture.runtime.pipeline.OpeningRuntimeBehavior;
 import dev.aperture.runtime.pipeline.RuntimePipeline;
+import dev.aperture.runtime.replication.RuntimeReplicator;
+import dev.aperture.runtime.schedule.RuntimeTickScheduler;
+import dev.aperture.runtime.state.RuntimeObjectRegistry;
+import dev.aperture.runtime.transaction.RuntimeTransactionManager;
+import dev.aperture.runtime.world.RuntimeWorldQuery;
 import dev.aperture.runtime.service.OpeningGenerationService;
 import java.util.List;
 import org.slf4j.Logger;
@@ -50,9 +58,20 @@ public final class ApertureBootstrap {
 	private final OpeningGenerationService generation = new OpeningGenerationService(kernel);
 	private final PlacementService placement = new PlacementService(openingTypes, instances);
 	private final FabricPlacementAdapter fabricPlacement = new FabricPlacementAdapter();
+	private final OpeningInstanceRepository runtimeState = new OpeningInstanceRepository(instances);
+	private final RuntimeObjectRegistry runtimeObjects = new RuntimeObjectRegistry(runtimeState);
 	private final RuntimePipeline runtimePipeline = new RuntimePipeline(
-		List.of(new OpeningRuntimeBehavior(openingTypes)),
-		new OpeningInstanceRepository(instances)
+		List.of(new OpeningRuntimeBehavior(openingTypes)), runtimeObjects
+	);
+	private final ArchitecturalRuntimeEnvironment runtimeEnvironment = new ArchitecturalRuntimeEnvironment(
+		runtimeObjects,
+		runtimePipeline,
+		new RuntimeTransactionManager(),
+		new RuntimeEventBus(),
+		new RuntimeTickScheduler(),
+		RuntimeWorldQuery.empty(),
+		RuntimeReplicator.noop(),
+		new RuntimeDiagnostics()
 	);
 
 	public void initialize() {
@@ -67,7 +86,8 @@ public final class ApertureBootstrap {
 			instances,
 			generation,
 			placement,
-			runtimePipeline
+			runtimePipeline,
+			runtimeEnvironment
 		));
 		verifyReferencePipeline();
 		LOGGER.info("Aperture runtime bootstrap complete - {} opening types", openingTypes.all().size());
