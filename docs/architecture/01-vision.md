@@ -2,36 +2,36 @@
 
 ## Mission
 
-**Aperture is an Architectural Design Kernel running inside Minecraft.**
+**Aperture is an Architectural Runtime Kernel with Minecraft as its first platform adapter.**
 
-It provides a pure, reusable foundation for generating architectural openings — doors, windows, curtain walls, skylights, and façade elements — using a procedural, parametric, data-driven system comparable to Autodesk Revit families, Rhino Grasshopper, or SketchUp dynamic components.
+It provides pure, reusable contracts for defining, generating, placing, operating, editing, persisting, replicating, and simulating architectural objects. Doors and windows are the first complete family, not the boundary of the platform.
 
-Aperture is **not a content mod**. It is a **platform for architectural generation**.
+Aperture is **not a content mod**. It is a **platform for architectural design and operation**.
 
 ## What Aperture Is
 
 | Aperture Is | Aperture Is Not |
 |---|---|
-| An Architectural Design Kernel | A furniture/decoration pack |
-| A platform for parametric generation | A catalog of static models |
+| An Architectural Runtime Kernel | A furniture/decoration pack |
+| A platform for parametric design and operation | A catalog of static models |
 | Procedural geometry from definitions | Hand-authored block-per-variant content |
 | Host-aware (cuts walls, respects structure) | Free-floating decorative blocks |
-| Parametric, extensible, data-driven | Hardcoded door/window classes |
-| Editor + pipeline + runtime | A collection of door types |
+| Stateful, behavioral, extensible, data-driven | Hardcoded door/window classes |
+| Definitions + generation + runtime + simulation | A collection of door types |
 
 ## Core Identity
 
-**"Aperture is an Architectural Design Kernel running inside Minecraft."**
+**"Aperture is an Architectural Runtime Kernel; Minecraft is one adapter."**
 
 This means:
 
-1. **Kernel-first**: The core abstractions (geometry, parameters, components, pipeline) are Minecraft-free and reusable
-2. **Platform, not content**: We build the generation system, not the 50 door types
-3. **Data-driven**: New opening types are JSON + small generators, not code forks
-4. **CAD-quality**: Precise geometry, constraints, undo/redo, dimension feedback
-5. **Runtime generation**: Everything computed from parameters, nothing hardcoded
+1. **Kernel-first**: Definition, geometry, state, behavior, commands, and simulation contracts are Minecraft-free and reusable
+2. **Platform, not content**: We build shared object lifecycle infrastructure, not a catalog of families
+3. **Schema-driven**: Object families declare parameters, state, capabilities, interactions, and migrations
+4. **CAD-quality and transactional**: Precise geometry, constraints, commands, undo/redo, revision checks, and deterministic replay
+5. **Adapter-based runtime**: The same runtime definition can operate on multiple platforms that provide its required capabilities
 
-**The Iron Law**: "Aperture-core and aperture-geometry SHALL NOT import net.minecraft.*"
+**The Iron Law**: "aperture-core, aperture-geometry, and aperture-runtime SHALL NOT import net.minecraft.*"
 
 ## Core Philosophy
 
@@ -56,7 +56,7 @@ Nothing is implemented as an isolated Minecraft block. Each architectural family
                         ↓
 ┌─────────────────────────────────────────────────────┐
 │  Layer 2: PLATFORM                                  │
-│  (Runtime: pipeline, rendering, placement, NBT)     │
+│  (Objects, state, behavior, events, commands, sync) │
 └─────────────────────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────┐
@@ -68,36 +68,47 @@ Nothing is implemented as an isolated Minecraft block. Each architectural family
 
 **Development Priority**: Platform before Content.
 
-We don't need 50 door types. We need a platform so robust that adding the 51st door type requires zero pipeline code changes — just JSON + assets.
+We do not need 50 door types. We need one complete Opening reference implementation and a second non-Opening family that proves the runtime abstractions are genuinely general.
 
 ## Long-Term North Star
 
+Aperture is organized around four related pipelines with separate responsibilities:
+
+```text
+Definition Pipeline
+Asset / JSON / Node Graph / AI Output → Validation → Resolution → Compiled Definition
+
+Generation Pipeline
+Compiled Definition → Parameters → Constraints → Components → Geometry → Mesh → Placement
+
+Runtime Pipeline
+Placed Object → State → Capabilities → Behavior → Interaction → Transition → Effects → Persistence/Replication
+
+Simulation Pipeline
+World Snapshot → Spatial Semantics → Domain Solvers → Results → Visualization/Behavior Commands
 ```
-Definition  →  Parameter  →  Constraint  →  Component  →  Geometry  →  Mesh  →  Blocks  →  Render
-     ↑              ↑              ↑              ↑              ↑         ↑         ↑
-  Catalog      Resolution    Validation       Graph        Kernel    Voxelize  Platform
-```
 
-The Generation Pipeline is Aperture's CPU.
+Generation is one processor in the platform, not the complete runtime.
 
-Future extensions plug into the same pipeline:
+All mutation producers converge on the same command boundary:
 
-- **Node editor** → edits `OpeningTypeDefinition` graphs
-- **AI assistant** → proposes/modifies definitions and parameters
-- **BIM export** → serializes instances + host relationships to IFC
-- **Multiplayer** → syncs instances and collaborative edits
-- **External CAD** → import/export geometry through the kernel
+- **Editor** → emits validated Commands and Transactions
+- **AI assistant** → proposes the same Commands; it does not bypass validation
+- **Player interaction** → becomes an Interaction and then a Command or state transition
+- **Multiplayer** → replicates authoritative Commands, revisions, and results
+- **Simulation** → reads snapshots and emits results or behavior commands
+- **External CAD/BIM** → imports and exports definitions, instances, host relations, and spatial semantics
 
 ## Design Principles
 
 The project must be:
 
 - **Modular** — strict module boundaries, dependency rules enforced by CI
-- **Minecraft-agnostic core** — geometry, parameters, components are pure Java
-- **Data-driven** — opening types defined in JSON data packs
-- **Procedural** — geometry generated at runtime from parameters
-- **Immutable definitions** — OpeningTypeDefinition never changes after load
-- **Mutable instances** — OpeningInstance parameters can be edited with undo/redo
+- **Minecraft-agnostic domain** — Kernel and Runtime contracts are pure Java
+- **Schema-driven** — architectural families declare definitions, parameters, state, capabilities, and interactions
+- **Procedural** — family-specific geometry is generated at runtime from parameters
+- **Immutable definitions** — compiled runtime definitions never change after publication
+- **Transactional instances** — object state changes through commands, revisions, and validated transitions
 - **Cache-friendly** — pipeline results cached by (type, parameters) tuple
 - **Incrementally updateable** — parameter change → partial pipeline recompute
 - **Future AI-compatible** — schema-first, deterministic generation
@@ -108,14 +119,14 @@ The project must be:
 ## Architectural Tenets
 
 1. **ArchitecturalObject is the universal runtime primitive** — Opening is the first implemented family; no special-case door block logic and no forcing unrelated families into the Opening model.
-2. **Core is Minecraft-agnostic** — geometry, parameters, definitions live in pure Java modules (aperture-core, aperture-geometry, aperture-math).
-3. **The Iron Law** — aperture-core and aperture-geometry SHALL NOT import net.minecraft.*
+2. **Domain logic is Minecraft-agnostic** — definitions, geometry, state, behavior, commands, and simulation contracts live in pure Java modules.
+3. **The Iron Law** — aperture-core, aperture-geometry, and aperture-runtime SHALL NOT import net.minecraft.*
 4. **Adapters at the edges** — Minecraft blocks, rendering, networking are Platform layer concerns.
-5. **Schemas over code** — new opening types are data + small generators, not new mod forks.
+5. **Schemas over code** — new family definitions are data plus typed strategies, not platform forks.
 6. **Immutable definitions, mutable instances** — Revit-like family vs. placed element split.
 7. **Version everything** — migrations are first-class; long-term survival depends on this.
-8. **Platform before content** — A robust pipeline is worth more than 50 hardcoded door types.
-9. **Data flows through the pipeline** — Definition → Parameters → Components → Geometry → Mesh → Blocks → Render.
+8. **Platform before content** — reusable lifecycle infrastructure is worth more than 50 hardcoded families.
+9. **Explicit lifecycle pipelines** — Definition, Generation, Runtime, and Simulation retain separate responsibilities and typed boundaries.
 10. **Components are graph nodes** — topological evaluation, incremental updates, dependency tracking.
 
 ## Reference Systems
@@ -134,43 +145,44 @@ Do **not** think like:
 - A furniture catalog (static models)
 - A texture pack (visual-only changes)
 
-## Success Criteria
+## Platform Success Criteria
 
-Aperture succeeds when:
+Aperture succeeds as an Architectural Runtime Kernel when:
 
-1. **Adding a new opening type requires zero pipeline code changes** — only JSON + assets
-2. **Users can edit parameters in real-time** — drag handle, see preview, commit
-3. **The kernel is reusable** — someone ports Aperture abstractions to another voxel game with minimal changes
-4. **AI can generate openings** — LLM outputs valid OpeningTypeDefinition JSON that works first try
-5. **Performance is acceptable** — < 150ms cold pipeline, < 5ms cached, < 100ms parameter edit
-6. **Content creators thrive** — data pack authors create custom opening families without touching Java
+1. **Unified object model** — any supported `ArchitecturalObject` can be created through a Definition/Instance contract without pretending to be an Opening.
+2. **Declarative runtime semantics** — definitions can declare parameters, persistent and transient state, capabilities, behaviors, interactions, host requirements, and migrations.
+3. **Heterogeneous graphs** — dependency and system graphs connect openings, structure, equipment, spatial objects, and building systems.
+4. **Event-driven operation** — world, time, weather, player, sensor, and object events can trigger deterministic behavior evaluation and state transitions.
+5. **One mutation boundary** — Editor actions, AI proposals, player interactions, automation, and simulation effects become the same validated Commands and Transactions.
+6. **Authoritative collaboration** — concurrent multiplayer edits use revisions, conflict policy, server authority, replication, and replayable command history.
+7. **Simulation access** — solvers can read immutable world snapshots, object capabilities, host relations, rooms, zones, routes, and system topology.
+8. **Portable runtime definitions** — a definition can run through different platform adapters when they provide the required world-query and effect capabilities.
+9. **Minecraft-free core** — Kernel and Runtime domain logic do not import Minecraft APIs; platform dependencies remain at adapter edges.
+10. **Versioned durability** — definitions, instances, state, host dependencies, commands, and simulation inputs have explicit schemas and migrations.
+11. **Observable performance** — generation, behavior evaluation, transactions, persistence, and simulation publish measurable budgets and diagnostics.
+12. **Generalization proof** — Opening is the first complete Runtime Object case, and at least one non-Opening family works without an Opening-shaped compatibility layer.
 
-## What We're Building (Week 1-4)
+## Opening Reference Acceptance
 
-**Week 1**: Architecture Bible completion
-- ✅ All core documentation (Kernel, Platform, Editor)
-- 77% → 100% Foundation/Kernel/Platform docs
+Opening remains the first end-to-end proof, not the platform's final success definition:
 
-**Week 2**: Kernel V1 validation
-- NBT persistence (place → save → reload)
-- Golden tests (fixed_window, door)
-- Profile extrusion working
-- Performance: < 150ms cold pipeline
+- A new Opening type requires no generation-pipeline code changes.
+- Door and window definitions declare parameters, state, capabilities, behavior, and interactions.
+- Placement preserves structured host identity, feature, local frame, attachment policy, and dependency revision.
+- JSON/NBT persistence round-trips persistent state and host bindings; transient state is reconstructed.
+- Real-time editing meets measured preview and cached-generation budgets.
 
-**Week 3**: First geometry through pipeline
-- Frame geometry generator (L-profile extrusion)
-- Glass geometry generator (planar surface)
-- Full fixed_window test case
+## Current Strategic Milestones
 
-**Week 4**: First door through pipeline
-- Door frame + panel + hardware
-- Opening/closing state
-- Full single_door test case
-
-**Beyond**: Platform refinement → Editor implementation → Content library
+1. Complete the Opening runtime path from interaction through persistence and replication.
+2. Make Commands and Transactions the only mutation boundary for Editor, AI, player, and network operations.
+3. Add dependency and system graphs with revision-driven invalidation.
+4. Prove portability with a platform-neutral runtime test adapter.
+5. Implement one non-Opening family to validate `ArchitecturalObject` generalization.
+6. Establish immutable world snapshots and the first simulation-domain contract.
 
 ---
 
 **Document Status**: ✅ Updated with new positioning  
-**Last Updated**: 2026-07-16  
-**Next Review**: After Kernel V1 milestone
+**Last Updated**: 2026-07-17
+**Next Review**: After the first non-Opening runtime object milestone

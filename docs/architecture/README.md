@@ -1,8 +1,10 @@
 # Aperture Architecture
 
-Aperture is a **parametric architectural opening platform** for Minecraft — not a furniture or decoration mod.
+Aperture is an **Architectural Runtime Kernel** with a Minecraft platform adapter — not a furniture, decoration, or door-and-window catalog.
 
-Every door, window, curtain wall, skylight, and façade element is a single kind of thing: an **Opening**, defined procedurally, placed in host geometry, edited parametrically, and rendered as generated structure.
+Every placed and operated element is an `ArchitecturalObject`. Openings are the first implemented family; other families retain typed definitions and generation strategies while sharing runtime identity, state, behavior, commands, persistence, replication, and simulation contracts.
+
+Minecraft is one adapter. Pure Kernel and Runtime modules must remain usable by other hosts.
 
 ## Document Index
 
@@ -35,5 +37,11 @@ Major decisions are recorded in [`ADRs/`](ADRs/).
 ## Core Pipeline
 
 ```
-Definition → Validation → Generation → Placement → Instance → Render/Sync
+Definition → Validation → Compiled Definition
+                         ↓
+              Generation → Placement
+                         ↓
+Instance → Runtime State → Behavior → Interaction → Effects → Persistence/Replication
+                         ↓
+World Snapshot → Simulation → Results → Visualization/Behavior Commands
 ```

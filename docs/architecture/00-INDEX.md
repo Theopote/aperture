@@ -1,8 +1,9 @@
 # Aperture Architecture Index
 
-**Version**: 2.0  
-**Last Updated**: 2026-07-16  
+**Version**: 3.0
+**Last Updated**: 2026-07-17
 **Purpose**: Master index of all architecture documentation
+
 
 ---
 
@@ -11,21 +12,42 @@
 Aperture's architecture is organized into four layers:
 
 1. **Kernel**: Pure abstractions (geometry, parameters, components, constraints)
-2. **Platform**: Runtime system connecting Kernel to Minecraft
+2. **Platform**: Platform-neutral object runtime with Minecraft and future host adapters
 3. **Editor**: CAD-quality manipulation and design tools
-4. **Applications**: Concrete opening and building types
+4. **Applications**: Concrete architectural object families and system definitions
 
-This index maps all architecture documents to these layers and tracks their completion status.
+This index maps architecture documents to these layers. Document currentness and implementation progress are tracked separately.
 
 ---
 
 ## Document Status Legend
 
-- ✅ **Complete**: Fully written, reflects current implementation
+- ✅ **Current**: Fully written and consistent with the intended architecture; this does not imply implementation completion
 - 🔄 **In Progress**: Partially written or being updated
 - 📝 **Draft**: Outline exists, needs detail
 - ⏸️ **Planned**: Identified but not yet started
 - 🔒 **Frozen**: Deliberately not worked on yet (see roadmap)
+
+## Implementation Progress Matrix
+
+Implementation and documentation progress are reported separately. The percentages below are directional planning estimates, not earned milestones and not an aggregate score. A dimension moves only when executable evidence—tests, platform integration, persistence round-trips, or working user flows—changes.
+
+**Assessment date**: 2026-07-17
+
+| Dimension | Estimate | Current evidence | Principal gap |
+|---|---:|---|---|
+| Architecture specification | 85% | Kernel, generation, runtime, editor, asset, and placement contracts documented | Cross-document cleanup and simulation/collaboration contracts |
+| Generation Kernel implementation | 80% | Single kernel, staged geometry/mesh pipeline, structured caching and diagnostics | Golden coverage, broader geometry primitives, incremental graph execution |
+| Minecraft placement integration | 40% | Raycast placement, preview, validation, structured host binding | Production lifecycle coverage and host revision invalidation |
+| Runtime behavior system | 20% | Runtime environment, state schema, behavior/interaction interfaces, ticks and diagnostics | Rich behaviors, world effects, scheduling semantics, heterogeneous objects |
+| Persistence | 35% | Versioned JSON and NBT codecs for Opening state and host binding | End-to-end place/save/reload tests, migrations, command history durability |
+| Networking | 5% | Replication boundary and revision concepts | Protocol, server authority, conflict handling, reconnect/resync |
+| Editor runtime integration | 30% | Selection, preview, parameter UI, gizmo and command abstractions | Unified command path, parameter-bound gizmos, undo/redo integration |
+| Simulation | 2% | Direction and runtime query concepts only | World snapshots, spatial semantics, solver API, first domain solver |
+| Collaboration | 2% | Transaction and revision concepts only | Multi-user commands, merge policy, presence, audit/replay |
+| Architectural object generalization | 25% | `ArchitecturalObject`, generic runtime state, structured host relationships | Generic definitions and a second non-Opening family |
+
+These dimensions are intentionally non-additive. Documentation coverage tables later in this index measure documents only and must not be read as implementation completion.
 
 ---
 
@@ -55,35 +77,36 @@ This index maps all architecture documents to these layers and tracks their comp
 
 | Document | Status | Description |
 |----------|--------|-------------|
-| [02-domain-model.md](architecture/02-domain-model.md) | ✅ | Opening data model (Definition, Instance, Parameters) |
-| [04-core-systems.md](architecture/04-core-systems.md) | ✅ | Overview of 9 cooperating systems |
-| [kernel/01-geometry-kernel.md](architecture/kernel/01-geometry-kernel.md) | ✅ | Geometry primitives: Point, Curve, Profile, Mesh, Transform, Extrusion, Boolean |
-| [kernel/02-parameter-engine.md](architecture/kernel/02-parameter-engine.md) | ✅ | 8 parameter types, constraint expressions, validation |
-| [kernel/03-component-system.md](architecture/kernel/03-component-system.md) | ✅ | Component types, ComponentAssembly contract, component lifecycle |
-| [kernel/04-generation-pipeline.md](architecture/kernel/04-generation-pipeline.md) | ✅ | 8-stage pipeline: Definition → Parameter → Constraint → Component → Geometry → Mesh → Collision → Placement → Render |
-| [kernel/05-component-graph.md](architecture/kernel/05-component-graph.md) | ✅ | Components as graph nodes with ports, topological evaluation, incremental updates |
-| [kernel/06-constraint-solver.md](architecture/kernel/06-constraint-solver.md) | ✅ | Expression parser, evaluator, dependency tracking, incremental validation |
-| [kernel/07-command-system.md](architecture/kernel/07-command-system.md) | ✅ | Command pattern for Undo/Redo, networking, AI integration |
-| [kernel/08-asset-system.md](architecture/kernel/08-asset-system.md) | ✅ | Asset catalog: profiles, materials, opening types, presets, hot reload |
+| [02-domain-model.md](02-domain-model.md) | ✅ | Opening data model (Definition, Instance, Parameters) |
+| [04-core-systems.md](04-core-systems.md) | ✅ | Overview of 9 cooperating systems |
+| [kernel/01-geometry-kernel.md](kernel/01-geometry-kernel.md) | ✅ | Geometry primitives: Point, Curve, Profile, Mesh, Transform, Extrusion, Boolean |
+| [kernel/02-parameter-engine.md](kernel/02-parameter-engine.md) | ✅ | 8 parameter types, constraint expressions, validation |
+| [kernel/03-component-system.md](kernel/03-component-system.md) | ✅ | Component types, ComponentAssembly contract, component lifecycle |
+| [kernel/04-generation-pipeline.md](kernel/04-generation-pipeline.md) | ✅ | 8-stage pipeline: Definition → Parameter → Constraint → Component → Geometry → Mesh → Collision → Placement → Render |
+| [kernel/05-component-graph.md](kernel/05-component-graph.md) | ✅ | Components as graph nodes with ports, topological evaluation, incremental updates |
+| [kernel/06-constraint-solver.md](kernel/06-constraint-solver.md) | ✅ | Expression parser, evaluator, dependency tracking, incremental validation |
+| [kernel/07-command-system.md](kernel/07-command-system.md) | ✅ | Command pattern for Undo/Redo, networking, AI integration |
+| [kernel/08-asset-system.md](kernel/08-asset-system.md) | ✅ | Asset catalog: profiles, materials, opening types, presets, hot reload |
 
 ### ADRs (Architecture Decision Records)
 
 | Document | Status | Description |
 |----------|--------|-------------|
-| [ADRs/0001-opening-as-domain-primitive.md](architecture/ADRs/0001-opening-as-domain-primitive.md) | ✅ | Why "Opening" is the only entity |
-| [ADRs/0002-pure-java-core.md](architecture/ADRs/0002-pure-java-core.md) | ✅ | Why Kernel must be Minecraft-free |
+| [ADRs/0001-opening-as-domain-primitive.md](ADRs/0001-opening-as-domain-primitive.md) | Superseded | Opening remains the common primitive within the Opening family |
+| [ADRs/0002-pure-java-core.md](ADRs/0002-pure-java-core.md) | ✅ | Why Kernel must be Minecraft-free |
+| [ADRs/0003-architectural-object-as-runtime-primitive.md](ADRs/0003-architectural-object-as-runtime-primitive.md) | ✅ | ArchitecturalObject is the universal runtime primitive |
 
-### Completion Status: **~85%**
+### Implementation View: **See the capability matrix above**
 
 **Exists**:
 - ✅ Basic geometry types (BoundingBox, Transform)
 - ✅ 8 parameter types with full specification
 - ✅ Constraint expression evaluator with dependency tracking
 - ✅ Component types (Frame, Glass, Panel, etc.)
-- ✅ 8-stage Generation Pipeline specification
-- ✅ Component Graph system with topological evaluation
-- ✅ Command System for Undo/Redo
-- ✅ Asset System for catalogs and hot reload
+- ✅ Generation Pipeline specification and staged implementation
+- ✅ Component Graph specification; partial implementation
+- ✅ Command System specification; runtime integration remains incomplete
+- ✅ Asset catalog and hot-reload foundations
 - ✅ Comprehensive documentation coverage
 
 **Missing**:
@@ -108,7 +131,7 @@ This index maps all architecture documents to these layers and tracks their comp
 
 ## Layer 2: Platform
 
-**Purpose**: Runtime system connecting Kernel to Minecraft world, rendering, and persistence.
+**Purpose**: Platform-neutral object runtime plus adapters for Minecraft world access, rendering, persistence, and replication.
 
 **Modules**: `aperture-runtime`, `aperture-fabric`, `aperture-opening`, `aperture-render`
 
@@ -116,37 +139,37 @@ This index maps all architecture documents to these layers and tracks their comp
 
 | Document | Status | Description |
 |----------|--------|-------------|
-| [platform/01-opening-pipeline.md](architecture/platform/01-opening-pipeline.md) | ✅ | Definition → Parameter → Component → Geometry → Mesh → Render data flow |
-| [platform/03-runtime-pipeline.md](architecture/platform/03-runtime-pipeline.md) | In Progress | Capabilities, behavior evaluation, state transitions, effects, persistence and replication |
-| [platform/04-runtime-environment.md](architecture/platform/04-runtime-environment.md) | In Progress | Object registry, state, behavior, interactions, events, ticks, world queries, replication and diagnostics |
-| [05-rendering.md](architecture/05-rendering.md) | ✅ | Rendering pipeline: delta engine, mesh compiler, LOD, materials |
-| [06-placement.md](architecture/06-placement.md) | ✅ | Placement workflow: targeting, preview, validation, commit |
-| [07-serialization.md](architecture/07-serialization.md) | ✅ | Persistence, networking, schema migration |
-| [10-fabric-placement-adapter.md](architecture/10-fabric-placement-adapter.md) | ✅ | Minecraft raycast → PlacementContext adapter |
+| [platform/01-opening-pipeline.md](platform/01-opening-pipeline.md) | ✅ | Definition → Parameter → Component → Geometry → Mesh → Render data flow |
+| [platform/03-runtime-pipeline.md](platform/03-runtime-pipeline.md) | In Progress | Capabilities, behavior evaluation, state transitions, effects, persistence and replication |
+| [platform/04-runtime-environment.md](platform/04-runtime-environment.md) | In Progress | Object registry, state, behavior, interactions, events, ticks, world queries, replication and diagnostics |
+| [05-rendering.md](05-rendering.md) | ✅ | Rendering pipeline: delta engine, mesh compiler, LOD, materials |
+| [06-placement.md](06-placement.md) | ✅ | Placement workflow: targeting, preview, validation, commit |
+| [07-serialization.md](07-serialization.md) | ✅ | Persistence, networking, schema migration |
+| [10-fabric-placement-adapter.md](10-fabric-placement-adapter.md) | ✅ | Minecraft raycast → PlacementContext adapter |
 
-### Completion Status: **~95%**
+### Implementation View: **See the capability matrix above**
 
-**Exists**:
-- ✅ OpeningTypeDefinition loader (JSON data packs)
-- ✅ OpeningInstance model
-- ✅ Generation pipeline skeleton (OpeningPipelineAdapter)
-- ✅ Rendering pipeline (aperture-render module, delta engine, ghost preview)
-- ✅ Material catalog system
-- ✅ Placement preview system
-- ✅ Basic validation chain
-- ✅ Complete pipeline documentation
+**Implemented foundations**:
+- ✅ Opening Definition/Instance generation path through `ApertureKernel`
+- ✅ Runtime object registry, schema-backed state, behavior and interaction boundaries
+- ✅ Rendering, material, placement preview, validation, collision and placement metadata
+- ✅ Structured JSON/NBT codecs for persistent state and host bindings
+- ✅ Runtime diagnostics, event, tick, world-query, transaction and replication interfaces
 
-**Missing**:
-- ❌ NBT persistence (OpeningInstance to Block Entity)
-- ❌ Network synchronization (client parameter edits → server authority)
-- ❌ Golden tests for pipeline stages
+**Major gaps**:
+- ❌ End-to-end place → save → reload → resume golden test
+- ❌ Server-authoritative network protocol and conflict handling
+- ❌ Command unification across Editor, AI, player interaction and networking
+- ❌ Dependency/system graphs and revision-driven host invalidation
+- ❌ Simulation snapshots, spatial semantics and domain solvers
+- ❌ Second non-Opening family proving runtime generalization
 
 ### Action Items:
-- [x] Write platform/01-opening-pipeline.md ✅
-- [ ] Implement NBT persistence (place → save → reload works)
-- [ ] Add Collision and Footprint to PipelineResult
-- [ ] Create golden tests for fixed_window and door
-- [ ] Verify adding new opening types requires zero pipeline code changes
+- [x] Implement structured Opening JSON/NBT codecs
+- [ ] Prove world lifecycle persistence with an end-to-end reload test
+- [ ] Implement authoritative Command/Transaction replication
+- [ ] Create generation and runtime golden tests for fixed_window and door
+- [ ] Add one non-Opening ArchitecturalObject reference family
 
 ---
 
@@ -160,11 +183,11 @@ This index maps all architecture documents to these layers and tracks their comp
 
 | Document | Status | Description |
 |----------|--------|-------------|
-| [editor/01-editor-kernel.md](architecture/editor/01-editor-kernel.md) | ✅ | Selection, Manipulator, Command, History, Snap (GUI-independent abstractions) |
+| [editor/01-editor-kernel.md](editor/01-editor-kernel.md) | ✅ | Selection, Manipulator, Command, History, Snap (GUI-independent abstractions) |
 | **editor/02-manipulation.md** | ⏸️ | Gizmo system, drag math, constraint projection |
 | **editor/03-history.md** | ⏸️ | Undo/redo, edit commands, revision tracking |
 
-### Completion Status: **~30%**
+### Implementation View: **See Editor runtime integration in the capability matrix**
 
 **Exists**:
 - ✅ Editor module structure (aperture-editor)
@@ -194,7 +217,7 @@ This index maps all architecture documents to these layers and tracks their comp
 
 **Purpose**: Concrete opening types (Door, Window, Curtain Wall) and future building types (Roof, Stair, etc.).
 
-**Status**: 🔒 **Frozen** until Kernel/Platform/Editor reach acceptance criteria (see [13-platform-roadmap-af.md](architecture/13-platform-roadmap-af.md))
+**Status**: 🔒 **Frozen** until Kernel/Platform/Editor reach acceptance criteria (see [13-platform-roadmap-af.md](13-platform-roadmap-af.md))
 
 ### Documents
 
@@ -224,9 +247,9 @@ This index maps all architecture documents to these layers and tracks their comp
 
 | Document | Status | Description |
 |----------|--------|-------------|
-| [08-expansion-plan.md](architecture/08-expansion-plan.md) | ✅ | Original Phase 0-5 timeline view |
-| [12-phase-roadmap.md](architecture/12-phase-roadmap.md) | ✅ | Twelve-phase engineering breakdown |
-| [13-platform-roadmap-af.md](architecture/13-platform-roadmap-af.md) | ✅ | **Phase A-F decision framework + Family Library Freeze** |
+| [08-expansion-plan.md](08-expansion-plan.md) | ✅ | Original Phase 0-5 timeline view |
+| [12-phase-roadmap.md](12-phase-roadmap.md) | ✅ | Twelve-phase engineering breakdown |
+| [13-platform-roadmap-af.md](13-platform-roadmap-af.md) | ✅ | **Phase A-F decision framework + Family Library Freeze** |
 
 **Relationship**:
 - **08**: Time-horizon view (original)
@@ -251,49 +274,17 @@ All roadmaps agree: **Platform before Content**.
 
 ---
 
-## Current Priorities (Next 2 Weeks)
+## Current Strategic Priorities
 
-Based on [APERTURE-REDEFINED.md](APERTURE-REDEFINED.md), the immediate priorities are:
+1. Complete the Opening runtime path through persistence, replication, and deterministic resume.
+2. Make Commands and Transactions the only mutation boundary for Editor, AI, player, automation, and network input.
+3. Implement dependency and system graphs with revision-driven invalidation.
+4. Add end-to-end golden tests for generation, placement, save/reload, interaction, and replay.
+5. Introduce immutable world snapshots and spatial semantics for simulation consumers.
+6. Implement a second, non-Opening `ArchitecturalObject` family without Opening compatibility wrappers.
+7. Demonstrate one Runtime Definition on a platform-neutral test adapter.
 
-### Week 1: Architecture Bible Completion
-1. **Update foundation docs**
-   - [ ] Update 01-vision.md with new positioning
-   - [ ] Create 00-dependency-rules.md
-   - [ ] Add Iron Law to README and CONTRIBUTING
-
-2. **Write missing Kernel docs**
-   - [x] kernel/01-geometry-kernel.md ✅
-   - [x] kernel/02-parameter-engine.md ✅
-   - [x] kernel/03-component-system.md ✅
-   - [x] kernel/04-generation-pipeline.md ✅
-   - [x] kernel/05-component-graph.md ✅
-   - [x] kernel/06-constraint-solver.md ✅
-   - [x] kernel/07-command-system.md ✅
-   - [x] kernel/08-asset-system.md ✅
-
-3. **Write missing Platform docs**
-   - [x] platform/01-opening-pipeline.md ✅
-
-4. **Write missing Editor docs**
-   - [x] editor/01-editor-kernel.md ✅
-
-5. **Architecture review**
-   - [ ] Verify consistency across all docs
-   - [ ] Check for contradictions or missing links
-
-### Week 2: Kernel Completion & Validation
-1. **Code**
-   - [ ] Unify parameter resolution
-   - [ ] Implement NBT persistence
-   - [ ] Add Collision/Footprint to pipeline outputs
-
-2. **Tests**
-   - [ ] Create golden tests (fixed_window, door)
-   - [ ] Write end-to-end integration test
-
-3. **Milestone**
-   - [ ] Create docs/milestones/KERNEL-V1.md
-   - [ ] Declare Kernel V1 feature-complete
+Progress must be updated from executable evidence in the matrix, not from document count or elapsed sprint time.
 
 ---
 
@@ -324,7 +315,7 @@ Based on [APERTURE-REDEFINED.md](APERTURE-REDEFINED.md), the immediate prioritie
 
 ## Contributing to Documentation
 
-See [DEVELOPMENT.md](DEVELOPMENT.md) for the process.
+See [DEVELOPMENT.md](../DEVELOPMENT.md) for the process.
 
 Key points:
 - Architecture docs are written in Markdown
@@ -350,6 +341,6 @@ Key points:
 
 ## Last Updated
 
-This index reflects the state as of **2026-07-16**, after the strategic reframing in [APERTURE-REDEFINED.md](APERTURE-REDEFINED.md).
+This index reflects the state as of **2026-07-17**, after the Architectural Runtime Kernel reframing.
 
-**Next review**: After Week 1 sprint (Kernel docs completion).
+**Next review**: After the first non-Opening runtime object or authoritative networking milestone.
