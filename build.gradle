@@ -45,7 +45,7 @@ processResources {
 	}
 }
 
-def javaVersion = Integer.parseInt(findProperty('java_version') ?: '21')
+def javaVersion = Integer.parseInt(findProperty('java_version') ?: '21' as String as String)
 def fabricJavaVersion = Integer.parseInt(findProperty('fabric_java_version') ?: '25')
 
 tasks.withType(JavaCompile).configureEach {
