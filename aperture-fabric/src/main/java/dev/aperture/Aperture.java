@@ -2,9 +2,10 @@ package dev.aperture;
 
 import dev.aperture.bootstrap.ApertureBootstrap;
 import dev.aperture.bootstrap.DevelopmentSelfTest;
+import dev.aperture.fabric.network.ApertureReplicationNetworking;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -20,6 +21,7 @@ public class Aperture implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		LOGGER.info("Initializing Aperture — Architectural Opening Design System");
+		ApertureReplicationNetworking.registerPayloadType();
 		bootstrap = new ApertureBootstrap();
 		bootstrap.initialize();
 		if (DevelopmentSelfTest.shouldRun(
