@@ -34,13 +34,13 @@ public final class RuntimePipeline {
 		return process(object, interaction, RuntimeEvaluationContext.empty());
 	}
 
-		Objects.requireNonNull(object, "object");
 	public RuntimeResult process(
-		Objects.requireNonNull(context, "context");
 		ArchitecturalObject object,
 		RuntimeInteraction interaction,
 		RuntimeEvaluationContext context
 	) {
+		Objects.requireNonNull(object, "object");
+		Objects.requireNonNull(context, "context");
 		Objects.requireNonNull(interaction, "interaction");
 
 		RuntimeTransition<ArchitecturalObject> transition = behaviorEngine.evaluate(object, interaction, context);

@@ -36,4 +36,9 @@ public final class OpeningInstanceRepository implements RuntimeStateStore {
 	public Collection<ArchitecturalObject> all() {
 		return List.copyOf(store.all());
 	}
+
+	@Override
+	public boolean remove(UUID objectId) {
+		return store.remove(objectId);
+	}
 }

@@ -12,4 +12,6 @@ public interface RuntimeStateStore extends RuntimeObjectRepository {
 	Optional<ArchitecturalObject> find(UUID objectId);
 
 	Collection<ArchitecturalObject> all();
+
+	boolean remove(UUID objectId);
 }

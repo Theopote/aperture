@@ -3,6 +3,7 @@ package dev.aperture.runtime;
 import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.core.instance.OpeningInstanceStore;
 import dev.aperture.core.placement.PlacementService;
+import dev.aperture.core.object.ArchitecturalObject;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
 import dev.aperture.runtime.catalog.MaterialCatalogRegistry;
 import dev.aperture.runtime.registry.MaterialResolverRegistry;
@@ -14,7 +15,8 @@ import dev.aperture.runtime.service.OpeningGenerationService;
 import java.util.UUID;
 
 /**
- * Server-safe runtime facade: opening generation, placement, persistence, and render data.
+ * Server-safe architectural object environment plus generation, placement, material,
+ * persistence, scheduling, interaction, event, replication, and diagnostic services.
  * Does not include editor services (selection, gizmos, inspector, undo).
  */
 public final class ApertureRuntime {
@@ -97,6 +99,14 @@ public final class ApertureRuntime {
 
 	public ArchitecturalRuntimeEnvironment environment() {
 		return environment;
+	}
+
+	public ArchitecturalObject register(ArchitecturalObject object) {
+		return environment.register(object);
+	}
+
+	public boolean unregister(UUID objectId) {
+		return environment.unregister(objectId);
 	}
 
 	public RuntimeResult interact(UUID objectId, RuntimeInteraction interaction) {

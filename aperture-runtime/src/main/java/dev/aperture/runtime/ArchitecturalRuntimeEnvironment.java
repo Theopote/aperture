@@ -56,6 +56,10 @@ public final class ArchitecturalRuntimeEnvironment {
 
 	public ArchitecturalObject register(ArchitecturalObject object) {
 		return objects.register(object);
+
+	}
+	public boolean unregister(UUID objectId) {
+		return transactions.execute(objectId, () -> objects.unregister(objectId));
 	}
 
 	public Optional<ArchitecturalObject> find(UUID objectId) {

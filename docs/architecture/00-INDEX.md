@@ -118,6 +118,7 @@ This index maps all architecture documents to these layers and tracks their comp
 |----------|--------|-------------|
 | [platform/01-opening-pipeline.md](architecture/platform/01-opening-pipeline.md) | ✅ | Definition → Parameter → Component → Geometry → Mesh → Render data flow |
 | [platform/03-runtime-pipeline.md](architecture/platform/03-runtime-pipeline.md) | In Progress | Capabilities, behavior evaluation, state transitions, effects, persistence and replication |
+| [platform/04-runtime-environment.md](architecture/platform/04-runtime-environment.md) | In Progress | Object registry, state, behavior, interactions, events, ticks, world queries, replication and diagnostics |
 | [05-rendering.md](architecture/05-rendering.md) | ✅ | Rendering pipeline: delta engine, mesh compiler, LOD, materials |
 | [06-placement.md](architecture/06-placement.md) | ✅ | Placement workflow: targeting, preview, validation, commit |
 | [07-serialization.md](architecture/07-serialization.md) | ✅ | Persistence, networking, schema migration |

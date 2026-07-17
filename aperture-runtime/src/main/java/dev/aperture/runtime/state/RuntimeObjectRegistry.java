@@ -52,6 +52,12 @@ public final class RuntimeObjectRegistry implements RuntimeObjectRepository {
 	public Collection<ArchitecturalObject> snapshot() {
 		return List.copyOf(liveObjects.values());
 	}
+	public boolean unregister(UUID objectId) {
+		Objects.requireNonNull(objectId, "objectId");
+		ArchitecturalObject removed = liveObjects.remove(objectId);
+		return stateStore.remove(objectId) || removed != null;
+	}
+
 
 	@Override
 	public void save(ArchitecturalObject object) {
