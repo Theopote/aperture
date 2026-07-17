@@ -89,7 +89,7 @@ for (int i = 0; i < count; i++) {
 String prefix = "state_" + i + "_";
 String key = input.getString(prefix + "key").orElse(null);
 StatePropertyType type = parseStatePropertyType(input.getString(prefix + "type").orElse(null));
-StatePropertyDefinition definition = key == null ? null : OpeningStateSchemas.OPERABLE.property(key).orElse(null);
+StatePropertyDefinition definition = key == null ? null : OpeningStateSchemas.OPERABLE.properties().get(key);
 if (definition == null || !definition.persistent() || definition.type() != type) continue;
 Object value = switch (type) {
 case NUMBER -> input.getDoubleOr(prefix + "number", 0.0);
