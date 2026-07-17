@@ -1,5 +1,7 @@
 package dev.aperture.runtime.schedule;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.concurrent.atomic.AtomicLong;
@@ -21,14 +23,18 @@ public final class RuntimeTickScheduler {
 		tasks.add(new ScheduledTask(currentTick + delayTicks, sequence.getAndIncrement(), Objects.requireNonNull(task, "task")));
 	}
 
-	public synchronized int tick() {
-		currentTick++;
-		int executed = 0;
-		while (!tasks.isEmpty() && tasks.peek().dueTick() <= currentTick) {
-			tasks.remove().task().run();
-			executed++;
+	public int tick() {
+		List<Runnable> due = new ArrayList<>();
+		synchronized (this) {
+			currentTick++;
+			while (!tasks.isEmpty() && tasks.peek().dueTick() <= currentTick) {
+				due.add(tasks.remove().task());
+			}
 		}
-		return executed;
+		for (Runnable task : due) {
+			task.run();
+		}
+		return due.size();
 	}
 
 	private record ScheduledTask(long dueTick, long sequence, Runnable task) implements Comparable<ScheduledTask> {

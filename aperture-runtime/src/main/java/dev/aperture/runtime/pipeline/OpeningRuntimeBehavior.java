@@ -2,10 +2,11 @@ package dev.aperture.runtime.pipeline;
 
 import dev.aperture.core.catalog.OpeningTypeRegistry;
 import dev.aperture.core.instance.OpeningInstance;
-import dev.aperture.core.instance.OpeningState;
+import java.time.Instant;
 import dev.aperture.core.opening.OpeningCategory;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -29,13 +30,21 @@ public final class OpeningRuntimeBehavior implements RuntimeBehavior<OpeningInst
 
 	@Override
 	public Set<RuntimeCapability> capabilities(OpeningInstance object) {
-		return isOperable(object) ? OPERABLE : Set.of();
+		if (!isOperable(object) || !object.state().runtimeState().bool("enabled")) return Set.of();
+		if (object.state().locked()) return Set.of(CLOSE);
+		return OPERABLE;
 	}
 
+
+	@Override
+	public RuntimeTransition<OpeningInstance> evaluate(OpeningInstance object, RuntimeInteraction interaction) {
+		return evaluate(object, interaction, RuntimeEvaluationContext.empty());
+	}
 	@Override
 	public RuntimeTransition<OpeningInstance> evaluate(
 		OpeningInstance object,
-		RuntimeInteraction interaction
+		RuntimeInteraction interaction,
+		RuntimeEvaluationContext context
 	) {
 		if (!isOperable(object)) {
 			throw new IllegalArgumentException("Opening does not support runtime interaction: " + object.typeId());
@@ -51,8 +60,20 @@ public final class OpeningRuntimeBehavior implements RuntimeBehavior<OpeningInst
 			return RuntimeTransition.unchanged(object);
 		}
 
+		String motion = nextRatio > object.state().openRatio() ? "opening" : "closing";
+		var nextState = object.state().transition(
+			Map.of("openRatio", nextRatio),
+			Map.of(
+				"targetOpenRatio", nextRatio,
+				"velocity", 0.0,
+				"motion", motion,
+				"activeInteractor", interaction.actor().id(),
+				"lastEventTime", (double) context.tick()
+			),
+			Instant.EPOCH.plusMillis(context.tick())
+		);
 		OpeningInstance updated = object
-			.withState(new OpeningState(nextRatio))
+			.withState(nextState)
 			.withRevision(object.revision() + 1);
 		return new RuntimeTransition<>(
 			updated,
