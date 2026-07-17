@@ -15,26 +15,32 @@ public record StatePropertyDefinition(
 	public StatePropertyDefinition {
 		Objects.requireNonNull(type, "type");
 		values = Set.copyOf(values);
-		validate(defaultValue);
+		validateValue(type, min, max, values, defaultValue);
 	}
 
 	public void validate(Object value) {
 		Objects.requireNonNull(value, "state value");
+		validateValue(type, min, max, values, value);
+	}
+
+	private static void validateValue(
+		StatePropertyType type, Double min, Double max, Set<String> values, Object value
+	) {
 		switch (type) {
 			case NUMBER -> {
-				if (!(value instanceof Number number)) throw invalid(value);
+				if (!(value instanceof Number number)) throw invalid(type, value);
 				double numeric = number.doubleValue();
-				if ((min != null && numeric < min) || (max != null && numeric > max)) throw invalid(value);
+				if ((min != null && numeric < min) || (max != null && numeric > max)) throw invalid(type, value);
 			}
-			case BOOLEAN -> { if (!(value instanceof Boolean)) throw invalid(value); }
-			case STRING -> { if (!(value instanceof String)) throw invalid(value); }
+			case BOOLEAN -> { if (!(value instanceof Boolean)) throw invalid(type, value); }
+			case STRING -> { if (!(value instanceof String)) throw invalid(type, value); }
 			case ENUM -> {
-				if (!(value instanceof String text) || !values.contains(text)) throw invalid(value);
+				if (!(value instanceof String text) || !values.contains(text)) throw invalid(type, value);
 			}
 		}
 	}
 
-	private IllegalArgumentException invalid(Object value) {
+	private static IllegalArgumentException invalid(StatePropertyType type, Object value) {
 		return new IllegalArgumentException("Invalid " + type + " state value: " + value);
 	}
 
