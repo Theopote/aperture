@@ -8,6 +8,7 @@ import dev.aperture.core.opening.OpeningId;
 import dev.aperture.parameter.ParameterSet;
 import dev.aperture.core.parametric.ParametricSchema;
 import dev.aperture.core.parametric.Parameter;
+import dev.aperture.core.state.StateSchema;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -25,11 +26,21 @@ public record OpeningTypeDefinition(
 	OpeningId id,
 	OpeningCategory category,
 	ParametricSchema parametricSchema,
+	StateSchema stateSchema,
 	List<ConstraintRule> constraints,
 	GeneratorId generator,
 	ComponentAssembly components,
 	List<String> materialSlots
 ) {
+	public OpeningTypeDefinition(
+		int schemaVersion, OpeningId id, OpeningCategory category,
+		ParametricSchema parametricSchema, List<ConstraintRule> constraints,
+		GeneratorId generator, ComponentAssembly components, List<String> materialSlots
+	) {
+		this(schemaVersion, id, category, parametricSchema, StateSchema.empty(),
+			constraints, generator, components, materialSlots);
+	}
+
 	public OpeningTypeDefinition {
 		if (schemaVersion < 1) {
 			throw new IllegalArgumentException("schemaVersion must be >= 1");
@@ -37,6 +48,7 @@ public record OpeningTypeDefinition(
 		Objects.requireNonNull(id, "id");
 		Objects.requireNonNull(category, "category");
 		Objects.requireNonNull(parametricSchema, "parametricSchema");
+		Objects.requireNonNull(stateSchema, "stateSchema");
 		Objects.requireNonNull(generator, "generator");
 		Objects.requireNonNull(components, "components");
 		constraints = List.copyOf(constraints);
@@ -72,6 +84,7 @@ public record OpeningTypeDefinition(
 		private final OpeningCategory category;
 		private final GeneratorId generator;
 		private int schemaVersion = 1;
+		private StateSchema stateSchema = StateSchema.empty();
 		private final ParametricSchema.Builder parametricSchema = ParametricSchema.builder();
 		private final List<ConstraintRule> constraints = new ArrayList<>();
 		private final List<OpeningComponent> components = new ArrayList<>();
@@ -85,6 +98,11 @@ public record OpeningTypeDefinition(
 
 		public Builder parameter(String name, Parameter parameter) {
 			parametricSchema.put(name, parameter);
+			return this;
+		}
+
+		public Builder stateSchema(StateSchema stateSchema) {
+			this.stateSchema = Objects.requireNonNull(stateSchema, "stateSchema");
 			return this;
 		}
 
@@ -123,6 +141,7 @@ public record OpeningTypeDefinition(
 				id,
 				category,
 				parametricSchema.build(),
+				stateSchema,
 				constraints,
 				generator,
 				ComponentAssembly.of(components),

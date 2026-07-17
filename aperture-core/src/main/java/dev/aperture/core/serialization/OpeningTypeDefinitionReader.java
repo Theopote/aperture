@@ -22,6 +22,7 @@ import dev.aperture.core.parametric.ParameterKind;
 import dev.aperture.core.parametric.ParameterMetadata;
 import dev.aperture.core.parametric.ParametricSchema;
 import dev.aperture.core.parametric.RangeParameter;
+import dev.aperture.core.state.StateSchema;
 import dev.aperture.parameter.ParameterType;
 import dev.aperture.parameter.ParameterValue;
 
@@ -61,6 +62,10 @@ public final class OpeningTypeDefinitionReader {
 		OpeningCategory category = OpeningCategory.fromId(root.get("category").getAsString());
 		GeneratorId generator = GeneratorId.parse(root.get("generator").getAsString());
 
+		StateSchema stateSchema = root.has("stateSchema")
+			? RuntimeStateJson.readSchema(root.getAsJsonObject("stateSchema"))
+			: StateSchema.empty();
+
 		ParametricSchema.Builder parameters = ParametricSchema.builder();
 		if (root.has("parameters")) {
 			JsonObject parametersObject = root.getAsJsonObject("parameters");
@@ -97,6 +102,7 @@ public final class OpeningTypeDefinitionReader {
 			id,
 			category,
 			parameters.build(),
+			stateSchema,
 			constraints,
 			generator,
 			components,
