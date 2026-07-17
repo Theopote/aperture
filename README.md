@@ -1,6 +1,6 @@
 # Aperture
 
-**An Architectural Design Kernel running inside Minecraft.**
+**An Architectural Runtime Kernel with Minecraft as its first platform adapter.**
 
 Aperture is not a door mod or a furniture collection. It is a parametric design platform — a kernel for procedural architectural modeling that happens to run in Minecraft.
 
@@ -20,7 +20,16 @@ Everything is parametric. Everything is procedural. Everything is generated from
 
 ## Architecture
 
-Aperture is organized into four layers:
+Aperture's target architecture has six domain layers:
+
+1. **Foundation** — math, IDs, schemas, values, serialization, diagnostics, versions
+2. **Design Kernel** — definitions, components, constraints, geometry, mesh, assets, generation
+3. **Runtime Kernel** — objects, state, capabilities, behavior, events, commands, transactions
+4. **Simulation Kernel** — snapshots, solver contracts, time stepping, results
+5. **Platform Adapters** — runtime orchestration, rendering, editing, persistence, networking, Minecraft/Fabric
+6. **Applications** — Opening and future building, spatial, equipment, and system families
+
+The four-layer list below describes the current historical module grouping while K2 migrates physical ownership. `ArchitecturalObject` is the universal runtime entity; `Opening` is the first fully implemented architectural family.
 
 **Layer 1: Kernel** — Pure abstractions (geometry, parameters, components, constraints)  
 **Layer 2: Platform** — Runtime system connecting Kernel to Minecraft  

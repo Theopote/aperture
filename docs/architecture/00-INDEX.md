@@ -9,7 +9,16 @@
 
 ## Overview
 
-Aperture's architecture is organized into four layers:
+Aperture's target architecture is organized into six domain layers:
+
+1. **Foundation**
+2. **Design Kernel**
+3. **Runtime Kernel**
+4. **Simulation Kernel**
+5. **Platform Adapters**
+6. **Applications**
+
+The older four-layer headings retained later in this index describe current document grouping, not the target domain boundary. [03-module-architecture.md](03-module-architecture.md) is authoritative for dependencies and [14-k2-architectural-runtime-object.md](14-k2-architectural-runtime-object.md) defines the next milestone.
 
 1. **Kernel**: Pure abstractions (geometry, parameters, components, constraints)
 2. **Platform**: Platform-neutral object runtime with Minecraft and future host adapters
@@ -94,7 +103,7 @@ These dimensions are intentionally non-additive. Documentation coverage tables l
 |----------|--------|-------------|
 | [ADRs/0001-opening-as-domain-primitive.md](ADRs/0001-opening-as-domain-primitive.md) | Superseded | Opening remains the common primitive within the Opening family |
 | [ADRs/0002-pure-java-core.md](ADRs/0002-pure-java-core.md) | ✅ | Why Kernel must be Minecraft-free |
-| [ADRs/0003-architectural-object-as-runtime-primitive.md](ADRs/0003-architectural-object-as-runtime-primitive.md) | ✅ | ArchitecturalObject is the universal runtime primitive |
+| [ADRs/0003-architectural-object-runtime-primitive.md](ADRs/0003-architectural-object-runtime-primitive.md) | ✅ | ArchitecturalObject is the universal runtime primitive |
 
 ### Implementation View: **See the capability matrix above**
 
@@ -250,6 +259,7 @@ These dimensions are intentionally non-additive. Documentation coverage tables l
 | [08-expansion-plan.md](08-expansion-plan.md) | ✅ | Original Phase 0-5 timeline view |
 | [12-phase-roadmap.md](12-phase-roadmap.md) | ✅ | Twelve-phase engineering breakdown |
 | [13-platform-roadmap-af.md](13-platform-roadmap-af.md) | ✅ | **Phase A-F decision framework + Family Library Freeze** |
+| [14-k2-architectural-runtime-object.md](14-k2-architectural-runtime-object.md) | ✅ | K2 Runtime Object and Command/Event/Behavior delivery sequence |
 
 **Relationship**:
 - **08**: Time-horizon view (original)
@@ -297,8 +307,8 @@ Progress must be updated from executable evidence in the matrix, not from docume
 | **Platform** | 5 | 5 | 0 | 0 |
 | **Editor** | 3 | 1 | 0 | 2 |
 | **Applications** | 2 | 0 | 0 | 2 |
-| **Roadmaps** | 4 | 4 | 0 | 0 |
-| **Total** | 31 | 26 (84%) | 0 (0%) | 5 (16%) |
+| **Roadmaps** | 5 | 5 | 0 | 0 |
+| **Total** | 32 | 27 (84%) | 0 (0%) | 5 (16%) |
 
 **Target**: 100% Foundation, Kernel, Platform docs complete before Phase 4.
 

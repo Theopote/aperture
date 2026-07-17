@@ -2,7 +2,7 @@
 
 ## Status
 
-Superseded for platform-wide use by [ADR 0003](0003-architectural-object-as-runtime-primitive.md).
+Superseded for platform-wide use by [ADR 0003](0003-architectural-object-runtime-primitive.md).
 
 Accepted within the Opening family.
 

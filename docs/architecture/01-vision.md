@@ -41,7 +41,28 @@ This means:
 
 Nothing is implemented as an isolated Minecraft block. Each architectural family owns its definitions and generation strategy while sharing runtime identity, persistence, synchronization, editing, interaction, and simulation infrastructure.
 
-## Four-Layer Architecture
+## Six Domain Layers
+
+| Layer | Domain | Current and planned modules | Responsibility |
+|---:|---|---|---|
+| 1 | Foundation | `aperture-math`, future `aperture-data`, `aperture-parameter` | Math, IDs, schemas, values, serialization foundations, diagnostics, versions |
+| 2 | Design Kernel | `aperture-core`, `aperture-geometry`, `aperture-pipeline`, `aperture-kernel` | Definitions, components, constraints, geometry, mesh, assets, generation |
+| 3 | Runtime Kernel | planned `aperture-runtime-model` | Objects, state, capabilities, behavior, events, commands, transactions |
+| 4 | Simulation Kernel | future `aperture-simulation` | Snapshots, solver API, time stepping, results, visualization data |
+| 5 | Platform Adapters | `aperture-runtime`, `aperture-render`, `aperture-editor`, `aperture-fabric` | World, render, editor, persistence, network and Minecraft integration |
+| 6 | Applications | `aperture-opening`, future building/spatial families | Concrete object definitions and family-specific strategies |
+
+The lifecycle boundary is explicit:
+
+```text
+ArchitecturalObjectDefinition
+        -> instantiate
+ArchitecturalObjectInstance
+        -> activate in world
+RuntimeArchitecturalObject
+```
+
+### Historical four-layer grouping
 
 ```
 ┌─────────────────────────────────────────────────────┐

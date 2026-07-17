@@ -6,7 +6,9 @@ last_verified: 2026-07-17
 
 # Module Architecture
 
-Aperture is split into small Java libraries and thin Minecraft/Fabric adapters. Dependency direction points from foundational data types toward the runtime; platform code must not leak back into the libraries.
+Aperture is split into pure Java domain libraries and thin platform adapters. The target architecture has Foundation, Design Kernel, Runtime Kernel, Simulation Kernel, Platform Adapter, and Application layers. The dependency listing below describes current physical packaging while K2 introduces the missing runtime-model boundary.
+
+Pure runtime contracts must not depend on `aperture-opening` or Minecraft. K2 first validates object, state, capability, event, command, and behavior contracts in one cohesive `aperture-runtime-model`; it does not create every proposed Gradle module at once.
 
 ```text
 aperture-math
@@ -23,6 +25,21 @@ aperture-math
 ```
 
 This is a direction rule, not a requirement that every module depend on every predecessor.
+## K2 dependency direction
+
+```text
+aperture-runtime-model
+        -> aperture-runtime
+        -> aperture-fabric
+
+aperture-opening
+        -> aperture-runtime-model
+```
+
+`aperture-runtime-model` owns pure object, state, capability, event, command, and behavior contracts. `aperture-runtime` owns Minecraft-independent orchestration. `aperture-fabric` owns platform conversion. The reverse dependency `runtime-model -> opening` is forbidden.
+
+The domain-layer model is a responsibility map, not a request to split modules prematurely. Further physical splits require concrete dependency or ownership pressure.
+
 
 ## Responsibilities
 
