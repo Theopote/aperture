@@ -6,6 +6,8 @@ import dev.aperture.runtime.model.object.ArchitecturalObjectId;
 import dev.aperture.runtime.model.persistence.ArchitecturalObjectSnapshot;
 import dev.aperture.runtime.model.event.WorldRef;
 import dev.aperture.runtime.model.replication.CommandRequestMessage;
+import dev.aperture.runtime.model.replication.ObjectResyncRequest;
+import dev.aperture.runtime.model.replication.ObjectSnapshotMessage;
 import dev.aperture.runtime.replication.AuthoritativeCommandGateway;
 
 import java.util.Objects;
@@ -47,6 +49,11 @@ public final class FabricRuntimeLifecycle {
 
 	public static synchronized Optional<RuntimeObjectSession> find(ArchitecturalObjectId objectId) {
 		return runtime == null ? Optional.empty() : runtime.find(objectId);
+	}
+
+	public static synchronized ObjectSnapshotMessage resync(ObjectResyncRequest request) {
+		if (commands == null) throw new IllegalStateException("Architectural runtime is not installed");
+		return commands.resync(request);
 	}
 
 	public static synchronized AuthoritativeCommandGateway.Outcome submit(CommandRequestMessage request) {
