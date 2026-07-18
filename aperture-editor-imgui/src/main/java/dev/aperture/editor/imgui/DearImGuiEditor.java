@@ -20,11 +20,16 @@ public final class DearImGuiEditor {
 	private static final String DOCKSPACE_ID = "ApertureMainDockspace";
 	private final EditorSession session;
 	private final DearImGuiPropertyEditor propertyEditor;
-	private boolean defaultLayoutPending = true;
+	private boolean defaultLayoutPending;
 
 	public DearImGuiEditor(EditorSession session) {
+		this(session, true);
+	}
+
+	public DearImGuiEditor(EditorSession session, boolean defaultLayoutPending) {
 		this.session = Objects.requireNonNull(session, "session");
 		this.propertyEditor = new DearImGuiPropertyEditor(session);
+		this.defaultLayoutPending = defaultLayoutPending;
 	}
 
 	public void render() {

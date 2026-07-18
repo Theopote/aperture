@@ -38,12 +38,14 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 		ImGui.createContext();
 		ImGuiIO io = ImGui.getIO();
 		io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard | ImGuiConfigFlags.DockingEnable);
-		var configDirectory=client.gameDirectory.toPath().resolve("config/aperture"); try{Files.createDirectories(configDirectory);}catch(IOException error){throw new IllegalStateException("Unable to create Aperture UI config directory",error);} io.setIniFilename(configDirectory.resolve("imgui.ini").toString());
+		var configDirectory=client.gameDirectory.toPath().resolve("config/aperture"); try{Files.createDirectories(configDirectory);}catch(IOException error){throw new IllegalStateException("Unable to create Aperture UI config directory",error);} var iniPath=configDirectory.resolve("imgui.ini"); io.setIniFilename(iniPath.toString());
 		io.getFonts().addFontDefault();
+		io.getFonts().build();
+		ImGui.styleColorsDark();
 		if (!glfw.init(window, true)) throw new IllegalStateException("Unable to initialize ImGui GLFW backend");
 		resetPixelStore();
 		gl3.init("#version 150");
-		editor = new DearImGuiEditor(createSession());
+		editor = new DearImGuiEditor(createSession(), Files.notExists(iniPath));
 		initialized = true;
 		Aperture.LOGGER.info("Dear ImGui initialized for window {}", window);
 	}
