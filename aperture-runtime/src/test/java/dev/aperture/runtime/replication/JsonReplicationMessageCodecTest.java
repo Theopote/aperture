@@ -2,13 +2,18 @@ package dev.aperture.runtime.replication;
 
 import dev.aperture.math.Transform3d;
 import dev.aperture.parameter.ParameterSet;
+import dev.aperture.runtime.model.event.ActorRef;
 import dev.aperture.runtime.model.object.ArchitecturalFamilyId;
 import dev.aperture.runtime.model.object.ArchitecturalObjectId;
 import dev.aperture.runtime.model.object.ArchitecturalObjectInstance;
 import dev.aperture.runtime.model.object.ArchitecturalTypeId;
+import dev.aperture.runtime.model.replication.CommandAcceptedMessage;
 import dev.aperture.runtime.model.replication.CommandCommittedReplicationEvent;
+import dev.aperture.runtime.model.replication.CommandRejectedMessage;
+import dev.aperture.runtime.model.replication.CommandRequestMessage;
 import dev.aperture.runtime.model.replication.EventDeltaMessage;
 import dev.aperture.runtime.model.replication.ObjectRemovedMessage;
+import dev.aperture.runtime.model.replication.ObjectResyncRequest;
 import dev.aperture.runtime.model.replication.ObjectSnapshotMessage;
 import dev.aperture.runtime.model.replication.ReplicaSnapshot;
 import dev.aperture.runtime.model.replication.ReplicationMessage;
@@ -45,7 +50,11 @@ class JsonReplicationMessageCodecTest {
 				new CommandCommittedReplicationEvent(UUID.fromString("57bd45e5-bd55-4f45-bb25-98568062d895"), 8),
 				new StateTransitionReplicationEvent(new StateRevision(3), new StateRevision(4),
 					Set.of("openRatio"))), TIME),
-			new ObjectRemovedMessage(1, objectId, 9, TIME)
+			new ObjectRemovedMessage(1, objectId, 9, TIME),
+			new CommandRequestMessage(1, objectId, UUID.randomUUID(), "request_open", Map.of("source", "editor"), 7, new StateRevision(3), new ActorRef("minecraft:test"), TIME),
+			new CommandAcceptedMessage(1, objectId, UUID.randomUUID(), 8, new StateRevision(4), TIME),
+			new CommandRejectedMessage(1, objectId, UUID.randomUUID(), CommandRejectedMessage.ErrorCode.REVISION_CONFLICT, "stale", 8, new StateRevision(4), TIME),
+			new ObjectResyncRequest(1, objectId, 7, new StateRevision(3), 12, "gap")
 		);
 
 		JsonReplicationMessageCodec codec = new JsonReplicationMessageCodec();

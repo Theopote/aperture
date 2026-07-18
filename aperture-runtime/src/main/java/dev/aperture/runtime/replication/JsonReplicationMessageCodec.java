@@ -7,12 +7,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.aperture.math.Transform3d;
 import dev.aperture.math.Vec3d;
+import dev.aperture.runtime.model.event.ActorRef;
 import dev.aperture.runtime.model.object.ArchitecturalObjectId;
 import dev.aperture.runtime.model.object.ArchitecturalObjectInstance;
 import dev.aperture.runtime.model.persistence.ArchitecturalObjectSnapshot;
+import dev.aperture.runtime.model.replication.CommandAcceptedMessage;
 import dev.aperture.runtime.model.replication.CommandCommittedReplicationEvent;
+import dev.aperture.runtime.model.replication.CommandRejectedMessage;
+import dev.aperture.runtime.model.replication.CommandRequestMessage;
 import dev.aperture.runtime.model.replication.EventDeltaMessage;
 import dev.aperture.runtime.model.replication.ObjectRemovedMessage;
+import dev.aperture.runtime.model.replication.ObjectResyncRequest;
 import dev.aperture.runtime.model.replication.ObjectSnapshotMessage;
 import dev.aperture.runtime.model.replication.ReplicaSnapshot;
 import dev.aperture.runtime.model.replication.ReplicatedEvent;
@@ -48,6 +53,10 @@ public final class JsonReplicationMessageCodec implements ReplicationMessageCode
 			case StateDeltaMessage delta -> writeStateDelta(root, delta);
 			case EventDeltaMessage delta -> writeEventDelta(root, delta);
 			case ObjectRemovedMessage removed -> writeRemoved(root, removed);
+			case CommandRequestMessage request -> writeCommandRequest(root, request);
+			case CommandAcceptedMessage accepted -> writeCommandAccepted(root, accepted);
+			case CommandRejectedMessage rejected -> writeCommandRejected(root, rejected);
+			case ObjectResyncRequest request -> writeResyncRequest(root, request);
 			default -> throw new IllegalArgumentException("Message is not a client replication payload: " + message.getClass().getName());
 		}
 		return GSON.toJson(root);
@@ -63,6 +72,10 @@ public final class JsonReplicationMessageCodec implements ReplicationMessageCode
 			case "state_delta" -> readStateDelta(root, protocolVersion, objectId);
 			case "event_delta" -> readEventDelta(root, protocolVersion, objectId);
 			case "removed" -> readRemoved(root, protocolVersion, objectId);
+			case "command_request" -> readCommandRequest(root, protocolVersion, objectId);
+			case "command_accepted" -> readCommandAccepted(root, protocolVersion, objectId);
+			case "command_rejected" -> readCommandRejected(root, protocolVersion, objectId);
+			case "resync_request" -> readResyncRequest(root, protocolVersion, objectId);
 			default -> throw new IllegalArgumentException("Unknown replication message kind");
 		};
 	}
@@ -141,6 +154,64 @@ public final class JsonReplicationMessageCodec implements ReplicationMessageCode
 			Instant.parse(requiredString(root, "timestamp")));
 	}
 
+	private static void writeCommandRequest(JsonObject root, CommandRequestMessage message) {
+		root.addProperty("kind", "command_request");
+		root.addProperty("commandId", message.commandId().toString());
+		root.addProperty("commandType", message.commandType());
+		root.add("payload", GSON.toJsonTree(message.payload()));
+		root.addProperty("expectedObjectRevision", message.expectedObjectRevision());
+		root.addProperty("expectedStateRevision", message.expectedStateRevision().value());
+		root.addProperty("actor", message.actor().id());
+		root.addProperty("timestamp", message.timestamp().toString());
+	}
+
+	private static CommandRequestMessage readCommandRequest(JsonObject root, int version, ArchitecturalObjectId objectId) {
+		@SuppressWarnings("unchecked") Map<String, String> payload = GSON.fromJson(root.getAsJsonObject("payload"), Map.class);
+		return new CommandRequestMessage(version, objectId, UUID.fromString(requiredString(root, "commandId")),
+			requiredString(root, "commandType"), payload, root.get("expectedObjectRevision").getAsLong(),
+			new StateRevision(root.get("expectedStateRevision").getAsLong()), new ActorRef(requiredString(root, "actor")),
+			Instant.parse(requiredString(root, "timestamp")));
+	}
+
+	private static void writeCommandAccepted(JsonObject root, CommandAcceptedMessage message) {
+		root.addProperty("kind", "command_accepted"); root.addProperty("commandId", message.commandId().toString());
+		root.addProperty("resultingObjectRevision", message.resultingObjectRevision());
+		root.addProperty("resultingStateRevision", message.resultingStateRevision().value());
+		root.addProperty("timestamp", message.timestamp().toString());
+	}
+
+	private static CommandAcceptedMessage readCommandAccepted(JsonObject root, int version, ArchitecturalObjectId objectId) {
+		return new CommandAcceptedMessage(version, objectId, UUID.fromString(requiredString(root, "commandId")),
+			root.get("resultingObjectRevision").getAsLong(), new StateRevision(root.get("resultingStateRevision").getAsLong()),
+			Instant.parse(requiredString(root, "timestamp")));
+	}
+
+	private static void writeCommandRejected(JsonObject root, CommandRejectedMessage message) {
+		root.addProperty("kind", "command_rejected"); root.addProperty("commandId", message.commandId().toString());
+		root.addProperty("errorCode", message.errorCode().name()); root.addProperty("message", message.message());
+		root.addProperty("authoritativeObjectRevision", message.authoritativeObjectRevision());
+		root.addProperty("authoritativeStateRevision", message.authoritativeStateRevision().value());
+		root.addProperty("timestamp", message.timestamp().toString());
+	}
+
+	private static CommandRejectedMessage readCommandRejected(JsonObject root, int version, ArchitecturalObjectId objectId) {
+		return new CommandRejectedMessage(version, objectId, UUID.fromString(requiredString(root, "commandId")),
+			CommandRejectedMessage.ErrorCode.valueOf(requiredString(root, "errorCode")), requiredString(root, "message"),
+			root.get("authoritativeObjectRevision").getAsLong(), new StateRevision(root.get("authoritativeStateRevision").getAsLong()),
+			Instant.parse(requiredString(root, "timestamp")));
+	}
+
+	private static void writeResyncRequest(JsonObject root, ObjectResyncRequest message) {
+		root.addProperty("kind", "resync_request"); root.addProperty("observedObjectRevision", message.observedObjectRevision());
+		root.addProperty("observedStateRevision", message.observedStateRevision().value());
+		root.addProperty("observedEventSequence", message.observedEventSequence()); root.addProperty("reason", message.reason());
+	}
+
+	private static ObjectResyncRequest readResyncRequest(JsonObject root, int version, ArchitecturalObjectId objectId) {
+		return new ObjectResyncRequest(version, objectId, root.get("observedObjectRevision").getAsLong(),
+			new StateRevision(root.get("observedStateRevision").getAsLong()), root.get("observedEventSequence").getAsLong(),
+			requiredString(root, "reason"));
+	}
 	private static JsonObject writeEvent(ReplicatedEvent event) {
 		JsonObject json = new JsonObject();
 		json.addProperty("type", event.eventType());

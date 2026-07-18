@@ -37,7 +37,7 @@ class RuntimeTransactionTest {
 		RuntimeMutation mutation = new RuntimeMutation(List.of(new StatePatch(StateRevision.INITIAL, Map.of(
 			DoorStateSchema.TARGET_OPEN_RATIO, StateValue.number(1),
 			DoorStateSchema.MOTION, StateValue.enumeration("opening")
-		), NOW)), List.of(event), List.of(), List.of());
+		), NOW)), List.of(), List.of(event), List.of(), List.of());
 
 		RuntimeCommitResult result = fixture.transaction.commit(fixture.initial, 0, mutation);
 
@@ -70,7 +70,7 @@ class RuntimeTransactionTest {
 		RuntimeMutation mutation = new RuntimeMutation(List.of(new StatePatch(StateRevision.INITIAL, Map.of(
 			DoorStateSchema.LOCKED, StateValue.bool(true),
 			DoorStateSchema.OPEN_RATIO, StateValue.number(2)
-		), NOW)), List.of(), List.of(), List.of());
+		), NOW)), List.of(), List.of(), List.of(), List.of());
 
 		RuntimeCommitResult result = fixture.transaction.commit(fixture.initial, 0, mutation);
 
@@ -89,7 +89,7 @@ class RuntimeTransactionTest {
 			Map.of(DoorStateSchema.LOCKED, StateValue.bool(true)), NOW);
 
 		RuntimeCommitResult result = fixture.transaction.commit(fixture.initial, 0,
-			new RuntimeMutation(List.of(stale), List.of(), List.of(), List.of()));
+			new RuntimeMutation(List.of(stale), List.of(), List.of(), List.of(), List.of()));
 
 		assertEquals(RuntimeCommitResult.Status.REJECTED, result.status());
 		assertSame(fixture.initial, fixture.repository.require(fixture.initial.instance().objectId()));
@@ -97,7 +97,7 @@ class RuntimeTransactionTest {
 
 	private static RuntimeMutation mutation(String property, StateValue value) {
 		return new RuntimeMutation(List.of(new StatePatch(StateRevision.INITIAL,
-			Map.of(property, value), NOW)), List.of(), List.of(), List.of());
+			Map.of(property, value), NOW)), List.of(), List.of(), List.of(), List.of());
 	}
 
 	private static Fixture fixture() {

@@ -65,7 +65,7 @@ class RuntimeWorldEffectOrderingTest {
 				WorldEffect effect = () -> "test:must_not_execute";
 				StatePatch invalid = new StatePatch(context.state().revision(),
 					Map.of(DoorStateSchema.OPEN_RATIO, StateValue.number(2)), envelope.timestamp());
-				return new CommandResult(CommandResult.Status.ACCEPTED, List.of(invalid), List.of(),
+				return new CommandResult(CommandResult.Status.ACCEPTED, List.of(invalid), List.of(), List.of(),
 					List.of(effect), List.of());
 			}
 		};

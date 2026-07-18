@@ -50,11 +50,18 @@ public final class DefaultRuntimeObjectSession implements RuntimeObjectSession {
 	public static DefaultRuntimeObjectSession committed(
 		RuntimeObjectSession previous, RuntimeState state, long emittedEvents, DirtyFlags dirtyFlags
 	) {
+		return committed(previous, previous.instance(), state, emittedEvents, dirtyFlags);
+	}
+
+	public static DefaultRuntimeObjectSession committed(
+		RuntimeObjectSession previous, ArchitecturalObjectInstance updatedInstance,
+		RuntimeState state, long emittedEvents, DirtyFlags dirtyFlags
+	) {
 		if (!(previous instanceof DefaultRuntimeObjectSession session)) {
 			throw new IllegalArgumentException("Unsupported session implementation: " + previous.getClass().getName());
 		}
 		if (emittedEvents < 0) throw new IllegalArgumentException("emittedEvents must be non-negative");
-		ArchitecturalObjectInstance instance = previous.instance().withRevision(
+		ArchitecturalObjectInstance instance = updatedInstance.withRevision(
 			Math.addExact(previous.objectRevision(), 1));
 		return new DefaultRuntimeObjectSession(instance, state, session.configuration,
 			Math.addExact(previous.eventSequence(), emittedEvents), dirtyFlags);

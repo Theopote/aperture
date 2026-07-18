@@ -95,6 +95,7 @@ public final class DefaultArchitecturalRuntime implements ArchitecturalRuntime {
 		if (evaluated.status() == TransactionResult.Status.REJECTED) return evaluated;
 		RuntimeMutation mutation = new RuntimeMutation(
 			evaluated.commandResults().stream().flatMap(result -> result.statePatches().stream()).toList(),
+			evaluated.commandResults().stream().flatMap(result -> result.parameterPatches().stream()).toList(),
 			evaluated.commandResults().stream().flatMap(result -> result.events().stream()).toList(),
 			evaluated.commandResults().stream().flatMap(result -> result.worldEffects().stream()).toList(),
 			java.util.List.of());
@@ -113,7 +114,7 @@ public final class DefaultArchitecturalRuntime implements ArchitecturalRuntime {
 		for (RuntimeObjectSession session : activeObjects()) {
 			session.evaluateTick(context).ifPresent(patch -> runtimeTransaction.commit(
 				session, session.objectRevision(),
-				new RuntimeMutation(java.util.List.of(patch), java.util.List.of(),
+				new RuntimeMutation(java.util.List.of(patch), java.util.List.of(), java.util.List.of(),
 					java.util.List.of(), java.util.List.of())));
 		}
 	}

@@ -10,6 +10,7 @@ import java.util.List;
 public record CommandResult(
 	Status status,
 	List<StatePatch> statePatches,
+	List<ParameterPatch> parameterPatches,
 	List<ArchitecturalEvent> events,
 	List<WorldEffect> worldEffects,
 	List<CommandDiagnostic> diagnostics
@@ -18,6 +19,7 @@ public record CommandResult(
 
 	public CommandResult {
 		statePatches = List.copyOf(statePatches);
+		parameterPatches = List.copyOf(parameterPatches);
 		events = List.copyOf(events);
 		worldEffects = List.copyOf(worldEffects);
 		diagnostics = List.copyOf(diagnostics);
@@ -27,11 +29,15 @@ public record CommandResult(
 	}
 
 	public static CommandResult accepted(List<StatePatch> patches) {
-		return new CommandResult(Status.ACCEPTED, patches, List.of(), List.of(), List.of());
+		return new CommandResult(Status.ACCEPTED, patches, List.of(), List.of(), List.of(), List.of());
+	}
+
+	public static CommandResult acceptedParameters(List<ParameterPatch> patches) {
+		return new CommandResult(Status.ACCEPTED, List.of(), patches, List.of(), List.of(), List.of());
 	}
 
 	public static CommandResult rejected(String code, String message) {
-		return new CommandResult(Status.REJECTED, List.of(), List.of(), List.of(),
+		return new CommandResult(Status.REJECTED, List.of(), List.of(), List.of(), List.of(),
 			List.of(CommandDiagnostic.error(code, message)));
 	}
 }

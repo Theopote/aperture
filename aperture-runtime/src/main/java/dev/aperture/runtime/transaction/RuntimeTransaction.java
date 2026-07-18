@@ -5,6 +5,8 @@ import dev.aperture.runtime.lifecycle.DirtyFlags;
 import dev.aperture.runtime.lifecycle.RuntimeObjectRepository;
 import dev.aperture.runtime.lifecycle.RuntimeObjectSession;
 import dev.aperture.runtime.model.state.StatePatch;
+import dev.aperture.parameter.ParameterSet;
+import dev.aperture.runtime.model.object.ArchitecturalObjectInstance;
 import dev.aperture.runtime.model.state.StateValue;
 
 import java.time.Instant;
@@ -37,8 +39,9 @@ public final class RuntimeTransaction {
 			if (mutation.isEmpty()) {
 				return RuntimeCommitResult.rejected("runtime.empty_mutation", "Accepted command produced no mutation");
 			}
+			ArchitecturalObjectInstance updatedInstance = applyParameters(current, mutation);
 			DefaultRuntimeObjectSession candidate = DefaultRuntimeObjectSession.committed(
-				current, transition.current(), mutation.events().size(), dirtyFlags(current, transition));
+				current, updatedInstance, transition.current(), mutation.events().size(), dirtyFlags(current, transition, mutation));
 			if (!repository.replace(current, candidate)) {
 				return RuntimeCommitResult.rejected("runtime.concurrent_commit",
 					"Authoritative session changed before commit");
@@ -74,7 +77,22 @@ public final class RuntimeTransaction {
 		return new StateTransition(session.state(), session.state().apply(merged), java.util.Optional.of(merged));
 	}
 
-	private static DirtyFlags dirtyFlags(RuntimeObjectSession session, StateTransition transition) {
+	private static ArchitecturalObjectInstance applyParameters(RuntimeObjectSession session, RuntimeMutation mutation) {
+		if (mutation.parameterPatches().isEmpty()) return session.instance();
+		Map<String, dev.aperture.parameter.ParameterValue> values = new LinkedHashMap<>(session.instance().parameterOverrides().asMap());
+		mutation.parameterPatches().forEach(patch -> {
+			if (patch.expectedObjectRevision() != session.objectRevision()) throw new IllegalArgumentException("Parameter patch revision conflict");
+			dev.aperture.parameter.ParameterValue current = values.get(patch.parameter());
+			if (current == null) throw new IllegalArgumentException("Unknown parameter: " + patch.parameter());
+			if (current.type() != patch.value().type()) throw new IllegalArgumentException("Parameter type mismatch: " + patch.parameter());
+			values.put(patch.parameter(), patch.value());
+		});
+		ArchitecturalObjectInstance instance = session.instance();
+		return new ArchitecturalObjectInstance(instance.schemaVersion(), instance.objectId(), instance.typeId(), instance.familyId(), ParameterSet.of(values), instance.transform(), instance.hostBindings(), instance.persistentState(), instance.revision(), instance.metadata());
+	}
+
+	private static DirtyFlags dirtyFlags(RuntimeObjectSession session, StateTransition transition, RuntimeMutation mutation) {
+		if (!mutation.parameterPatches().isEmpty()) return new DirtyFlags(true, true, true);
 		if (!transition.changed()) return new DirtyFlags(false, true, false);
 		boolean persistent = transition.appliedPatch().orElseThrow().updates().keySet().stream()
 			.anyMatch(name -> session.state().schema().require(name).persistence()
