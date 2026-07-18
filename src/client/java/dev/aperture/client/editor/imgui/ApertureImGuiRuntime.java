@@ -1,6 +1,7 @@
 package dev.aperture.client.editor.imgui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import dev.aperture.Aperture;
 import dev.aperture.editor.imgui.DearImGuiEditor;
 import dev.aperture.editor.model.command.*;
 import dev.aperture.editor.model.history.DefaultHistoryProjection;
@@ -18,7 +19,6 @@ import imgui.glfw.ImGuiImplGlfw;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 
-import java.util.UUID;
 import java.nio.file.Files;
 import java.io.IOException;
 
@@ -28,6 +28,8 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 	private final ImGuiImplGl3 gl3 = new ImGuiImplGl3();
 	private DearImGuiEditor editor;
 	private boolean initialized;
+	private boolean drawDataReady;
+	private boolean drawSubmissionLogged;
 
 	public void initialize() {
 		if (initialized) return;
@@ -43,17 +45,26 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 		gl3.init("#version 150");
 		editor = new DearImGuiEditor(createSession());
 		initialized = true;
+		Aperture.LOGGER.info("Dear ImGui initialized for window {}", window);
 	}
 
-	public void renderFrame() {
+	public void buildFrame() {
 		if (!initialized) initialize();
+		RenderSystem.assertOnRenderThread();
+		glfw.newFrame(); ImGui.newFrame(); editor.render(); ImGui.render();
+		drawDataReady = true;
+	}
+
+	public void renderPendingDrawData() {
+		if (!initialized || !drawDataReady) return;
 		RenderSystem.assertOnRenderThread();
 		int[] viewport = new int[4]; GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport);
 		boolean scissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
 		try {
-			glfw.newFrame(); ImGui.newFrame(); editor.render(); ImGui.render();
 			GL11.glDisable(GL11.GL_SCISSOR_TEST); gl3.renderDrawData(ImGui.getDrawData());
+			if (!drawSubmissionLogged) { Aperture.LOGGER.info("Dear ImGui draw data submitted before frame swap"); drawSubmissionLogged = true; }
 		} finally {
+			drawDataReady = false;
 			GL11.glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
 			if (scissor) GL11.glEnable(GL11.GL_SCISSOR_TEST); else GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		}
@@ -73,5 +84,5 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 
 	private static void resetPixelStore(){GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT,1);GL11.glPixelStorei(org.lwjgl.opengl.GL12.GL_UNPACK_ROW_LENGTH,0);}
 
-	@Override public void close(){if(!initialized)return;gl3.dispose();glfw.dispose();ImGui.destroyContext();initialized=false;editor=null;}
+	@Override public void close(){if(!initialized)return;gl3.dispose();glfw.dispose();ImGui.destroyContext();initialized=false;drawDataReady=false;editor=null;}
 }

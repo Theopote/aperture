@@ -15,20 +15,22 @@ public final class ApertureImGuiClient implements ClientModInitializer {
 	private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(
 		Identifier.fromNamespaceAndPath(Aperture.MOD_ID, "editor")
 	);
-	private final ApertureImGuiRuntime runtime = new ApertureImGuiRuntime();
+	private static final ApertureImGuiRuntime RUNTIME = new ApertureImGuiRuntime();
 	private KeyMapping toggle;
 
 	@Override public void onInitializeClient() {
 		toggle = KeyMappingHelper.registerKeyMapping(new KeyMapping(
 			"key.aperture.toggle_imgui_editor", GLFW.GLFW_KEY_F4, CATEGORY));
 		ClientTickEvents.END_CLIENT_TICK.register(this::tick);
-		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> runtime.close());
+		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> RUNTIME.close());
 	}
 
 	private void tick(Minecraft client) {
 		while (toggle.consumeClick()) {
-			if (client.screen instanceof ApertureImGuiScreen) client.setScreen(null);
-			else client.setScreen(new ApertureImGuiScreen(runtime));
+			if (client.screen instanceof ApertureImGuiScreen) { Aperture.LOGGER.info("Closing Aperture Dear ImGui editor"); client.setScreen(null); }
+			else { Aperture.LOGGER.info("Opening Aperture Dear ImGui editor"); client.setScreen(new ApertureImGuiScreen(RUNTIME)); }
 		}
 	}
+
+	public static void renderPendingDrawData() { RUNTIME.renderPendingDrawData(); }
 }

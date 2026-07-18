@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 public final class ApertureImGuiScreen extends Screen {
 	private final ApertureImGuiRuntime runtime;
 	public ApertureImGuiScreen(ApertureImGuiRuntime runtime){super(Component.literal("Aperture Editor"));this.runtime=runtime;}
-	@Override public void extractRenderState(GuiGraphicsExtractor graphics,int mouseX,int mouseY,float partialTick){runtime.renderFrame();}
+	@Override public void extractRenderState(GuiGraphicsExtractor graphics,int mouseX,int mouseY,float partialTick){runtime.buildFrame();}
 	@Override public void extractBackground(GuiGraphicsExtractor graphics,int mouseX,int mouseY,float partialTick){}
 	@Override public boolean isInGameUi(){return true;}
 	@Override public boolean isPauseScreen(){return false;}

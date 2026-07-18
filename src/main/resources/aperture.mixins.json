@@ -3,7 +3,7 @@
 	"package": "dev.aperture.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [],
-	"client": [],
+	"client": ["client.ApertureImGuiRenderMixin"],
 	"injectors": {
 		"defaultRequire": 1
 	},
