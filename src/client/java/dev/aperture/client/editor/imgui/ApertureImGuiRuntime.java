@@ -18,6 +18,7 @@ import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 
 import java.nio.file.Files;
 import java.io.IOException;
@@ -47,7 +48,7 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 		gl3.init("#version 150");
 		editor = new DearImGuiEditor(createSession(), Files.notExists(iniPath));
 		initialized = true;
-		Aperture.LOGGER.info("Dear ImGui initialized for window {}", window);
+		Aperture.LOGGER.info("Dear ImGui initialized for window {} (fontTexture={}, validTexture={})", window, io.getFonts().getTexID(), GL11.glIsTexture(io.getFonts().getTexID()));
 	}
 
 	public void buildFrame() {
@@ -61,12 +62,19 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 		if (!initialized || !drawDataReady) return;
 		RenderSystem.assertOnRenderThread();
 		int[] viewport = new int[4]; GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport);
+		int previousFramebuffer = GL11.glGetInteger(GL30.GL_FRAMEBUFFER_BINDING);
+		int previousDrawBuffer = GL11.glGetInteger(GL11.GL_DRAW_BUFFER);
 		boolean scissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
 		try {
-			GL11.glDisable(GL11.GL_SCISSOR_TEST); gl3.renderDrawData(ImGui.getDrawData());
+			GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+			GL11.glDrawBuffer(GL11.GL_BACK);
+			GL11.glDisable(GL11.GL_SCISSOR_TEST);
+			gl3.renderDrawData(ImGui.getDrawData());
 			if (!drawSubmissionLogged) { Aperture.LOGGER.info("Dear ImGui draw data submitted before frame swap"); drawSubmissionLogged = true; }
 		} finally {
 			drawDataReady = false;
+			GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, previousFramebuffer);
+			GL11.glDrawBuffer(previousDrawBuffer);
 			GL11.glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
 			if (scissor) GL11.glEnable(GL11.GL_SCISSOR_TEST); else GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		}
