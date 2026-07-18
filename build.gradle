@@ -156,7 +156,9 @@ tasks.register('checkArchitecture') {
 			[files: fileTree("${rootDir}/aperture-runtime/src/main") { include '**/*.java'; exclude '**/transaction/**' }, pattern: ~/\.state\(\)\.apply\s*\(/, message: 'Authoritative RuntimeState may only be applied inside a runtime transaction'],
 			[files: files("${rootDir}/aperture-fabric/src/main/java/dev/aperture/block/entity/OpeningBlockEntity.java"), pattern: ~/(RuntimeState|StatePatch|DoorState)/, message: 'BlockEntity must anchor sessions and snapshots, not own runtime state logic'],
 			[files: files("${rootDir}/aperture-core/src/main/java/dev/aperture/core/serialization/OpeningInstanceCodec.java"), pattern: ~/UnsupportedOperationException/, message: 'OpeningInstanceCodec must implement the DecodeContext entry point'],
-			[files: files("${rootDir}/aperture-fabric/src/main/java/dev/aperture/bootstrap/ApertureBootstrap.java"), pattern: ~/DevelopmentSelfTest|verifyReferencePipeline|instances\.put\s*\(/, message: 'Production bootstrap must not run self-tests or create reference instances']
+			[files: files("${rootDir}/aperture-fabric/src/main/java/dev/aperture/bootstrap/ApertureBootstrap.java"), pattern: ~/DevelopmentSelfTest|verifyReferencePipeline|instances\.put\s*\(/, message: 'Production bootstrap must not run self-tests or create reference instances'],
+			[files: fileTree("${rootDir}/docs/architecture/editor") { include '**/*.md' }, pattern: ~/Set<OpeningInstance>|\.setParameter\s*\(|\.setPosition\s*\(|\.setTransform\s*\(|command\.execute\s*\(|command\.undo\s*\(|history\.execute\s*\(/, message: 'Editor architecture must use ID selection, replica projections, authoritative gateway submission, and compensating undo'],
+			[files: fileTree("${rootDir}/docs/architecture/editor") { include '**/*.md' }, pattern: ~/on(Change|Drag|MouseMove)\s*\(\s*gateway::submit|submitOnEveryFrame/, message: 'Continuous Editor input must remain local preview and submit only once at gesture completion']
 		]
 		sourceRules.each { rule ->
 			rule.files.each { source ->

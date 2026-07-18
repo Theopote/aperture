@@ -34,3 +34,13 @@ Priority: P0 until K2.2 full acceptance. K2.3 Editor Shell may proceed in parall
 ## Exit rule
 
 K2.2 is fully accepted only when these scenarios have repeatable automated coverage where feasible and any unavoidable visual checks have recorded manual evidence.
+## P1 replication scalability carried into K2.3
+
+- [ ] Filter Fabric replication recipients by object/chunk tracking range.
+- [ ] Use `StateDeltaMessage` as the normal committed steady-state path.
+- [ ] Reserve full snapshots for bootstrap, recovery, upgrade, and resync.
+- [ ] Add bounded `EditBegin`, ephemeral `PreviewUpdate`, `EditCommit`, and `EditCancel` interaction sessions.
+- [ ] Verify Inspector/gizmo gestures send one durable commit rather than one command per frame.
+- [ ] Add load tests for many dynamic objects, multi-selection, and multiple editors.
+
+These P1 items do not block the first Editor shell, but the initial UI must follow the local-preview/single-commit policy in [Editor Interaction Transport](../architecture/editor/04-interaction-transport.md).

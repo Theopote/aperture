@@ -92,3 +92,5 @@ Door, Fixed Window, and Curtain Wall are sufficient reference families. Until K2
 | Multiplayer Visual Verification | Not Proven |
 
 K2.3 Editor Shell may begin in parallel, but the P0 items in [K2.2 Open Verification Backlog](../refactoring/k2-2-open-verification.md) remain required for full K2.2 acceptance.
+
+Before K2.3 implementation, Editor code must follow the authoritative flow defined by [Editor Kernel](editor/01-editor-kernel.md) and [Authoritative Editor Command History](editor/03-command-history.md): ID/ComponentPath selection, client replica projections, `EditorCommandGateway` submission, and compensating-command Undo/Redo. Local mutation of placed objects is forbidden.
