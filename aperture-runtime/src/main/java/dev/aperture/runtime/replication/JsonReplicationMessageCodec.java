@@ -48,6 +48,7 @@ public final class JsonReplicationMessageCodec implements ReplicationMessageCode
 			case StateDeltaMessage delta -> writeStateDelta(root, delta);
 			case EventDeltaMessage delta -> writeEventDelta(root, delta);
 			case ObjectRemovedMessage removed -> writeRemoved(root, removed);
+			default -> throw new IllegalArgumentException("Message is not a client replication payload: " + message.getClass().getName());
 		}
 		return GSON.toJson(root);
 	}
