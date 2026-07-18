@@ -84,7 +84,16 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 		return new DefaultEditorSession(selection,read,commands,new SchemaDrivenInspectorModel(read),previews,new DefaultHistoryProjection(),diagnostics,new DefaultWorkspaceModel(),()->{var selected=selection.snapshot().primaryObject();if(selected!=null)previews.clearObject(selected);});
 	}
 
-	private static void resetPixelStore(){GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT,1);GL11.glPixelStorei(org.lwjgl.opengl.GL12.GL_UNPACK_ROW_LENGTH,0);}
+	private static void resetPixelStore() {
+		GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
+		GL11.glPixelStorei(org.lwjgl.opengl.GL12.GL_UNPACK_ROW_LENGTH, 0);
+		GL11.glPixelStorei(org.lwjgl.opengl.GL12.GL_UNPACK_SKIP_PIXELS, 0);
+		GL11.glPixelStorei(org.lwjgl.opengl.GL12.GL_UNPACK_SKIP_ROWS, 0);
+		GL11.glPixelStorei(GL11.GL_PACK_ALIGNMENT, 1);
+		GL11.glPixelStorei(org.lwjgl.opengl.GL12.GL_PACK_ROW_LENGTH, 0);
+		GL11.glPixelStorei(org.lwjgl.opengl.GL12.GL_PACK_SKIP_PIXELS, 0);
+		GL11.glPixelStorei(org.lwjgl.opengl.GL12.GL_PACK_SKIP_ROWS, 0);
+	}
 
 	@Override public void close(){if(!initialized)return;gl3.dispose();glfw.dispose();ImGui.destroyContext();initialized=false;drawDataReady=false;editor=null;}
 }
