@@ -2,11 +2,11 @@
 
 ## Current state
 
-The legacy `dev.aperture.core.editor` package contains selection, mutable editor objects, local commands/history, manipulators, snap and gizmo support. `src/client` owns `ClientRuntimeReplicas`; rendering is in `aperture-render`; Fabric owns Minecraft lifecycle. `aperture-editor-imgui` existed only as a frame-renderer seam and had no editor model.
+The legacy `dev.aperture.core.editor` package contains selection, mutable editor objects, local commands/history, manipulators, snap and gizmo support. `src/client` owns `ClientRuntimeReplicas`; rendering is in `aperture-render`; Fabric owns Minecraft lifecycle. `aperture-editor-imgui` now contains platform-neutral window models and renderer seams, but no Dear ImGui implementation.
 
 ## Legacy mutation paths
 
-The legacy `core.editor.session.EditorSession`, `EditorContext`, `EditorObject`, `SetParameterCommand` and `SetTransformCommand` retain `OpeningInstance` and execute/undo local mutations. They are retained temporarily for K2.2 compatibility and are not the K2.3 frontend API. Runtime state mutation remains transaction-owned. No reusable ImGui context, docking, font, DPI, input capture or workspace persistence implementation was present.
+The legacy `core.editor.session.EditorSession`, `EditorContext`, `EditorObject`, `SetParameterCommand` and `SetTransformCommand` retain `OpeningInstance` and execute/undo local mutations. They are retained temporarily for K2.2 compatibility and are not the K2.3 frontend API. Runtime state mutation remains transaction-owned. There is still no ImGui context, real docking, font atlas, native backend or OpenGL renderer. Workspace persistence and input policy contracts now exist, but they are not connected to Dear ImGui.
 
 ## Authoritative boundary
 
@@ -21,8 +21,8 @@ The client source set exposes `ClientRuntimeReplicas.store()` (`ClientReplicaSto
 | Command | local `execute/undo` | gateway transport submission | added, legacy deprecated path remains |
 | History | local mutable undo | compensating authoritative command | added contract |
 | Preview | direct editor mutation | local overlay/edit session | added |
-| UI frontend | client seams | standalone `aperture-editor-imgui` | module exists; shell integration remains |
+| UI frontend | renderer abstractions only | real Dear ImGui frontend | P0: implement binding, widgets, docking and native host |
 
 ## Remaining gaps
 
-Fabric still needs the concrete ImGui/GLFW/OpenGL host, world picking binding, native font setup and client smoke verification. Legacy editor callers must be migrated before its mutable package can be deleted.
+P0: `aperture-editor-imgui` has no `imgui-java` or native dependency and makes no Dear ImGui calls. Fabric still needs the concrete ImGui/GLFW/OpenGL host, real widgets/dockspace, world picking binding, native font setup and client smoke verification. Legacy editor callers must be migrated before its mutable package can be deleted.

@@ -5,7 +5,7 @@ import dev.aperture.editor.imgui.workspace.MainDockspace;
 import dev.aperture.editor.model.session.EditorSession;
 import java.util.Objects;
 
-/** Composes all K2.3 windows while keeping drawing calls behind a frontend renderer. */
+/** Composes window-facing models for an injected renderer. This class makes no Dear ImGui calls. */
 public final class ApertureImGuiEditor {
 	private final EditorSession session; private final MainDockspace dockspace;
 	public ApertureImGuiEditor(EditorSession session,WindowRenderer renderer){
