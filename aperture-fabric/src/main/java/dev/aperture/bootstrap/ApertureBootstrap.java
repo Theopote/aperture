@@ -8,6 +8,17 @@ import dev.aperture.core.instance.InMemoryOpeningInstanceStore;
 import dev.aperture.core.instance.OpeningInstanceStore;
 import dev.aperture.core.placement.PlacementService;
 import dev.aperture.fabric.placement.FabricPlacementAdapter;
+import dev.aperture.fabric.runtime.FabricRuntimeLifecycle;
+import dev.aperture.geometry.kinematic.ComponentPath;
+import dev.aperture.math.Vec3d;
+import dev.aperture.opening.runtime.DoorCapabilities;
+import dev.aperture.opening.runtime.DoorKinematics;
+import dev.aperture.opening.runtime.DoorRuntimeTick;
+import dev.aperture.opening.runtime.DoorStateSchema;
+import dev.aperture.opening.runtime.ManualDoorInteractionBehavior;
+import dev.aperture.opening.runtime.RequestCloseDoorHandler;
+import dev.aperture.opening.runtime.RequestOpenDoorHandler;
+import dev.aperture.opening.runtime.SetDoorLockHandler;
 import dev.aperture.kernel.ApertureKernel;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
@@ -15,6 +26,14 @@ import dev.aperture.registry.ApertureBlockEntities;
 import dev.aperture.registry.ApertureBlocks;
 import dev.aperture.runtime.ApertureRuntime;
 import dev.aperture.runtime.ArchitecturalRuntimeEnvironment;
+import dev.aperture.runtime.lifecycle.ArchitecturalRuntime;
+import dev.aperture.runtime.lifecycle.DefaultArchitecturalRuntime;
+import dev.aperture.runtime.lifecycle.InMemoryRuntimeObjectRepository;
+import dev.aperture.runtime.lifecycle.KinematicModel;
+import dev.aperture.runtime.lifecycle.RuntimeObjectConfiguration;
+import dev.aperture.runtime.model.command.DefaultCommandBus;
+import dev.aperture.runtime.model.object.ArchitecturalTypeId;
+import dev.aperture.runtime.model.world.WorldQueryExecutor;
 import dev.aperture.runtime.catalog.MaterialCatalogLoader;
 import dev.aperture.runtime.diagnostic.RuntimeDiagnostics;
 import dev.aperture.runtime.catalog.MaterialCatalogRegistry;
@@ -70,6 +89,7 @@ public final class ApertureBootstrap {
 		RuntimeReplicator.noop(),
 		new RuntimeDiagnostics()
 	);
+	private final ArchitecturalRuntime architecturalRuntime = createArchitecturalRuntime();
 
 	public void initialize() {
 		registerBlocks();
@@ -87,6 +107,22 @@ public final class ApertureBootstrap {
 			runtimeEnvironment
 		));
 		LOGGER.info("Aperture runtime bootstrap complete - {} opening types", openingTypes.all().size());
+	}
+
+
+	private static ArchitecturalRuntime createArchitecturalRuntime() {
+		RuntimeObjectConfiguration door = new RuntimeObjectConfiguration(
+			DoorStateSchema.SCHEMA, DoorCapabilities::from,
+			List.of(new ManualDoorInteractionBehavior()),
+			new KinematicModel(List.of(DoorKinematics.swingPanel(
+				new ComponentPath("door.panel").value(), Vec3d.ZERO, false))),
+			DoorRuntimeTick.atSpeed(1.0));
+		return new DefaultArchitecturalRuntime(
+			new InMemoryRuntimeObjectRepository(),
+			instance -> instance.typeId().equals(ArchitecturalTypeId.parse("aperture:door")) ? door : null,
+			new DefaultCommandBus(List.of(
+				new RequestOpenDoorHandler(), new RequestCloseDoorHandler(), new SetDoorLockHandler())),
+			WorldQueryExecutor.unavailable());
 	}
 
 	private void registerBlocks() {
@@ -160,6 +196,8 @@ public final class ApertureBootstrap {
 	public PlacementService placement() {
 		return placement;
 	}
+
+	public ArchitecturalRuntime architecturalRuntime() { return architecturalRuntime; }
 
 	public FabricPlacementAdapter fabricPlacement() {
 		return fabricPlacement;

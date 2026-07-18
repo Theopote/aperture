@@ -5,6 +5,7 @@ import dev.aperture.math.Transform3d;
 import dev.aperture.math.Vec3d;
 import dev.aperture.core.instance.OpeningInstance;
 import dev.aperture.registry.ApertureBlocks;
+import dev.aperture.fabric.runtime.OpeningRuntimeSnapshotAdapter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -30,7 +31,10 @@ public final class OpeningWorldPlacement {
 		}
 
 		if (level.getBlockEntity(pos) instanceof OpeningBlockEntity openingBlockEntity) {
-			openingBlockEntity.setInstance(instance);
+			openingBlockEntity.setInstance(instance); // compatibility view used by the current renderer
+			if (!level.isClientSide() && instance.typeId().toString().equals("aperture:door")) {
+				openingBlockEntity.setRuntimeSnapshot(OpeningRuntimeSnapshotAdapter.fromDoor(instance));
+			}
 		}
 	}
 
