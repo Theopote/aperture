@@ -29,10 +29,11 @@ The client replica is a projection only. There is no client API that can commit 
 - Opening family runtime registration is inverted through `ArchitecturalFamilyPlugin`.
 - Core runtime tests run without Minecraft startup.
 
-## Honest remaining environment verification
+## Minecraft environment verification
 
-The repository's automated JUnit suite, Fabric compilation, client compilation, and architecture checks pass. The existing Loom GameTest sources are excluded from ordinary JUnit execution and have not been executed in a launched Minecraft dedicated-server harness during this run. Consequently, in-game interaction, chunk reload, dynamic collision/picking feel, and two real connected clients still require a manual or Loom server GameTest pass before calling K2.2 production-verified.
+The dedicated-server Loom GameTest source set is enabled and `DoorRuntimeGameTests.blockEntityActivatesAndSnapshotsDoorSession` passes under Minecraft 26.1. It proves that a real server world creates the Opening BlockEntity, activates one authoritative Door session from its snapshot, accepts a Door command through the authority gateway, and commits exactly one object revision.
 
+The repository's automated JUnit suite, Fabric compilation, client compilation, architecture checks, and dedicated-server GameTest pass. Two simultaneously connected graphical clients have not been launched in this headless run, so visual multiplayer observation and dynamic collision/picking feel remain manual verification items.
 The current Fabric interaction broadcast sends a full authoritative snapshot to all connected players after a successful interaction. This favors deterministic convergence over bandwidth efficiency. Tracking-range filtering and steady-state delta broadcasts are follow-up optimizations; the platform-neutral delta/resync protocol is already tested.
 
 ## Verification commands
@@ -41,6 +42,7 @@ The current Fabric interaction broadcast sends a full authoritative snapshot to 
 ./gradlew test
 ./gradlew compileClientJava
 ./gradlew checkArchitecture
+./gradlew :aperture-fabric:runGameTest
 ```
 
 The next product phase remains K2.3 Editor Shell only after the Minecraft environment verification above is completed.
