@@ -19,6 +19,7 @@ import imgui.glfw.ImGuiImplGlfw;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL33;
 
 import java.nio.file.Files;
 import java.io.IOException;
@@ -64,17 +65,20 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 		int[] viewport = new int[4]; GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport);
 		int previousFramebuffer = GL11.glGetInteger(GL30.GL_FRAMEBUFFER_BINDING);
 		int previousDrawBuffer = GL11.glGetInteger(GL11.GL_DRAW_BUFFER);
+		int previousSampler = GL30.glGetIntegeri(GL33.GL_SAMPLER_BINDING, 0);
 		boolean scissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
 		try {
 			GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
 			GL11.glDrawBuffer(GL11.GL_BACK);
+			GL33.glBindSampler(0, 0);
 			GL11.glDisable(GL11.GL_SCISSOR_TEST);
 			gl3.renderDrawData(ImGui.getDrawData());
-			if (!drawSubmissionLogged) { Aperture.LOGGER.info("Dear ImGui draw data submitted before frame swap"); drawSubmissionLogged = true; }
+			if (!drawSubmissionLogged) { Aperture.LOGGER.info("Dear ImGui draw data submitted before frame swap (isolatedSampler={})", previousSampler); drawSubmissionLogged = true; }
 		} finally {
 			drawDataReady = false;
 			GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, previousFramebuffer);
 			GL11.glDrawBuffer(previousDrawBuffer);
+			GL33.glBindSampler(0, previousSampler);
 			GL11.glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
 			if (scissor) GL11.glEnable(GL11.GL_SCISSOR_TEST); else GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		}
