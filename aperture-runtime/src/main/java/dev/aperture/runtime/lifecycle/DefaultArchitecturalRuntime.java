@@ -9,7 +9,12 @@ import dev.aperture.runtime.model.command.TransactionResult;
 import dev.aperture.runtime.model.object.ArchitecturalObjectId;
 import dev.aperture.runtime.model.object.ArchitecturalObjectInstance;
 import dev.aperture.runtime.model.persistence.ArchitecturalObjectSnapshot;
+import dev.aperture.runtime.model.world.WorldEffectExecutor;
+import dev.aperture.runtime.model.world.WorldEffectResult;
 import dev.aperture.runtime.model.world.WorldQueryExecutor;
+import dev.aperture.runtime.transaction.RuntimeCommitResult;
+import dev.aperture.runtime.transaction.RuntimeMutation;
+import dev.aperture.runtime.transaction.RuntimeTransaction;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -21,6 +26,8 @@ public final class DefaultArchitecturalRuntime implements ArchitecturalRuntime {
 	private final RuntimeObjectConfigurationResolver configurations;
 	private final CommandBus commandBus;
 	private final WorldQueryExecutor worldQuery;
+	private final WorldEffectExecutor worldEffects;
+	private final RuntimeTransaction runtimeTransaction;
 
 	public DefaultArchitecturalRuntime(
 		RuntimeObjectRepository repository,
@@ -28,10 +35,22 @@ public final class DefaultArchitecturalRuntime implements ArchitecturalRuntime {
 		CommandBus commandBus,
 		WorldQueryExecutor worldQuery
 	) {
+		this(repository, configurations, commandBus, worldQuery, effect -> WorldEffectResult.applied());
+	}
+
+	public DefaultArchitecturalRuntime(
+		RuntimeObjectRepository repository,
+		RuntimeObjectConfigurationResolver configurations,
+		CommandBus commandBus,
+		WorldQueryExecutor worldQuery,
+		WorldEffectExecutor worldEffects
+	) {
 		this.repository = Objects.requireNonNull(repository, "repository");
 		this.configurations = Objects.requireNonNull(configurations, "configurations");
 		this.commandBus = Objects.requireNonNull(commandBus, "commandBus");
 		this.worldQuery = Objects.requireNonNull(worldQuery, "worldQuery");
+		this.worldEffects = Objects.requireNonNull(worldEffects, "worldEffects");
+		this.runtimeTransaction = new RuntimeTransaction(repository);
 	}
 
 	@Override
@@ -51,7 +70,15 @@ public final class DefaultArchitecturalRuntime implements ArchitecturalRuntime {
 	public CommandResult submit(CommandEnvelope<?> envelope) {
 		Objects.requireNonNull(envelope, "envelope");
 		RuntimeObjectSession session = repository.require(envelope.command().target().objectId());
-		return commandBus.dispatch(envelope, context(session));
+		CommandResult evaluated = commandBus.dispatch(envelope, context(session));
+		if (evaluated.status() == CommandResult.Status.REJECTED) return evaluated;
+		RuntimeCommitResult committed = runtimeTransaction.commit(
+			session, envelope.expectedObjectRevision(), RuntimeMutation.from(evaluated));
+		if (committed.status() == RuntimeCommitResult.Status.REJECTED) {
+			return CommandResult.rejected(committed.code(), committed.message());
+		}
+		committed.change().orElseThrow().worldEffects().forEach(worldEffects::execute);
+		return evaluated;
 	}
 
 	@Override
@@ -60,12 +87,24 @@ public final class DefaultArchitecturalRuntime implements ArchitecturalRuntime {
 		ArchitecturalObjectId target = transaction.commands().getFirst().command().target().objectId();
 		if (transaction.commands().stream().anyMatch(command ->
 			!target.equals(command.command().target().objectId()))) {
-			return new TransactionResult(TransactionResult.Status.REJECTED, transaction.commands().stream()
-				.map(ignored -> CommandResult.rejected("transaction.multiple_objects",
-					"Phase 1 transactions must target one active object"))
-				.toList());
+			return rejectedTransaction(transaction, "transaction.multiple_objects",
+				"Runtime transaction must target one active object");
 		}
-		return commandBus.dispatch(transaction, context(repository.require(target)));
+		RuntimeObjectSession session = repository.require(target);
+		TransactionResult evaluated = commandBus.dispatch(transaction, context(session));
+		if (evaluated.status() == TransactionResult.Status.REJECTED) return evaluated;
+		RuntimeMutation mutation = new RuntimeMutation(
+			evaluated.commandResults().stream().flatMap(result -> result.statePatches().stream()).toList(),
+			evaluated.commandResults().stream().flatMap(result -> result.events().stream()).toList(),
+			evaluated.commandResults().stream().flatMap(result -> result.worldEffects().stream()).toList(),
+			java.util.List.of());
+		RuntimeCommitResult committed = runtimeTransaction.commit(
+			session, transaction.commands().getFirst().expectedObjectRevision(), mutation);
+		if (committed.status() == RuntimeCommitResult.Status.REJECTED) {
+			return rejectedTransaction(transaction, committed.code(), committed.message());
+		}
+		committed.change().orElseThrow().worldEffects().forEach(worldEffects::execute);
+		return evaluated;
 	}
 
 	@Override public void tick(RuntimeTickContext context) { Objects.requireNonNull(context, "context"); }
@@ -79,6 +118,13 @@ public final class DefaultArchitecturalRuntime implements ArchitecturalRuntime {
 
 	@Override public Optional<RuntimeObjectSession> find(ArchitecturalObjectId objectId) { return repository.find(objectId); }
 	@Override public Collection<RuntimeObjectSession> activeObjects() { return repository.activeObjects(); }
+
+	private static TransactionResult rejectedTransaction(
+		CommandTransaction transaction, String code, String message
+	) {
+		return new TransactionResult(TransactionResult.Status.REJECTED, transaction.commands().stream()
+			.map(ignored -> CommandResult.rejected(code, message)).toList());
+	}
 
 	private RuntimeObjectConfiguration requireConfiguration(ArchitecturalObjectInstance instance) {
 		return Objects.requireNonNull(configurations.resolve(instance),

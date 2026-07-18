@@ -10,6 +10,7 @@ public interface RuntimeObjectRepository {
 	RuntimeObjectSession add(RuntimeObjectSession session);
 	Optional<RuntimeObjectSession> find(ArchitecturalObjectId objectId);
 	RuntimeObjectSession require(ArchitecturalObjectId objectId);
+	boolean replace(RuntimeObjectSession expected, RuntimeObjectSession replacement);
 	Optional<RuntimeObjectSession> unload(ArchitecturalObjectId objectId);
 	Collection<RuntimeObjectSession> activeObjects();
 }

@@ -34,6 +34,19 @@ public final class InMemoryRuntimeObjectRepository implements RuntimeObjectRepos
 	}
 
 	@Override
+	public synchronized boolean replace(RuntimeObjectSession expected, RuntimeObjectSession replacement) {
+		Objects.requireNonNull(expected, "expected");
+		Objects.requireNonNull(replacement, "replacement");
+		ArchitecturalObjectId id = expected.instance().objectId();
+		if (!id.equals(replacement.instance().objectId())) {
+			throw new IllegalArgumentException("Replacement must retain object identity");
+		}
+		if (sessions.get(id) != expected) return false;
+		sessions.put(id, replacement);
+		return true;
+	}
+
+	@Override
 	public synchronized Optional<RuntimeObjectSession> unload(ArchitecturalObjectId objectId) {
 		return Optional.ofNullable(sessions.remove(Objects.requireNonNull(objectId, "objectId")));
 	}
