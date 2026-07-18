@@ -18,7 +18,8 @@
 			"dev.aperture.Aperture"
 		],
 		"client": [
-			"dev.aperture.client.ApertureClient"
+			"dev.aperture.client.ApertureClient",
+			"dev.aperture.client.editor.imgui.ApertureImGuiClient"
 		]
 	},
 	"mixins": [

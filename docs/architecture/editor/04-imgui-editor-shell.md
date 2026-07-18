@@ -1,31 +1,36 @@
 # ImGui editor shell
 
-## Status: architecture only
+## Status: concrete UI implemented, client smoke proof pending
 
-Current implementation is an **ImGui-compatible editor frontend architecture**. It is not a Dear ImGui implementation.
-
-There is currently no `imgui-java` dependency, native library, ImGui context, `ImGui.begin()`, `ImGui.dockSpace()`, concrete widget rendering, GLFW backend, or OpenGL draw-data renderer. `ApertureImGuiEditor` only composes window models and delegates them to an injected `WindowRenderer`. `MainDockspace` is a logical window composition, not a Dear ImGui dockspace.
+Aperture now contains a concrete Dear ImGui implementation based on `imgui-java` 1.86.12. `DearImGuiEditor` calls `ImGui.begin()`, `ImGui.dockSpace()` and DockBuilder APIs for the first-run layout.
 
 ## Implemented
 
-- Headless editor session contracts and stable-ID selection.
-- Replica/read-model projection and local preview overlay.
-- Command gateway, diagnostics and compensating-command contracts.
-- Window-facing models for Outliner, Inspector, Runtime State, History and Diagnostics.
-- Backend, input, render-state and workspace persistence interfaces.
-- Unit tests for these platform-neutral contracts.
+- `imgui-java-binding`, `imgui-java-lwjgl3` and Windows/Linux/macOS native declarations.
+- Full-screen transparent docking root.
+- Concrete Object Outliner, Inspector, Runtime State, Command History and Diagnostics windows.
+- Default left/right/bottom dock layout.
+- GLFW and OpenGL3 backend initialization in the Minecraft client source set.
+- F4 client key binding and transparent non-pausing editor screen.
+- Client shutdown disposal and basic viewport/scissor restoration.
+- Headless Editor Model, replica projection and preview/command boundaries.
 
-## Not implemented - P0
+## Proven
 
-- Dear ImGui binding and native artifacts.
-- Dear ImGui context and font atlas.
-- Real docking root and window/widget calls.
-- GLFW event backend and Minecraft input bridge.
-- OpenGL draw-data rendering and concrete state restoration.
-- Fabric render-loop integration and client smoke proof.
+- Editor and editor-imgui unit tests.
+- Offline `compileClientJava`.
+- Architecture checks.
+
+## Not yet proven / remaining P0
+
+- A real Minecraft client smoke run has not yet been completed.
+- The Fabric editor command transport is intentionally not connected; UI writes are rejected rather than mutating replicas.
+- Inspector properties are displayed through real ImGui widgets but are currently read-only.
+- Chinese font atlas and broader OpenGL state restoration remain to be implemented.
+- Packaging/remap verification for a distributable client jar remains.
 
 ## Target flow
 
 `ArchitecturalObjectId -> ClientReplicaStore -> EditorReadModel -> Dear ImGui widgets -> EditorCommandGateway -> authoritative server runtime`
 
-Client Integrated: **No**. World Proven: **No**. K2.3 ImGui UI acceptance: **Not met**.
+Client Integrated: **compiled**. World Proven: **No**. K2.3 full acceptance: **Not met**.

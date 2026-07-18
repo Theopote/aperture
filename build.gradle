@@ -29,6 +29,11 @@ dependencies {
 	implementation project(':aperture-runtime')
 	implementation project(':aperture-fabric')
 	clientImplementation project(':aperture-editor')
+	clientImplementation project(':aperture-editor-imgui')
+	clientImplementation('io.github.spair:imgui-java-lwjgl3:1.86.12') { exclude group: 'org.lwjgl' }
+	clientRuntimeOnly 'io.github.spair:imgui-java-natives-windows:1.86.12'
+	clientRuntimeOnly 'io.github.spair:imgui-java-natives-linux:1.86.12'
+	clientRuntimeOnly 'io.github.spair:imgui-java-natives-macos:1.86.12'
 	clientImplementation project(':aperture-render')
 	clientImplementation project(':aperture-opening-runtime')
 }
