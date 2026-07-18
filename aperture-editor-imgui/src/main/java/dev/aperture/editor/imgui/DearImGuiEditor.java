@@ -19,10 +19,12 @@ import java.util.Objects;
 public final class DearImGuiEditor {
 	private static final String DOCKSPACE_ID = "ApertureMainDockspace";
 	private final EditorSession session;
+	private final DearImGuiPropertyEditor propertyEditor;
 	private boolean defaultLayoutPending = true;
 
 	public DearImGuiEditor(EditorSession session) {
 		this.session = Objects.requireNonNull(session, "session");
+		this.propertyEditor = new DearImGuiPropertyEditor(session);
 	}
 
 	public void render() {
@@ -78,14 +80,15 @@ public final class DearImGuiEditor {
 		if (selection.objectIds().isEmpty()) ImGui.textDisabled("No architectural object selected");
 		else if (selection.objectIds().size() > 1) ImGui.text(selection.objectIds().size() + " objects selected (read-only)");
 		else for (InspectorSection section : session.inspector().sections(selection.primaryObject())) {
-			if (ImGui.collapsingHeader(section.label())) for (InspectorProperty property : section.properties()) renderProperty(property);
+			if (ImGui.collapsingHeader(section.label())) for (InspectorProperty property : section.properties()) renderProperty(selection.primaryObject(), property);
 		}
 		ImGui.end();
 	}
 
-	private void renderProperty(InspectorProperty property) {
+	private void renderProperty(dev.aperture.runtime.model.object.ArchitecturalObjectId objectId, InspectorProperty property) {
 		ImGui.textDisabled(property.label()); ImGui.sameLine(180);
 		Object value = property.value();
+		if (value instanceof ParameterValue parameter && propertyEditor.render(objectId, property, parameter)) return;
 		String display = value instanceof ParameterValue parameter ? formatParameter(parameter) : String.valueOf(value);
 		ImGui.text(display + (property.unit().isBlank() ? "" : " " + property.unit()));
 	}
