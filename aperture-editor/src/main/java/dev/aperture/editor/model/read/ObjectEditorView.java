@@ -9,4 +9,4 @@ import java.util.List;
 public record ObjectEditorView(ArchitecturalObjectId objectId, ArchitecturalTypeId typeId,
 	ArchitecturalFamilyId familyId, String displayName, Transform3d transform,
 	List<HostBinding> hostBindings, ParameterSet parameters, RuntimeState runtimeState,
-	long objectRevision, long stateRevision, SyncStatus syncStatus, List<EditorDiagnostic> diagnostics) {}
+	long objectRevision, long stateRevision, SyncStatus syncStatus, List<RuntimeActionDescriptor> runtimeActions, List<EditorDiagnostic> diagnostics) {}

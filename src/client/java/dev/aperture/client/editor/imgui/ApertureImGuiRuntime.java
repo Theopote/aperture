@@ -90,7 +90,7 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 
 	private static EditorSession createSession() {
 		var selection=new DefaultSelectionModel(); var previews=new LocalPreviewCoordinator(); var diagnostics=new DiagnosticsModel();
-		var read=new ReplicaEditorReadModel(ClientRuntimeReplicas.store(),previews,diagnostics);
+		var read=new ReplicaEditorReadModel(ClientRuntimeReplicas.store(),previews,diagnostics,ClientRuntimeReplicas::runtimeActions);
 		EditorCommandTransport transport=new ClientEditorCommandTransport(diagnostics);
 		var commands=new DefaultEditorCommandGateway(transport,diagnostics);
 		return new DefaultEditorSession(selection,read,commands,new SchemaDrivenInspectorModel(read),previews,new DefaultHistoryProjection(),diagnostics,new DefaultWorkspaceModel(),()->{var selected=selection.snapshot().primaryObject();if(selected!=null)previews.clearObject(selected);});

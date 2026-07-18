@@ -1,6 +1,11 @@
 package dev.aperture.editor.imgui;
 
 import dev.aperture.editor.model.history.EditorHistoryEntry;
+import dev.aperture.editor.model.command.ExpectedRevision;
+import dev.aperture.runtime.model.command.RequestOpenCommand;
+import dev.aperture.runtime.model.command.RequestCloseCommand;
+import dev.aperture.runtime.model.command.SetLockCommand;
+import dev.aperture.runtime.model.event.ObjectRef;
 import dev.aperture.editor.model.inspector.InspectorProperty;
 import dev.aperture.editor.model.inspector.InspectorSection;
 import dev.aperture.editor.model.read.EditorDiagnostic;
@@ -157,10 +162,35 @@ public final class DearImGuiEditor {
 		if (!ImGui.begin("Runtime State")) { ImGui.end(); return; }
 		var id = session.selection().snapshot().primaryObject();
 		if (id == null) ImGui.textDisabled("No architectural object selected");
-		else session.readModel().object(id).ifPresentOrElse(view -> view.runtimeState().values().forEach((key,value) -> {
-			ImGui.textDisabled(key); ImGui.sameLine(180); ImGui.text(String.valueOf(value));
-		}), () -> ImGui.textDisabled("Replica unavailable"));
+		else session.readModel().object(id).ifPresentOrElse(view -> {
+			view.runtimeState().values().forEach((key,value) -> {
+				ImGui.textDisabled(key); ImGui.sameLine(180); ImGui.text(String.valueOf(value));
+			});
+			if (!view.runtimeActions().isEmpty()) {
+				ImGui.separator(); ImGui.textDisabled("Actions");
+				for (var action : view.runtimeActions()) {
+					if (!action.enabled()) ImGui.beginDisabled();
+					boolean pressed = ImGui.button(action.label()+"##"+action.id());
+					if (!action.enabled()) ImGui.endDisabled();
+					if (pressed) submitRuntimeAction(view, action.id());
+					ImGui.sameLine();
+				}
+				ImGui.newLine();
+			}
+		}, () -> ImGui.textDisabled("Replica unavailable"));
 		ImGui.end();
+	}
+
+	private void submitRuntimeAction(dev.aperture.editor.model.read.ObjectEditorView view, String action) {
+		ObjectRef target = new ObjectRef(view.objectId());
+		var command = switch (action) {
+			case "request_open" -> new RequestOpenCommand(target);
+			case "request_close" -> new RequestCloseCommand(target);
+			case "set_locked" -> new SetLockCommand(target, true);
+			case "set_unlocked" -> new SetLockCommand(target, false);
+			default -> throw new IllegalArgumentException("Unsupported runtime action: " + action);
+		};
+		session.commands().submit(command, new ExpectedRevision(view.objectRevision(), view.stateRevision()));
 	}
 
 	private void renderHistory() {
