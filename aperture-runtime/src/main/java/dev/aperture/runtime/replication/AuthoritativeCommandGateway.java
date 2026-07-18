@@ -8,6 +8,7 @@ import dev.aperture.runtime.model.command.CommandResult;
 import dev.aperture.runtime.model.command.RequestCloseCommand;
 import dev.aperture.runtime.model.command.RequestOpenCommand;
 import dev.aperture.runtime.model.command.SetLockCommand;
+import dev.aperture.runtime.model.capability.StandardCapabilities;
 import dev.aperture.runtime.model.event.ObjectRef;
 import dev.aperture.runtime.model.event.WorldRef;
 import dev.aperture.runtime.model.replication.*;
@@ -41,7 +42,7 @@ public final class AuthoritativeCommandGateway {
    return remember(request.commandId(), reject(request, CommandRejectedMessage.ErrorCode.REVISION_CONFLICT, "Authoritative revision differs from client expectation", before));
   }
   ArchitecturalCommand command;
-  try { command=decode(request); }
+  try { command=decode(request, before); }
   catch(IllegalArgumentException ex) { return remember(request.commandId(), reject(request, CommandRejectedMessage.ErrorCode.COMMAND_UNSUPPORTED, ex.getMessage(), before)); }
   CommandEnvelope<ArchitecturalCommand> envelope=new CommandEnvelope<>(request.commandId(), command, request.actor(), world, request.expectedObjectRevision(), request.timestamp(), request.commandId(), null, Map.of("transport","network"));
   CommandResult result=runtime.submit(envelope);
@@ -61,11 +62,13 @@ public final class AuthoritativeCommandGateway {
   return new ObjectSnapshotMessage(PROTOCOL_VERSION, ReplicaSnapshot.capture(session.instance(), session.state()));
  }
 
- private ArchitecturalCommand decode(CommandRequestMessage request) {
+ private ArchitecturalCommand decode(CommandRequestMessage request, RuntimeObjectSession session) {
   ObjectRef target=new ObjectRef(request.objectId());
   return switch(request.commandType()) {
    case "request_open" -> new RequestOpenCommand(target);
    case "request_close" -> new RequestCloseCommand(target);
+   case "toggle_open" -> session.capabilities().requireCapability(StandardCapabilities.OPENABLE).targetRatio() > 0
+    ? new RequestCloseCommand(target) : new RequestOpenCommand(target);
    case "set_lock" -> new SetLockCommand(target, parseBoolean(request.payload(), "locked"));
    default -> throw new IllegalArgumentException("Unsupported command type: "+request.commandType());
   };

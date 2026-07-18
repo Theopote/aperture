@@ -30,6 +30,7 @@ dependencies {
 	implementation project(':aperture-fabric')
 	clientImplementation project(':aperture-editor')
 	clientImplementation project(':aperture-render')
+	clientImplementation project(':aperture-opening-runtime')
 }
 
 processResources {

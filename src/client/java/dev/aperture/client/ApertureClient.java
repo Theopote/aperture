@@ -13,6 +13,7 @@ import dev.aperture.client.render.editor.EditorGizmoRenderer;
 import dev.aperture.client.render.placement.GhostPreviewMeshRenderer;
 import dev.aperture.client.render.placement.PlacementPreviewMeshService;
 import dev.aperture.client.render.placement.PlacementPreviewRenderer;
+import dev.aperture.client.runtime.ClientRuntimeReplicas;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
@@ -35,6 +36,7 @@ public class ApertureClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
+		ClientRuntimeReplicas.registerReceiver();
 		commitPlacementKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
 			"key.aperture.commit_placement",
 			GLFW.GLFW_KEY_P,

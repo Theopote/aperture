@@ -24,7 +24,7 @@ class AuthoritativeCommandGatewayTest {
   ClientReplicaStore clientA=client(); ClientReplicaStore clientB=client();
   JsonAuthorityProtocolCodec codec=new JsonAuthorityProtocolCodec();
   ObjectSnapshotMessage initial=new ObjectSnapshotMessage(1,ReplicaSnapshot.capture(created.instance(),created.state())); clientA.apply(initial); clientB.apply(initial);
-  UUID openId=UUID.randomUUID(); CommandRequestMessage open=request(instance.objectId(),openId,"request_open",Map.of(),0,0);
+  UUID openId=UUID.randomUUID(); CommandRequestMessage open=request(instance.objectId(),openId,"toggle_open",Map.of(),0,0);
   assertEquals(open,codec.decode(codec.encode(open)));
   var first=gateway.handle(open); assertInstanceOf(CommandAcceptedMessage.class,first.response()); assertEquals(1,runtime.find(instance.objectId()).orElseThrow().objectRevision());
   clientA.apply(first.broadcasts().getFirst());
