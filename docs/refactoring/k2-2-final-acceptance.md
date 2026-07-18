@@ -57,4 +57,9 @@ The current Fabric interaction broadcast sends a full authoritative snapshot to 
 ./gradlew :aperture-fabric:runGameTest
 ```
 
+## CI evidence
+
+[GitHub Actions CI](../../.github/workflows/build.yml) now defines four independent required-candidate jobs: `Architecture Check`, `Unit Tests`, `Compile Client`, and `Fabric Dedicated Server GameTest`. The architecture gate rejects ImGui, LWJGL/OpenGL, and Minecraft client imports from common/server Java source sets, and rejects ImGui/LWJGL dependencies declared on common dependency configurations.
+
+These gates pass locally on 2026-07-18. This is not GitHub-hosted CI evidence. CI status remains **Pending** until all four jobs pass for the repository's latest commit in GitHub Actions. Branch protection should then require these four named checks before merge.
 K2.3 Editor Shell may start in parallel, but the unresolved K2.2 verification backlog remains P0 and must not disappear from the roadmap or be treated as implicitly accepted by UI progress. See [K2.2 Open Verification Backlog](k2-2-open-verification.md).

@@ -1,30 +1,121 @@
-# Automatically build the project and run any configured tests for every push
-# and submitted pull request. This can help catch issues that only occur on
-# certain platforms or Java versions, and provides a first line of defence
-# against bad commits.
+name: CI
 
-name: build
-on: [pull_request, push]
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GRADLE_OPTS: -Dorg.gradle.daemon=false
 
 jobs:
-  build:
+  architecture-check:
+    name: Architecture Check
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
-      - name: checkout repository
-        uses: actions/checkout@v6
-      - name: validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@v6
-      - name: setup jdk
+      - uses: actions/checkout@v6
+      - uses: gradle/actions/wrapper-validation@v6
+      - name: Install core JDK 21
         uses: actions/setup-java@v5
         with:
+          distribution: microsoft
           java-version: '21'
-          distribution: 'microsoft'
-      - name: make gradle wrapper executable
-        run: chmod +x ./gradlew
-      - name: build
-        run: ./gradlew build
-      - name: capture build artifacts
+      - name: Install Fabric JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: microsoft
+          java-version: '25'
+      - uses: gradle/actions/setup-gradle@v6
+      - run: chmod +x ./gradlew
+      - name: Enforce module and client/server boundaries
+        run: ./gradlew checkArchitecture --stacktrace --no-daemon
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: gradle/actions/wrapper-validation@v6
+      - name: Install core JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: microsoft
+          java-version: '21'
+      - name: Install Fabric JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: microsoft
+          java-version: '25'
+      - uses: gradle/actions/setup-gradle@v6
+      - run: chmod +x ./gradlew
+      - name: Run unit and module integration tests
+        run: ./gradlew test --stacktrace --no-daemon
+      - name: Upload unit-test reports
+        if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: Artifacts
-          path: build/libs/
+          name: unit-test-reports
+          path: '**/build/reports/tests/**'
+          if-no-files-found: ignore
+
+  compile-client:
+    name: Compile Client
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: gradle/actions/wrapper-validation@v6
+      - name: Install core JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: microsoft
+          java-version: '21'
+      - name: Install Fabric JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: microsoft
+          java-version: '25'
+      - uses: gradle/actions/setup-gradle@v6
+      - run: chmod +x ./gradlew
+      - name: Compile split client source set
+        run: ./gradlew :aperture-editor-imgui:compileJava compileClientJava --stacktrace --no-daemon
+
+  fabric-gametest:
+    name: Fabric Dedicated Server GameTest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: gradle/actions/wrapper-validation@v6
+      - name: Install core JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: microsoft
+          java-version: '21'
+      - name: Install Fabric JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: microsoft
+          java-version: '25'
+      - uses: gradle/actions/setup-gradle@v6
+      - run: chmod +x ./gradlew
+      - name: Run headless Minecraft dedicated-server tests
+        run: ./gradlew :aperture-fabric:runGameTest --stacktrace --no-daemon
+      - name: Upload GameTest diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fabric-gametest-diagnostics
+          path: |
+            aperture-fabric/build/**/*.xml
+            aperture-fabric/run/**/logs/*.log
+            run/**/logs/*.log
+          if-no-files-found: ignore

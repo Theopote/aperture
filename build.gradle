@@ -128,7 +128,8 @@ tasks.register('checkArchitecture') {
 			'aperture-kernel': ['aperture-runtime','aperture-render','aperture-editor','aperture-fabric'],
 			'aperture-runtime': ['aperture-opening','aperture-opening-runtime','aperture-editor','aperture-fabric'],
 			'aperture-render': ['aperture-fabric'],
-			'aperture-editor': ['aperture-fabric']
+			'aperture-editor': ['aperture-editor-imgui','aperture-fabric'],
+			'aperture-editor-imgui': ['aperture-fabric']
 		]
 		def violations = []
 		forbiddenProjectDeps.each { moduleName, forbidden ->
@@ -143,7 +144,39 @@ tasks.register('checkArchitecture') {
 			}
 		}
 
+		def commonDependencyConfigurations = ['api', 'implementation', 'runtimeOnly', 'compileOnly']
+		allprojects.each { candidate ->
+			if (candidate.name == 'aperture-editor-imgui') {
+				return
+			}
+			commonDependencyConfigurations.each { configurationName ->
+				candidate.configurations.findByName(configurationName)?.dependencies?.each { dependency ->
+					def coordinate = "${dependency.group ?: ''}:${dependency.name ?: ''}".toLowerCase()
+					if (coordinate.contains('imgui') || coordinate.startsWith('org.lwjgl:')) {
+						violations << "Client/native dependency ${coordinate} must use a client-only configuration, not ${candidate.path}:${configurationName}"
+					}
+				}
+			}
+		}
+		allprojects.findAll { it.name != 'aperture-fabric' && it.name != 'aperture-editor-imgui' }.each { candidate ->
+			['api', 'implementation'].each { configurationName ->
+				candidate.configurations.findByName(configurationName)?.dependencies?.withType(ProjectDependency)?.each { dependency ->
+					if (dependency.path == ':aperture-editor-imgui') {
+						violations << "Only aperture-fabric may integrate aperture-editor-imgui, not ${candidate.path} (${configurationName})"
+					}
+				}
+			}
+		}
+		def imguiProject = project(':aperture-editor-imgui')
+		['api', 'implementation'].each { configurationName ->
+			imguiProject.configurations.findByName(configurationName)?.dependencies?.withType(ProjectDependency)?.each { dependency ->
+				if (dependency.path != ':aperture-editor') {
+					violations << "aperture-editor-imgui may depend only on aperture-editor, not ${dependency.path} (${configurationName})"
+				}
+			}
+		}
 		def sourceRules = [
+			[files: fileTree("${rootDir}/aperture-editor-imgui/src/main") { include '**/*.java' }, pattern: ~/import\s+(net\.minecraft\.|org\.lwjgl\.glfw\.)/, message: 'ImGui frontend must not own Minecraft or GLFW integration'],
 			[files: fileTree(rootDir) { include '**/src/**/*.java'; exclude '**/build/**' }, pattern: ~/dev\.aperture\.core\.parameter\./, message: 'old core.parameter API is forbidden'],
 			[files: fileTree(rootDir) { include '**/src/**/*.java'; exclude '**/build/**' }, pattern: ~/new\s+DefinitionStage\s*\(\s*\)/, message: 'DefinitionStage requires an injected registry'],
 			[files: fileTree("${rootDir}/aperture-pipeline/src/main/java/dev/aperture/pipeline/stage") { include '**/*.java' }, pattern: ~/loadClasspathCatalog\s*\(/, message: 'stages must not load profile catalogs'],
@@ -158,7 +191,8 @@ tasks.register('checkArchitecture') {
 			[files: files("${rootDir}/aperture-core/src/main/java/dev/aperture/core/serialization/OpeningInstanceCodec.java"), pattern: ~/UnsupportedOperationException/, message: 'OpeningInstanceCodec must implement the DecodeContext entry point'],
 			[files: files("${rootDir}/aperture-fabric/src/main/java/dev/aperture/bootstrap/ApertureBootstrap.java"), pattern: ~/DevelopmentSelfTest|verifyReferencePipeline|instances\.put\s*\(/, message: 'Production bootstrap must not run self-tests or create reference instances'],
 			[files: fileTree("${rootDir}/docs/architecture/editor") { include '**/*.md' }, pattern: ~/Set<OpeningInstance>|\.setParameter\s*\(|\.setPosition\s*\(|\.setTransform\s*\(|command\.execute\s*\(|command\.undo\s*\(|history\.execute\s*\(/, message: 'Editor architecture must use ID selection, replica projections, authoritative gateway submission, and compensating undo'],
-			[files: fileTree("${rootDir}/docs/architecture/editor") { include '**/*.md' }, pattern: ~/on(Change|Drag|MouseMove)\s*\(\s*gateway::submit|submitOnEveryFrame/, message: 'Continuous Editor input must remain local preview and submit only once at gesture completion']
+			[files: fileTree("${rootDir}/docs/architecture/editor") { include '**/*.md' }, pattern: ~/on(Change|Drag|MouseMove)\s*\(\s*gateway::submit|submitOnEveryFrame/, message: 'Continuous Editor input must remain local preview and submit only once at gesture completion'],
+			[files: fileTree(rootDir) { include 'src/main/**/*.java'; include 'aperture-*/src/main/**/*.java'; exclude '**/build/**'; exclude 'aperture-editor-imgui/**' }, pattern: ~/import\s+(imgui\.|org\.lwjgl\.|net\.minecraft\.client\.)/, message: 'Client, ImGui, LWJGL, and OpenGL APIs must not leak into common/server source sets']
 		]
 		sourceRules.each { rule ->
 			rule.files.each { source ->
