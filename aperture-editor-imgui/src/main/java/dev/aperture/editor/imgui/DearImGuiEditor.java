@@ -9,11 +9,15 @@ import dev.aperture.parameter.ParameterValue;
 import imgui.ImGui;
 import imgui.ImGuiViewport;
 import imgui.flag.ImGuiCol;
+import imgui.flag.ImGuiKey;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.internal.flag.ImGuiDockNodeFlags;
 
 import java.util.Objects;
+
+import dev.aperture.editor.imgui.input.EditorInputPolicy;
+import dev.aperture.editor.imgui.input.ShortcutDispatcher;
 
 /** Concrete Dear ImGui implementation of the K2.3 editor shell. */
 public final class DearImGuiEditor {
@@ -21,6 +25,7 @@ public final class DearImGuiEditor {
 	private final EditorSession session;
 	private final DearImGuiPropertyEditor propertyEditor;
 	private boolean defaultLayoutPending;
+	private final ShortcutDispatcher shortcuts = new ShortcutDispatcher();
 
 	public DearImGuiEditor(EditorSession session) {
 		this(session, true);
@@ -30,15 +35,18 @@ public final class DearImGuiEditor {
 		this.session = Objects.requireNonNull(session, "session");
 		this.propertyEditor = new DearImGuiPropertyEditor(session);
 		this.defaultLayoutPending = defaultLayoutPending;
+		configureShortcuts();
 	}
 
 	public void render() {
+		handleShortcuts();
 		renderDockspace();
-		renderOutliner();
-		renderInspector();
-		renderRuntimeState();
-		renderHistory();
-		renderDiagnostics();
+		var visibility = session.workspace().windowVisibility();
+		if (visibility.getOrDefault("outliner", true)) renderOutliner();
+		if (visibility.getOrDefault("inspector", true)) renderInspector();
+		if (visibility.getOrDefault("runtime", true)) renderRuntimeState();
+		if (visibility.getOrDefault("history", true)) renderHistory();
+		if (visibility.getOrDefault("diagnostics", true)) renderDiagnostics();
 	}
 
 	private void renderDockspace() {
@@ -52,8 +60,9 @@ public final class DearImGuiEditor {
 		ImGui.pushStyleColor(ImGuiCol.WindowBg, 0, 0, 0, 0);
 		int flags = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize
 			| ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoNavFocus
-			| ImGuiWindowFlags.NoDocking;
+			| ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.MenuBar;
 		ImGui.begin("Aperture Editor##Root", flags);
+		renderMenuBar();
 		int dockspace = ImGui.getID(DOCKSPACE_ID);
 		ImGui.dockSpace(dockspace, 0, 0, ImGuiDockNodeFlags.PassthruCentralNode);
 		if (defaultLayoutPending) {
@@ -65,6 +74,52 @@ public final class DearImGuiEditor {
 		ImGui.popStyleVar(3);
 	}
 
+	private void renderMenuBar() {
+		if (!ImGui.beginMenuBar()) return;
+		if (ImGui.beginMenu("View")) {
+			toggleWindow("Object Outliner", "outliner");
+			toggleWindow("Inspector", "inspector");
+			toggleWindow("Runtime State", "runtime");
+			toggleWindow("Command History", "history");
+			toggleWindow("Diagnostics", "diagnostics");
+			ImGui.separator();
+			if (ImGui.menuItem("Reset Dock Layout")) {
+				session.workspace().reset();
+				defaultLayoutPending = true;
+			}
+			ImGui.endMenu();
+		}
+		ImGui.endMenuBar();
+	}
+
+	private void toggleWindow(String label, String id) {
+		boolean visible = session.workspace().windowVisibility().getOrDefault(id, true);
+		if (ImGui.menuItem(label, "", visible)) session.workspace().setWindowVisible(id, !visible);
+	}
+
+	private void configureShortcuts() {
+		shortcuts.bind("ESCAPE", () -> { propertyEditor.cancel(); session.tools().cancelActiveTool(); });
+		shortcuts.bind("CTRL+A", () -> {
+			session.selection().clear();
+			session.readModel().visibleObjects().forEach(object -> session.selection().addObject(object.objectId()));
+		});
+		shortcuts.bind("CTRL+Z", () -> session.history().designCommands().stream()
+			.filter(entry -> entry.undoable() && entry.result() == EditorHistoryEntry.Result.ACCEPTED)
+			.reduce((first, second) -> second).ifPresent(session.commands()::undo));
+		shortcuts.bind("CTRL+SHIFT+Z", () -> session.history().designCommands().stream()
+			.reduce((first, second) -> second).ifPresent(session.commands()::redo));
+		shortcuts.bind("CTRL+Y", () -> shortcuts.dispatch("CTRL+SHIFT+Z", new EditorInputPolicy(false, false, false)));
+	}
+
+	private void handleShortcuts() {
+		var io = ImGui.getIO();
+		var policy = new EditorInputPolicy(io.getWantCaptureMouse(), io.getWantCaptureKeyboard(), io.getWantTextInput());
+		if (ImGui.isKeyPressed(ImGuiKey.Escape, false)) shortcuts.dispatch("ESCAPE", policy);
+		if (io.getKeyCtrl() && ImGui.isKeyPressed(ImGuiKey.A, false)) shortcuts.dispatch("CTRL+A", policy);
+		if (io.getKeyCtrl() && io.getKeyShift() && ImGui.isKeyPressed(ImGuiKey.Z, false)) shortcuts.dispatch("CTRL+SHIFT+Z", policy);
+		else if (io.getKeyCtrl() && ImGui.isKeyPressed(ImGuiKey.Z, false)) shortcuts.dispatch("CTRL+Z", policy);
+		if (io.getKeyCtrl() && ImGui.isKeyPressed(ImGuiKey.Y, false)) shortcuts.dispatch("CTRL+Y", policy);
+	}
 	private void renderOutliner() {
 		if (!ImGui.begin("Object Outliner")) { ImGui.end(); return; }
 		var selected = session.selection().snapshot().objectIds();
