@@ -16,6 +16,7 @@ public interface RuntimeObjectSession {
 	CapabilitySet capabilities();
 	List<BehaviorInstance> behaviors();
 	KinematicModel kinematics();
+	java.util.Optional<dev.aperture.runtime.model.state.StatePatch> evaluateTick(RuntimeTickContext context);
 	default long objectRevision() { return instance().revision(); }
 	default StateRevision stateRevision() { return state().revision(); }
 	long eventSequence();

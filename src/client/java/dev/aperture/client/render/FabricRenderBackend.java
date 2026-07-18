@@ -3,6 +3,8 @@ package dev.aperture.client.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.aperture.client.render.material.FabricMaterialGraphics;
 import dev.aperture.math.Transform3d;
+import dev.aperture.geometry.kinematic.ComponentPath;
+import dev.aperture.runtime.kinematic.KinematicPose;
 import dev.aperture.geometry.model.GeometryLayer;
 import dev.aperture.geometry.material.MaterialBinding;
 import dev.aperture.geometry.material.MaterialBindingSet;
@@ -40,7 +42,7 @@ public final class FabricRenderBackend implements RenderBackend {
 		BlockPos blockPos,
 		MaterialBindingSet materialBindings
 	) {
-		this.frameContext = new RenderFrameContext(poseStack, queue, lightCoords, transform, blockPos, materialBindings);
+		this.frameContext = new RenderFrameContext(poseStack, queue, lightCoords, transform, blockPos, materialBindings, KinematicPose.IDENTITY);
 	}
 
 	public void endFrame() {
@@ -56,7 +58,21 @@ public final class FabricRenderBackend implements RenderBackend {
 		Transform3d transform,
 		BlockPos blockPos
 	) {
+		submitAsset(poseStack, queue, lightCoords, asset, materialBindings, transform, blockPos, KinematicPose.IDENTITY);
+	}
+
+	public void submitAsset(
+		PoseStack poseStack,
+		SubmitNodeCollector queue,
+		int lightCoords,
+		MeshAsset asset,
+		MaterialBindingSet materialBindings,
+		Transform3d transform,
+		BlockPos blockPos,
+		KinematicPose kinematicPose
+	) {
 		beginFrame(poseStack, queue, lightCoords, transform, blockPos, materialBindings);
+		this.frameContext = new RenderFrameContext(poseStack, queue, lightCoords, transform, blockPos, materialBindings, kinematicPose);
 		for (MeshSection section : asset.sections().values()) {
 			if (materialBindings.get(section.partId()).isEmpty()) {
 				continue;
@@ -147,6 +163,7 @@ public final class FabricRenderBackend implements RenderBackend {
 				buffer,
 				section,
 				transform,
+				ctx.kinematicPose().transformFor(new ComponentPath(section.partId().componentPath())),
 				blockPos,
 				tintArgb,
 				lightCoords
@@ -174,7 +191,8 @@ public final class FabricRenderBackend implements RenderBackend {
 		int lightCoords,
 		Transform3d transform,
 		BlockPos blockPos,
-		MaterialBindingSet materialBindings
+			MaterialBindingSet materialBindings,
+		KinematicPose kinematicPose
 	) {
 	}
 }

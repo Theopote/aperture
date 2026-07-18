@@ -13,6 +13,7 @@ public final class OpeningInstanceRenderState extends BlockEntityRenderState {
 	private MaterialBindingSet materialBindings = new MaterialBindingSet(java.util.Map.of());
 	private Transform3d transform = Transform3d.at(0, 0, 0, dev.aperture.math.Facing.NORTH);
 	private boolean hasMesh;
+	private dev.aperture.runtime.kinematic.KinematicPose kinematicPose = dev.aperture.runtime.kinematic.KinematicPose.IDENTITY;
 
 	public MeshAsset meshAsset() {
 		return meshAsset;
@@ -24,6 +25,12 @@ public final class OpeningInstanceRenderState extends BlockEntityRenderState {
 
 	public Transform3d transform() {
 		return transform;
+	}
+
+	public dev.aperture.runtime.kinematic.KinematicPose kinematicPose() { return kinematicPose; }
+
+	public void setKinematicPose(dev.aperture.runtime.kinematic.KinematicPose pose) {
+		this.kinematicPose = java.util.Objects.requireNonNull(pose, "pose");
 	}
 
 	public boolean hasMesh() {
@@ -41,5 +48,6 @@ public final class OpeningInstanceRenderState extends BlockEntityRenderState {
 		this.meshAsset = MeshAsset.empty(dev.aperture.render.mesh.LODLevel.FULL);
 		this.materialBindings = new MaterialBindingSet(java.util.Map.of());
 		this.hasMesh = false;
+		this.kinematicPose = dev.aperture.runtime.kinematic.KinematicPose.IDENTITY;
 	}
 }

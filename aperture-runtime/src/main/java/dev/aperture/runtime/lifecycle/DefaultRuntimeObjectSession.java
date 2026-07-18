@@ -65,6 +65,9 @@ public final class DefaultRuntimeObjectSession implements RuntimeObjectSession {
 	@Override public CapabilitySet capabilities() { return configuration.capabilityResolver().resolve(state); }
 	@Override public List<BehaviorInstance> behaviors() { return configuration.behaviors(); }
 	@Override public KinematicModel kinematics() { return configuration.kinematics(); }
+	@Override public java.util.Optional<dev.aperture.runtime.model.state.StatePatch> evaluateTick(RuntimeTickContext context) {
+		return configuration.tickEvaluator().evaluate(state, context.elapsed(), context.timestamp());
+	}
 	@Override public long eventSequence() { return eventSequence; }
 	@Override public DirtyFlags dirtyFlags() { return dirtyFlags; }
 

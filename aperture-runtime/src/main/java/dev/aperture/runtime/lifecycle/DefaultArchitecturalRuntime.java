@@ -107,7 +107,16 @@ public final class DefaultArchitecturalRuntime implements ArchitecturalRuntime {
 		return evaluated;
 	}
 
-	@Override public void tick(RuntimeTickContext context) { Objects.requireNonNull(context, "context"); }
+	@Override
+	public void tick(RuntimeTickContext context) {
+		Objects.requireNonNull(context, "context");
+		for (RuntimeObjectSession session : activeObjects()) {
+			session.evaluateTick(context).ifPresent(patch -> runtimeTransaction.commit(
+				session, session.objectRevision(),
+				new RuntimeMutation(java.util.List.of(patch), java.util.List.of(),
+					java.util.List.of(), java.util.List.of())));
+		}
+	}
 	@Override public void unload(ArchitecturalObjectId objectId) { repository.unload(objectId); }
 
 	@Override

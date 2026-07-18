@@ -20,7 +20,7 @@ public final class DoorStateSchema {
 		.property(OPEN_RATIO, StatePropertyDefinition.number(
 			0, 0.0, 1.0, StatePersistence.PERSISTENT, StateDistribution.REPLICATED))
 		.property(TARGET_OPEN_RATIO, StatePropertyDefinition.number(
-			0, 0.0, 1.0, StatePersistence.TRANSIENT, StateDistribution.REPLICATED))
+			0, 0.0, 1.0, StatePersistence.PERSISTENT, StateDistribution.REPLICATED))
 		.property(LOCKED, StatePropertyDefinition.bool(
 			false, StatePersistence.PERSISTENT, StateDistribution.REPLICATED))
 		.property(MOTION, StatePropertyDefinition.enumeration(

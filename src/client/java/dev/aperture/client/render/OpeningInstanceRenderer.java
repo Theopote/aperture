@@ -59,7 +59,8 @@ public final class OpeningInstanceRenderer implements BlockEntityRenderer<@org.j
 			state.meshAsset(),
 			state.materialBindings(),
 			state.transform(),
-			state.blockPos
+			state.blockPos,
+			state.kinematicPose()
 		);
 		poseStack.popPose();
 	}

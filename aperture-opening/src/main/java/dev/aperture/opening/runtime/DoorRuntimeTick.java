@@ -13,6 +13,13 @@ import java.util.Optional;
 public final class DoorRuntimeTick {
 	private DoorRuntimeTick() { }
 
+	public static dev.aperture.runtime.model.state.StateTickEvaluator atSpeed(double speedPerSecond) {
+		if (!Double.isFinite(speedPerSecond) || speedPerSecond <= 0) {
+			throw new IllegalArgumentException("speedPerSecond must be positive");
+		}
+		return (state, elapsed, time) -> advance(state, elapsed, speedPerSecond, time);
+	}
+
 	public static Optional<StatePatch> advance(RuntimeState state, Duration elapsed, double speedPerSecond, Instant time) {
 		if (elapsed.isNegative()) throw new IllegalArgumentException("elapsed must not be negative");
 		if (!Double.isFinite(speedPerSecond) || speedPerSecond <= 0) throw new IllegalArgumentException("speedPerSecond must be positive");
