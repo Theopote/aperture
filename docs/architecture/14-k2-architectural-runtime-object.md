@@ -81,3 +81,14 @@ Door, Fixed Window, and Curtain Wall are sufficient reference families. Until K2
 13. `feat(network): add server-authoritative state replication`
 14. `test: add door runtime vertical-slice tests`
 15. `docs: update roadmap and implementation status`
+
+## K2.2 verification status — 2026-07-18
+
+| Scope | Status |
+|---|---|
+| Core Runtime | Passed |
+| Dedicated Server Integration | Partially Passed |
+| World Lifecycle | Not Fully Proven |
+| Multiplayer Visual Verification | Not Proven |
+
+K2.3 Editor Shell may begin in parallel, but the P0 items in [K2.2 Open Verification Backlog](../refactoring/k2-2-open-verification.md) remain required for full K2.2 acceptance.
