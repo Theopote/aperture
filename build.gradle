@@ -29,6 +29,7 @@ dependencies {
 	implementation project(':aperture-runtime')
 	implementation project(':aperture-fabric')
 	clientImplementation project(':aperture-editor')
+	clientImplementation project(':aperture-editor-imgui')
 	clientImplementation project(':aperture-render')
 	clientImplementation project(':aperture-opening-runtime')
 }

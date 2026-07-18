@@ -1,5 +1,9 @@
 dependencies {
 	api project(':aperture-editor')
+	implementation 'io.github.spair:imgui-java-binding:1.90.0'
+	runtimeOnly 'io.github.spair:imgui-java-natives-windows:1.90.0'
+	runtimeOnly 'io.github.spair:imgui-java-natives-linux:1.90.0'
+	runtimeOnly 'io.github.spair:imgui-java-natives-macos:1.90.0'
 }
 
 tasks.named('test') {
