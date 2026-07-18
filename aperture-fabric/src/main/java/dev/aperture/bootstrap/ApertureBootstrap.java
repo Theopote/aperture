@@ -18,7 +18,7 @@ import dev.aperture.opening.runtime.DoorStateSchema;
 import dev.aperture.opening.runtime.ManualDoorInteractionBehavior;
 import dev.aperture.opening.runtime.RequestCloseDoorHandler;
 import dev.aperture.opening.runtime.RequestOpenDoorHandler;
-import dev.aperture.opening.runtime.SetDoorLockHandler;
+import dev.aperture.opening.runtime.plugin.OpeningArchitecturalFamilyPlugin;
 import dev.aperture.kernel.ApertureKernel;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
@@ -34,6 +34,7 @@ import dev.aperture.runtime.lifecycle.RuntimeObjectConfiguration;
 import dev.aperture.runtime.model.command.DefaultCommandBus;
 import dev.aperture.runtime.model.object.ArchitecturalTypeId;
 import dev.aperture.runtime.model.world.WorldQueryExecutor;
+import dev.aperture.runtime.plugin.ArchitecturalFamilyPluginRegistry;
 import dev.aperture.runtime.catalog.MaterialCatalogLoader;
 import dev.aperture.runtime.diagnostic.RuntimeDiagnostics;
 import dev.aperture.runtime.catalog.MaterialCatalogRegistry;
@@ -111,20 +112,13 @@ public final class ApertureBootstrap {
 
 
 	private static ArchitecturalRuntime createArchitecturalRuntime() {
-		RuntimeObjectConfiguration door = new RuntimeObjectConfiguration(
-			DoorStateSchema.SCHEMA, DoorCapabilities::from,
-			List.of(new ManualDoorInteractionBehavior()),
-			new KinematicModel(List.of(DoorKinematics.swingPanel(
-				new ComponentPath("door.panel").value(), Vec3d.ZERO, false))),
-			DoorRuntimeTick.atSpeed(1.0));
+		ArchitecturalFamilyPluginRegistry families = new ArchitecturalFamilyPluginRegistry(
+			List.of(new OpeningArchitecturalFamilyPlugin()));
 		return new DefaultArchitecturalRuntime(
-			new InMemoryRuntimeObjectRepository(),
-			instance -> instance.typeId().equals(ArchitecturalTypeId.parse("aperture:door")) ? door : null,
-			new DefaultCommandBus(List.of(
-				new RequestOpenDoorHandler(), new RequestCloseDoorHandler(), new SetDoorLockHandler())),
+			new InMemoryRuntimeObjectRepository(), families,
+			new DefaultCommandBus(families.commandHandlers()),
 			WorldQueryExecutor.unavailable());
 	}
-
 	private void registerBlocks() {
 		ApertureBlocks.registerAll();
 		ApertureBlockEntities.registerAll();

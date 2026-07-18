@@ -19,6 +19,7 @@ dependencies {
 	implementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
 	implementation project(':aperture-runtime')
+	implementation project(':aperture-opening-runtime')
 
 	testImplementation platform('org.junit:junit-bom:5.11.4')
 	testImplementation 'org.junit.jupiter:junit-jupiter'

@@ -125,7 +125,7 @@ tasks.register('checkArchitecture') {
 			'aperture-opening': ['aperture-pipeline','aperture-kernel','aperture-runtime','aperture-render','aperture-editor','aperture-fabric'],
 			'aperture-pipeline': ['aperture-runtime','aperture-render','aperture-editor','aperture-fabric'],
 			'aperture-kernel': ['aperture-runtime','aperture-render','aperture-editor','aperture-fabric'],
-			'aperture-runtime': ['aperture-editor','aperture-fabric'],
+			'aperture-runtime': ['aperture-opening','aperture-opening-runtime','aperture-editor','aperture-fabric'],
 			'aperture-render': ['aperture-fabric'],
 			'aperture-editor': ['aperture-fabric']
 		]
@@ -151,6 +151,7 @@ tasks.register('checkArchitecture') {
 			[files: fileTree("${rootDir}/aperture-fabric/src") { include '**/*.java' }, pattern: ~/package\s+dev\.aperture\.(core|geometry|opening)\b/, message: 'Fabric must not define domain packages'],
 			[files: files("${rootDir}/docs/architecture/01-vision.md"), pattern: ~/Opening is the only first-class entity/, message: 'ArchitecturalObject, not Opening, is the universal runtime primitive'],
 			[files: fileTree("${rootDir}/aperture-runtime/src/main") { include '**/*.java' }, pattern: ~/import\s+net\.minecraft\./, message: 'Runtime must use world-query and replication ports instead of Minecraft imports'],
+			[files: fileTree("${rootDir}/aperture-runtime/src/main") { include '**/*.java' }, pattern: ~/import\s+dev\.aperture\.opening\./, message: 'Generic runtime must discover family behavior through ArchitecturalFamilyPlugin'],
 			[files: fileTree("${rootDir}/aperture-runtime/src/main") { include '**/*.java'; exclude '**/transaction/**' }, pattern: ~/\.state\(\)\.apply\s*\(/, message: 'Authoritative RuntimeState may only be applied inside a runtime transaction'],
 			[files: files("${rootDir}/aperture-fabric/src/main/java/dev/aperture/block/entity/OpeningBlockEntity.java"), pattern: ~/(RuntimeState|StatePatch|DoorState)/, message: 'BlockEntity must anchor sessions and snapshots, not own runtime state logic'],
 			[files: files("${rootDir}/aperture-core/src/main/java/dev/aperture/core/serialization/OpeningInstanceCodec.java"), pattern: ~/UnsupportedOperationException/, message: 'OpeningInstanceCodec must implement the DecodeContext entry point'],

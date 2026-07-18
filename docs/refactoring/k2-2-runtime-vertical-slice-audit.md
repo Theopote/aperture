@@ -152,3 +152,7 @@ Only one `runtime-model` `CommandBus` was found. JSON and NBT snapshot codecs ar
 ## Audit conclusion
 
 K2 contracts are substantially implemented and unit tested, but K2.2 is not an integration-completion exercise yet: the real Minecraft interaction chain is absent, the block entity is a second state holder, the old and new runtime paths compete, and dynamic pose consumers are disconnected. The next valid implementation step is Phase 1: establish the unified runtime/session/repository lifecycle and prove it with a Door lifecycle test.
+
+## Phase 6 update
+
+The deferred family dependency inversion is complete. perture-runtime no longer has a production dependency on perture-opening; Door runtime composition now lives in perture-opening-runtime and is registered through ArchitecturalFamilyPluginRegistry. See [K2.2 Phase 6: Family Plugin Decoupling](k2-2-phase-6-family-plugin.md).
