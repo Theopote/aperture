@@ -26,6 +26,7 @@ import dev.aperture.registry.ApertureBlockEntities;
 import dev.aperture.registry.ApertureBlocks;
 import dev.aperture.runtime.ApertureRuntime;
 import dev.aperture.runtime.ArchitecturalRuntimeEnvironment;
+import dev.aperture.runtime.command.SetParameterCommandHandler;
 import dev.aperture.runtime.lifecycle.ArchitecturalRuntime;
 import dev.aperture.runtime.lifecycle.DefaultArchitecturalRuntime;
 import dev.aperture.runtime.lifecycle.InMemoryRuntimeObjectRepository;
@@ -116,7 +117,7 @@ public final class ApertureBootstrap {
 			List.of(new OpeningArchitecturalFamilyPlugin()));
 		return new DefaultArchitecturalRuntime(
 			new InMemoryRuntimeObjectRepository(), families,
-			new DefaultCommandBus(families.commandHandlers()),
+			new DefaultCommandBus(java.util.stream.Stream.concat(families.commandHandlers().stream(), java.util.stream.Stream.of(new SetParameterCommandHandler())).toList()),
 			WorldQueryExecutor.unavailable());
 	}
 	private void registerBlocks() {

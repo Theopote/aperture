@@ -8,6 +8,8 @@ import dev.aperture.runtime.model.command.CommandResult;
 import dev.aperture.runtime.model.command.RequestCloseCommand;
 import dev.aperture.runtime.model.command.RequestOpenCommand;
 import dev.aperture.runtime.model.command.SetLockCommand;
+import dev.aperture.runtime.model.command.SetParameterCommand;
+import dev.aperture.parameter.ParameterValue;
 import dev.aperture.runtime.model.capability.StandardCapabilities;
 import dev.aperture.runtime.model.event.ObjectRef;
 import dev.aperture.runtime.model.event.WorldRef;
@@ -52,8 +54,10 @@ public final class AuthoritativeCommandGateway {
    return remember(request.commandId(), reject(request, CommandRejectedMessage.ErrorCode.COMMAND_REJECTED, message, after));
   }
   CommandAcceptedMessage accepted=new CommandAcceptedMessage(PROTOCOL_VERSION, request.objectId(), request.commandId(), after.objectRevision(), after.stateRevision(), after.state().timestamp());
-  StateDeltaMessage delta=StateDeltaFactory.between(before.instance(), before.state(), after.instance(), after.state());
-  return remember(request.commandId(), new Outcome(accepted, List.of(delta), false));
+  ReplicationMessage update=before.stateRevision().equals(after.stateRevision())
+   ? new ObjectSnapshotMessage(PROTOCOL_VERSION,ReplicaSnapshot.capture(after.instance(),after.state()))
+   : StateDeltaFactory.between(before.instance(),before.state(),after.instance(),after.state());
+  return remember(request.commandId(), new Outcome(accepted, List.of(update), false));
  }
 
  public ObjectSnapshotMessage resync(ObjectResyncRequest request) {
@@ -70,10 +74,28 @@ public final class AuthoritativeCommandGateway {
    case "toggle_open" -> session.capabilities().requireCapability(StandardCapabilities.OPENABLE).targetRatio() > 0
     ? new RequestCloseCommand(target) : new RequestOpenCommand(target);
    case "set_lock" -> new SetLockCommand(target, parseBoolean(request.payload(), "locked"));
+   case "set_parameter" -> new SetParameterCommand(target, required(request.payload(), "parameter"), parseParameter(request.payload()));
    default -> throw new IllegalArgumentException("Unsupported command type: "+request.commandType());
   };
  }
- private static boolean parseBoolean(Map<String,String> payload,String name) {
+ private static ParameterValue parseParameter(Map<String,String> payload) {
+  String type=required(payload,"valueType"); String value=required(payload,"value");
+  try {
+   return switch(type) {
+    case "LENGTH" -> ParameterValue.length(Double.parseDouble(value));
+    case "ANGLE" -> ParameterValue.angle(Double.parseDouble(value));
+    case "COUNT" -> ParameterValue.count(Integer.parseInt(value));
+    case "NUMBER" -> ParameterValue.number(Double.parseDouble(value));
+    case "ENUM" -> ParameterValue.enumValue(value);
+    case "BOOL" -> ParameterValue.bool(parseBoolean(payload,"value"));
+    case "MATERIAL_REF" -> ParameterValue.materialRef(value);
+    default -> throw new IllegalArgumentException("Unsupported parameter value type: "+type);
+   };
+  } catch(NumberFormatException error) { throw new IllegalArgumentException("Invalid "+type+" parameter value",error); }
+ }
+ private static String required(Map<String,String> payload,String name) {
+  String value=payload.get(name); if(value==null||value.isBlank()) throw new IllegalArgumentException("Missing payload: "+name); return value;
+ } private static boolean parseBoolean(Map<String,String> payload,String name) {
   String value=payload.get(name); if(!"true".equals(value)&&!"false".equals(value)) throw new IllegalArgumentException("Invalid boolean payload: "+name); return Boolean.parseBoolean(value);
  }
  private Outcome reject(CommandRequestMessage request, CommandRejectedMessage.ErrorCode code, String message, RuntimeObjectSession session) {
