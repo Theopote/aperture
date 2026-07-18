@@ -11,6 +11,7 @@ import dev.aperture.editor.model.read.*;
 import dev.aperture.editor.model.selection.DefaultSelectionModel;
 import dev.aperture.editor.model.session.*;
 import dev.aperture.client.runtime.ClientRuntimeReplicas;
+import dev.aperture.client.editor.ClientEditorPreviews;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.flag.ImGuiConfigFlags;
@@ -89,9 +90,9 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 	public boolean initialized(){return initialized;}
 
 	private static EditorSession createSession() {
-		var selection=new DefaultSelectionModel(); var previews=new LocalPreviewCoordinator(); var diagnostics=new DiagnosticsModel();
+		var selection=new DefaultSelectionModel(); var previews=ClientEditorPreviews.get(); var diagnostics=new DiagnosticsModel();
 		var read=new ReplicaEditorReadModel(ClientRuntimeReplicas.store(),previews,diagnostics,ClientRuntimeReplicas::runtimeActions);
-		EditorCommandTransport transport=new ClientEditorCommandTransport(diagnostics);
+		EditorCommandTransport transport=new ClientEditorCommandTransport(diagnostics,previews);
 		var commands=new DefaultEditorCommandGateway(transport,diagnostics);
 		return new DefaultEditorSession(selection,read,commands,new SchemaDrivenInspectorModel(read),previews,new DefaultHistoryProjection(),diagnostics,new DefaultWorkspaceModel(),()->{var selected=selection.snapshot().primaryObject();if(selected!=null)previews.clearObject(selected);});
 	}

@@ -1,6 +1,8 @@
 package dev.aperture.client.render;
 
 import dev.aperture.runtime.ApertureRuntime;
+import dev.aperture.client.editor.ClientEditorPreviews;
+import dev.aperture.runtime.model.object.ArchitecturalObjectId;
 import dev.aperture.runtime.material.MaterialBindingBuilder;
 import dev.aperture.math.Transform3d;
 import dev.aperture.core.instance.OpeningInstance;
@@ -37,12 +39,13 @@ public final class InstanceRenderCache {
 
 	public CachedInstanceRender resolve(OpeningInstance instance) {
 		ApertureRuntime runtime = ApertureRuntime.get();
+		OpeningInstance renderInstance = withPreview(instance);
 		CachedInstanceRender cached = cache.computeIfAbsent(
 			instance.instanceId(),
 			id -> new CachedInstanceRender(RenderDocument.forInstance(id))
 		);
 
-		PipelineResult pipeline = runtime.generation().generate(instance).asSuccess().output();
+		PipelineResult pipeline = runtime.generation().generate(renderInstance).asSuccess().output();
 		GeometryResult geometry = pipeline.geometry();
 		RenderDelta delta = cached.document().updateFrom(geometry);
 		if (!delta.isEmpty() || cached.meshAsset().partIds().isEmpty()) {
@@ -56,21 +59,28 @@ public final class InstanceRenderCache {
 		}
 
 		var definition = runtime.openingTypes().require(instance.typeId());
-		ParameterSet mergedParameters = definition.resolveParameters(instance.parameters());
+		ParameterSet mergedParameters = definition.resolveParameters(renderInstance.parameters());
 		if (!mergedParameters.equals(cached.lastParameters)) {
 			cached.materialBindings = MaterialBindingBuilder.build(
 				runtime.openingTypes().require(instance.typeId()),
-				instance,
+				renderInstance,
 				geometry,
 				runtime.materials()
 			);
 			cached.lastParameters = mergedParameters;
 		}
 
-		cached.transform = instance.transform();
+		cached.transform = renderInstance.transform();
 		return cached;
 	}
 
+	private static OpeningInstance withPreview(OpeningInstance instance) {
+		var overrides = ClientEditorPreviews.get().values(new ArchitecturalObjectId(instance.instanceId()));
+		if (overrides.isEmpty()) return instance;
+		Map<String, dev.aperture.parameter.ParameterValue> parameters = new HashMap<>(instance.parameters().asMap());
+		parameters.putAll(overrides);
+		return instance.withParameters(ParameterSet.of(parameters));
+	}
 	public void invalidate(UUID instanceId) {
 		cache.remove(instanceId);
 	}

@@ -2,27 +2,29 @@
 
 ## Current state
 
-The legacy `dev.aperture.core.editor` package contains selection, mutable editor objects, local commands/history, manipulators, snap and gizmo support. `src/client` owns `ClientRuntimeReplicas`; rendering is in `aperture-render`; Fabric owns Minecraft lifecycle. `aperture-editor-imgui` now contains platform-neutral window models and renderer seams, but no Dear ImGui implementation.
+The legacy `dev.aperture.core.editor` package still contains mutable local editor objects and history. The K2.3 path is separate: `aperture-editor` owns the headless session/read/command/preview models, `aperture-editor-imgui` owns real Dear ImGui windows and docking, and the root Fabric mod's `src/client` source set owns Minecraft, GLFW and OpenGL lifecycle integration.
+
+The client classpath explicitly includes `clientImplementation project(':aperture-editor-imgui')`, `imgui-java-lwjgl3`, and platform native runtime artifacts. `ApertureImGuiClient` is a Fabric client entrypoint; F4 opens `ApertureImGuiScreen`, initializes ImGui/GLFW/GL3, builds the Dockspace, and submits draw data before `RenderSystem.flipFrame`.
 
 ## Legacy mutation paths
 
-The legacy `core.editor.session.EditorSession`, `EditorContext`, `EditorObject`, `SetParameterCommand` and `SetTransformCommand` retain `OpeningInstance` and execute/undo local mutations. They are retained temporarily for K2.2 compatibility and are not the K2.3 frontend API. Runtime state mutation remains transaction-owned. There is still no ImGui context, real docking, font atlas, native backend or OpenGL renderer. Workspace persistence and input policy contracts now exist, but they are not connected to Dear ImGui.
+The legacy `core.editor.session.EditorSession`, `EditorContext`, `EditorObject`, `SetParameterCommand` and `SetTransformCommand` retain the old local mutation design. They are not used by the K2.3 ImGui frontend and remain only as migration debt. The active frontend selects `ArchitecturalObjectId`, reads `ClientReplicaStore` through `ReplicaEditorReadModel`, previews locally, and submits durable changes through `EditorCommandGateway`.
 
 ## Authoritative boundary
 
-The client source set exposes `ClientRuntimeReplicas.store()` (`ClientReplicaStore`). K2.3 reads immutable `ReplicaObject` values through `ReplicaEditorReadModel`. Formal writes use `EditorCommandGateway` and an injected transport; widgets never use codecs. Preview values live in `LocalPreviewCoordinator`, never in the replica store.
+`ClientEditorCommandTransport` encodes allow-listed command requests and sends them through Fabric C2S networking. `AuthoritativeCommandGateway` validates protocol and revisions, decodes typed commands, and commits through `RuntimeTransaction`. Accepted parameter edits broadcast an authoritative Object Snapshot; runtime state changes broadcast State Delta messages. Rejections and revision conflicts are correlated by command ID and exposed through Diagnostics.
 
 ## Migration table
 
-| Capability | Current implementation | Target implementation | Action |
-| --- | --- | --- | --- |
-| Selection | `Selection<EditorObjectId>` | runtime `ArchitecturalObjectId` snapshots | added, migrate callers |
-| Inspector | ad-hoc services | schema/value-driven descriptors | added first slice |
-| Command | local `execute/undo` | gateway transport submission | added, legacy deprecated path remains |
-| History | local mutable undo | compensating authoritative command | added contract |
-| Preview | direct editor mutation | local overlay/edit session | added |
-| UI frontend | renderer abstractions only | real Dear ImGui frontend | P0: implement binding, widgets, docking and native host |
+| Capability | Current implementation | Remaining action |
+| --- | --- | --- |
+| Selection | `ArchitecturalObjectId` snapshots with single/multi selection | world picking synchronization |
+| Inspector | schema/value-driven property descriptors and real ImGui controls | broaden widget types and units |
+| Command | async Fabric transport to server-authoritative gateway | history correlation and automatic resync request |
+| History | projection and compensating-command contracts | populate accepted design history from responses |
+| Preview | local overlay/edit session; one commit on gesture end | world-render preview proof |
+| UI frontend | real Dear ImGui Dockspace, windows, GL3 backend and persistent ini layout | Chinese font, DPI and formal client smoke checklist |
 
 ## Remaining gaps
 
-P0: `aperture-editor-imgui` has no `imgui-java` or native dependency and makes no Dear ImGui calls. Fabric still needs the concrete ImGui/GLFW/OpenGL host, real widgets/dockspace, world picking binding, native font setup and client smoke verification. Legacy editor callers must be migrated before its mutable package can be deleted.
+P0 gaps are world picking synchronization, complete response-driven History/Undo/Redo, automatic resync after revision conflict, and in-world proof of the full Width edit loop. Capability-driven Open/Close/Lock actions and bidirectional Fabric command transport are integrated. The legacy mutable editor package must still be migrated or removed.

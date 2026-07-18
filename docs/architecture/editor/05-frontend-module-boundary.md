@@ -24,4 +24,4 @@ aperture-fabric client source set
 - `aperture-fabric` is the only module allowed to integrate `aperture-editor-imgui`; that integration belongs in its client-only source set.
 - The Fabric dedicated server and GameTest classpaths must remain able to start without loading any ImGui, GLFW, or OpenGL class.
 
-The initial module contains only the frontend frame boundary. Concrete ImGui dependencies and windows are added there when UI implementation begins; they are never added to `aperture-editor`.
+The frontend module now contains the concrete Dear ImGui Dockspace, windows and widgets. The root Fabric mod declares it with `clientImplementation`; its `src/client` entrypoint owns GLFW/GL3 lifecycle, input and render-loop integration. ImGui remains absent from `aperture-editor` and dedicated-server source sets.

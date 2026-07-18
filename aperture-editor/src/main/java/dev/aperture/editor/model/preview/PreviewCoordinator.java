@@ -5,6 +5,7 @@ import java.util.*;
 public interface PreviewCoordinator {
 	void put(ArchitecturalObjectId objectId, String parameterKey, ParameterValue value);
 	Optional<ParameterValue> value(ArchitecturalObjectId objectId, String parameterKey);
+	Map<String, ParameterValue> values(ArchitecturalObjectId objectId);
 	void clear(ArchitecturalObjectId objectId, String parameterKey);
 	void clearObject(ArchitecturalObjectId objectId);
 }

@@ -7,6 +7,7 @@ import dev.aperture.editor.model.command.ExpectedRevision;
 import dev.aperture.editor.model.command.SetParameterArchitecturalCommand;
 import dev.aperture.editor.model.read.DiagnosticsModel;
 import dev.aperture.editor.model.read.EditorDiagnostic;
+import dev.aperture.editor.model.preview.PreviewCoordinator;
 import dev.aperture.fabric.network.ApertureReplicationPayload;
 import dev.aperture.parameter.ParameterValue;
 import dev.aperture.runtime.model.command.ArchitecturalCommand;
@@ -35,10 +36,12 @@ import java.util.concurrent.ConcurrentHashMap;
 final class ClientEditorCommandTransport implements EditorCommandTransport {
 	private final JsonReplicationMessageCodec codec = new JsonReplicationMessageCodec();
 	private final DiagnosticsModel diagnostics;
-	private final Map<UUID, ArchitecturalObjectId> pending = new ConcurrentHashMap<>();
+	private final PreviewCoordinator previews;
+	private final Map<UUID, PendingCommand> pending = new ConcurrentHashMap<>();
 
-	ClientEditorCommandTransport(DiagnosticsModel diagnostics) {
+	ClientEditorCommandTransport(DiagnosticsModel diagnostics, PreviewCoordinator previews) {
 		this.diagnostics = diagnostics;
+		this.previews = previews;
 		ClientRuntimeReplicas.addMessageListener(this::onMessage);
 	}
 
@@ -60,17 +63,19 @@ final class ClientEditorCommandTransport implements EditorCommandTransport {
 		CommandRequestMessage request = new CommandRequestMessage(AuthoritativeCommandGateway.PROTOCOL_VERSION,
 			command.target().objectId(), commandId, type, payload, revision.objectRevision(),
 			new StateRevision(revision.stateRevision()), new ActorRef(actor), Instant.now());
-		pending.put(commandId, command.target().objectId());
+		pending.put(commandId, new PendingCommand(command.target().objectId(), command instanceof SetParameterArchitecturalCommand set ? set.parameterKey() : null));
 		ClientPlayNetworking.send(new ApertureReplicationPayload(codec.encode(request)));
 		return new EditorCommandSubmission(commandId, EditorCommandSubmission.Status.PENDING,
 			"Submitted to authoritative server", revision.objectRevision(), revision.stateRevision());
 	}
 
 	private void onMessage(ReplicationMessage message) {
-		if (message instanceof CommandAcceptedMessage accepted) pending.remove(accepted.commandId());
+		if (message instanceof CommandAcceptedMessage accepted) clearPreview(pending.remove(accepted.commandId()));
 		else if (message instanceof CommandRejectedMessage rejected) {
-			ArchitecturalObjectId id = pending.remove(rejected.commandId());
-			if (id == null) return;
+			PendingCommand command = pending.remove(rejected.commandId());
+			if (command == null) return;
+			clearPreview(command);
+			ArchitecturalObjectId id = command.objectId();
 			EditorDiagnostic.Severity severity = EditorDiagnostic.Severity.ERROR;
 			diagnostics.add(new EditorDiagnostic(severity, rejected.errorCode().name().toLowerCase(), rejected.message(),
 				Optional.of(id), Optional.empty(), "server", Instant.now(),
@@ -78,6 +83,11 @@ final class ClientEditorCommandTransport implements EditorCommandTransport {
 		}
 	}
 
+	private void clearPreview(PendingCommand command) {
+		if (command != null && command.parameterKey() != null) previews.clear(command.objectId(), command.parameterKey());
+	}
+
+	private record PendingCommand(ArchitecturalObjectId objectId, String parameterKey) { }
 	private static Map<String, String> parameterPayload(String key, ParameterValue value) {
 		String raw = switch (value) {
 			case ParameterValue.LengthValue v -> Double.toString(v.millimeters());
