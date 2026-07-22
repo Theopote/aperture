@@ -18,11 +18,10 @@ final class DearImGuiLayout {
 		imgui.internal.ImGui.dockBuilderSplitNode(center.get(), ImGuiDir.Left, 0.20f, left, center);
 		imgui.internal.ImGui.dockBuilderSplitNode(center.get(), ImGuiDir.Right, 0.26f, right, center);
 		imgui.internal.ImGui.dockBuilderSplitNode(center.get(), ImGuiDir.Down, 0.28f, bottom, center);
-		imgui.internal.ImGui.dockBuilderDockWindow("Object Outliner", left.get());
+		imgui.internal.ImGui.dockBuilderDockWindow("Project Navigator", left.get());
 		imgui.internal.ImGui.dockBuilderDockWindow("Inspector", right.get());
-		imgui.internal.ImGui.dockBuilderDockWindow("Runtime State", right.get());
-		imgui.internal.ImGui.dockBuilderDockWindow("Command History", bottom.get());
-		imgui.internal.ImGui.dockBuilderDockWindow("Diagnostics", bottom.get());
+		imgui.internal.ImGui.dockBuilderDockWindow("Context Runtime", right.get());
+		imgui.internal.ImGui.dockBuilderDockWindow("Activity Console", bottom.get());
 		imgui.internal.ImGui.dockBuilderFinish(root);
 	}
 }
