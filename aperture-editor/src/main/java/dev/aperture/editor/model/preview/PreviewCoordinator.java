@@ -10,6 +10,7 @@ public interface PreviewCoordinator {
 	void transition(java.util.UUID commandId, PreviewState state);
 	Optional<PreviewState> state(java.util.UUID commandId);
 	void complete(java.util.UUID commandId);
+	void dismiss(java.util.UUID commandId);
 	void clear(ArchitecturalObjectId objectId, String parameterKey);
 	void clearObject(ArchitecturalObjectId objectId);
 }

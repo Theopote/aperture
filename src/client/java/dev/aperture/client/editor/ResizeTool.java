@@ -20,6 +20,7 @@ public final class ResizeTool implements EditorTool {
 	private final GizmoHitTester hitTester = new GizmoHitTester();
 	private Optional<String> hoveredManipulatorId = Optional.empty();
 	private ActiveDrag drag;
+	private PendingManipulation pending;
 
 	public ResizeTool(EditorSession session, ManipulatorDescriptorProvider descriptors) {
 		this.session = session;
@@ -35,6 +36,11 @@ public final class ResizeTool implements EditorTool {
 			return;
 		}
 		ObjectEditorView view = selectedView();
+		if (view != null && pending != null) {
+			pending.session().refresh(view);
+			if (pending.session().state() == ToolInteractionState.IDLE) pending = null;
+			else { hoveredManipulatorId = Optional.empty(); return; }
+		}
 		if (view == null || input.worldRay() == null) {
 			cancel();
 			return;
@@ -65,10 +71,19 @@ public final class ResizeTool implements EditorTool {
 		if (input.primaryReleased() && drag != null) finish();
 	}
 
-	@Override public void cancel() {
+	@Override public void suspend() {
 		if (drag != null) drag.session().cancel();
 		drag = null;
 		hoveredManipulatorId = Optional.empty();
+	}
+
+	@Override public void cancel() {
+		suspend();
+		if (pending != null && pending.session().state() != ToolInteractionState.PENDING
+			&& pending.session().state() != ToolInteractionState.ACCEPTED_WAITING_REPLICA) {
+			pending.session().dismiss();
+			pending = null;
+		}
 	}
 	@Override public void deactivate() { hoveredManipulatorId = Optional.empty(); }
 
@@ -83,6 +98,11 @@ public final class ResizeTool implements EditorTool {
 	}
 	public boolean hovered() { return hoveredManipulatorId.isPresent(); }
 	public boolean dragging() { return drag != null; }
+	public Optional<String> pendingManipulatorId() { return pending == null ? Optional.empty() : Optional.of(pending.manipulatorId()); }
+	public ToolInteractionState interactionState() {
+		if (drag != null) return ToolInteractionState.DRAGGING;
+		return pending == null ? (hovered() ? ToolInteractionState.HOVER : ToolInteractionState.IDLE) : pending.session().state();
+	}
 
 	private ObjectEditorView selectedView() {
 		var primary = session.selection().snapshot().primaryObject();
@@ -114,9 +134,12 @@ public final class ResizeTool implements EditorTool {
 	}
 
 	private void finish() {
-		LinearParameterDragSession completed = drag.session();
+		ActiveDrag completed = drag;
 		drag = null;
-		completed.finish();
+		completed.session().finish();
+		if (completed.session().state() != ToolInteractionState.CANCELLED) {
+			pending = new PendingManipulation(completed.manipulatorId(), completed.session());
+		}
 	}
 
 	private static Vec3 origin(WorldRay ray) {
@@ -129,4 +152,5 @@ public final class ResizeTool implements EditorTool {
 
 	private record ActiveDrag(String manipulatorId, LinearParameterDragSession session,
 		double anchorBlocks, Vec3 axisOrigin, Vec3 axis) { }
+	private record PendingManipulation(String manipulatorId, LinearParameterDragSession session) { }
 }

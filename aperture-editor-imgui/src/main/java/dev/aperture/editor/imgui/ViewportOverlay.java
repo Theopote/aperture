@@ -68,13 +68,15 @@ final class ViewportOverlay {
 		String dimensions = dimensions(view);
 		if (!dimensions.isBlank()) ImGui.textDisabled(dimensions);
 		var previews = context.session.preview().values(view.objectId());
-		if (!previews.isEmpty()) ImGui.textColored(ApertureStyle.BLUE[0], ApertureStyle.BLUE[1], ApertureStyle.BLUE[2], 1,
-			"Previewing " + previews.size() + " change" + (previews.size() == 1 ? "" : "s"));
-		else if (view.syncStatus() == SyncStatus.RESYNC_REQUIRED) ImGui.textColored(
-			ApertureStyle.WARNING[0], ApertureStyle.WARNING[1], ApertureStyle.WARNING[2], 1, "Resynchronization required");
-		else if (!view.diagnostics().isEmpty()) ImGui.textColored(
+		if (!view.diagnostics().isEmpty()) ImGui.textColored(
 			ApertureStyle.ERROR[0], ApertureStyle.ERROR[1], ApertureStyle.ERROR[2], 1,
 			view.diagnostics().size() + " issue" + (view.diagnostics().size() == 1 ? "" : "s"));
+		else if (!previews.isEmpty()) ImGui.textColored(
+			ApertureStyle.BLUE[0], ApertureStyle.BLUE[1], ApertureStyle.BLUE[2], 1,
+			"Pending / previewing " + previews.size() + " change" + (previews.size() == 1 ? "" : "s"));
+		else if (view.syncStatus() == SyncStatus.RESYNC_REQUIRED) ImGui.textColored(
+			ApertureStyle.WARNING[0], ApertureStyle.WARNING[1], ApertureStyle.WARNING[2], 1,
+			"Resynchronization required");
 	}
 
 	private void helpHud(float x, float y) {

@@ -10,6 +10,8 @@ public interface EditorTool {
 
 	void update(EditorInputFrame input);
 
+	default void suspend() { cancel(); }
+
 	default void cancel() { }
 
 	default void deactivate() { }

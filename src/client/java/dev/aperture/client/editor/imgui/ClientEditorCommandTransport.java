@@ -70,7 +70,7 @@ final class ClientEditorCommandTransport implements EditorCommandTransport {
 		CommandRequestMessage request = new CommandRequestMessage(AuthoritativeCommandGateway.PROTOCOL_VERSION,
 			command.target().objectId(), commandId, type, payload, revision.objectRevision(),
 			new StateRevision(revision.stateRevision()), new ActorRef(actor), Instant.now());
-		pending.put(commandId, new PendingCommand(command.target().objectId(), command instanceof SetParameterArchitecturalCommand set ? set.parameterKey() : null));
+		pending.put(commandId, new PendingCommand(command.target().objectId(), command instanceof SetParameterArchitecturalCommand set ? set.parameterKey() : null, -1));
 		ClientPlayNetworking.send(new ApertureReplicationPayload(codec.encode(request)));
 		return new EditorCommandSubmission(commandId, EditorCommandSubmission.Status.PENDING,
 			"Submitted to authoritative server", revision.objectRevision(), revision.stateRevision());
@@ -78,8 +78,8 @@ final class ClientEditorCommandTransport implements EditorCommandTransport {
 
 	private void onMessage(ReplicationMessage message) {
 		if (message instanceof CommandAcceptedMessage accepted) {
-			PendingCommand command=pending.remove(accepted.commandId());
-			if(command!=null){previews.transition(accepted.commandId(),PreviewState.ACCEPTED_WAITING_REPLICA);previews.complete(accepted.commandId());notifyResult(new EditorCommandSubmission(accepted.commandId(),EditorCommandSubmission.Status.ACCEPTED,"Accepted",accepted.resultingObjectRevision(),accepted.resultingStateRevision().value()));}
+			PendingCommand command=pending.get(accepted.commandId());
+			if(command!=null){pending.put(accepted.commandId(),command.withTargetRevision(accepted.resultingObjectRevision()));previews.transition(accepted.commandId(),PreviewState.ACCEPTED_WAITING_REPLICA);notifyResult(new EditorCommandSubmission(accepted.commandId(),EditorCommandSubmission.Status.ACCEPTED,"Accepted",accepted.resultingObjectRevision(),accepted.resultingStateRevision().value()));}
 		} else if (message instanceof CommandRejectedMessage rejected) {
 			PendingCommand command = pending.get(rejected.commandId());
 			if (command == null) return;
@@ -100,8 +100,8 @@ final class ClientEditorCommandTransport implements EditorCommandTransport {
 				Optional.of(id), Optional.empty(), "server", Instant.now(),
 				rejected.errorCode() == CommandRejectedMessage.ErrorCode.REVISION_CONFLICT ? "Resync object" : "Review command", false));
 		} else if(message instanceof ObjectSnapshotMessage snapshot){
-			var completed=pending.entrySet().stream().filter(entry->entry.getValue().objectId().equals(snapshot.objectId())&&previews.state(entry.getKey()).orElse(null)==PreviewState.RESYNCING).map(Map.Entry::getKey).toList();
-			completed.forEach(commandId->{pending.remove(commandId);previews.complete(commandId);});
+			var completed=pending.entrySet().stream().filter(entry->entry.getValue().objectId().equals(snapshot.objectId())&&((previews.state(entry.getKey()).orElse(null)==PreviewState.RESYNCING)||(previews.state(entry.getKey()).orElse(null)==PreviewState.ACCEPTED_WAITING_REPLICA&&snapshot.snapshot().instance().revision()>=entry.getValue().targetRevision()))).map(Map.Entry::getKey).toList();
+			completed.forEach(commandId->{pending.remove(commandId);previews.transition(commandId,PreviewState.COMPLETED);previews.complete(commandId);});
 		}
 	}
 
@@ -113,7 +113,7 @@ final class ClientEditorCommandTransport implements EditorCommandTransport {
 	}
 
 
-	private record PendingCommand(ArchitecturalObjectId objectId, String parameterKey) { }
+	private record PendingCommand(ArchitecturalObjectId objectId, String parameterKey, long targetRevision) { PendingCommand withTargetRevision(long revision){return new PendingCommand(objectId,parameterKey,revision);} }
 	private static Map<String, String> parameterPayload(String key, ParameterValue value) {
 		String raw = switch (value) {
 			case ParameterValue.LengthValue v -> Double.toString(v.millimeters());

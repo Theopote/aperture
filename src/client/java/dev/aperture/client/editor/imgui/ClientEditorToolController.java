@@ -3,7 +3,6 @@ package dev.aperture.client.editor.imgui;
 import dev.aperture.client.editor.ClientEditorWorkspace;
 import dev.aperture.client.editor.GizmoDragController;
 import dev.aperture.client.editor.ResizeTool;
-import dev.aperture.client.editor.OpeningManipulatorDescriptorProvider;
 import dev.aperture.client.placement.ClientPlacementPreview;
 import dev.aperture.editor.interaction.EditorInputFrame;
 import dev.aperture.editor.interaction.ToolManager;
@@ -29,7 +28,7 @@ final class ClientEditorToolController implements ToolController, ClientEditorWo
 
 	void bind(EditorSession editorSession) {
 		this.session = editorSession;
-		this.resizeTool = new ResizeTool(editorSession, new OpeningManipulatorDescriptorProvider(editorSession.inspector()));
+		this.resizeTool = new ResizeTool(editorSession, dev.aperture.editor.plugin.ArchitecturalEditorPluginRegistry.discover().manipulatorProvider(editorSession.inspector()));
 		this.toolManager = new ToolManager(resizeTool);
 	}
 
@@ -100,7 +99,7 @@ final class ClientEditorToolController implements ToolController, ClientEditorWo
 	@Override public void cancelTools() { cancelActiveTool(); }
 
 	@Override public ClientEditorWorkspace.ResizeState resizeState() {
-		return resizeTool == null ? new ClientEditorWorkspace.ResizeState(java.util.Optional.empty(), java.util.Optional.empty())
-			: new ClientEditorWorkspace.ResizeState(resizeTool.hoveredManipulatorId(), resizeTool.activeManipulatorId());
+		return resizeTool == null ? new ClientEditorWorkspace.ResizeState(java.util.Optional.empty(), java.util.Optional.empty(), java.util.Optional.empty(), dev.aperture.editor.interaction.ToolInteractionState.IDLE)
+			: new ClientEditorWorkspace.ResizeState(resizeTool.hoveredManipulatorId(), resizeTool.activeManipulatorId(), resizeTool.pendingManipulatorId(), resizeTool.interactionState());
 	}
 }

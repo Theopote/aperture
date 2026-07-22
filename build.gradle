@@ -36,6 +36,7 @@ dependencies {
 	clientRuntimeOnly 'io.github.spair:imgui-java-natives-macos:1.86.12'
 	clientImplementation project(':aperture-render')
 	clientImplementation project(':aperture-opening-runtime')
+	clientImplementation project(':aperture-opening-editor')
 }
 
 processResources {

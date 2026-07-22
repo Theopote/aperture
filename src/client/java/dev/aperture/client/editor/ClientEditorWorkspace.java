@@ -42,13 +42,15 @@ public final class ClientEditorWorkspace {
 		ResizeState resizeState();
 	}
 
-	public record ResizeState(Optional<String> hoveredManipulatorId, Optional<String> activeManipulatorId) {
+	public record ResizeState(Optional<String> hoveredManipulatorId, Optional<String> activeManipulatorId, Optional<String> pendingManipulatorId, dev.aperture.editor.interaction.ToolInteractionState interactionState) {
 		public ResizeState {
 			hoveredManipulatorId = hoveredManipulatorId == null ? Optional.empty() : hoveredManipulatorId;
 			activeManipulatorId = activeManipulatorId == null ? Optional.empty() : activeManipulatorId;
+			pendingManipulatorId = pendingManipulatorId == null ? Optional.empty() : pendingManipulatorId;
+			interactionState = interactionState == null ? dev.aperture.editor.interaction.ToolInteractionState.IDLE : interactionState;
 		}
 		public boolean hovered() { return hoveredManipulatorId.isPresent(); }
 		public boolean dragging() { return activeManipulatorId.isPresent(); }
-		private static final ResizeState IDLE = new ResizeState(Optional.empty(), Optional.empty());
+		private static final ResizeState IDLE = new ResizeState(Optional.empty(), Optional.empty(), Optional.empty(), dev.aperture.editor.interaction.ToolInteractionState.IDLE);
 	}
 }

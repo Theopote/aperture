@@ -41,6 +41,11 @@ public final class DimensionOverlayRenderer {
 
 	private static int handleColor(ClientEditorWorkspace.ResizeState state, String id) {
 		if (state.activeManipulatorId().filter(id::equals).isPresent()) return 0xFFFF8800;
+		if (state.pendingManipulatorId().filter(id::equals).isPresent()) return switch (state.interactionState()) {
+			case REJECTED, CONFLICT -> 0xFFFF4D5A;
+			case PENDING, ACCEPTED_WAITING_REPLICA -> 0xFF3DAEE9;
+			default -> HANDLE;
+		};
 		if (state.hoveredManipulatorId().filter(id::equals).isPresent()) return 0xFFFFFFFF;
 		return HANDLE;
 	}

@@ -11,7 +11,8 @@ public final class LocalPreviewCoordinator implements PreviewCoordinator {
 	public synchronized void associate(UUID commandId,ArchitecturalObjectId id,String key){pending.put(commandId,new PendingPreview(id,key,PreviewState.PENDING));}
 	public synchronized void transition(UUID commandId,PreviewState state){pending.computeIfPresent(commandId,(id,current)->new PendingPreview(current.objectId(),current.parameterKey(),state));}
 	public synchronized Optional<PreviewState> state(UUID commandId){return Optional.ofNullable(pending.get(commandId)).map(PendingPreview::state);}
-	public synchronized void complete(UUID commandId){var preview=pending.remove(commandId);if(preview!=null){clear(preview.objectId(),preview.parameterKey());}}
+	public synchronized void complete(UUID commandId){var preview=pending.get(commandId);if(preview!=null){var object=values.get(preview.objectId());if(object!=null){object.remove(preview.parameterKey());if(object.isEmpty())values.remove(preview.objectId());}}}
+	public synchronized void dismiss(UUID commandId){pending.remove(commandId);}
 	public synchronized void clear(ArchitecturalObjectId id,String key){var object=values.get(id);if(object!=null){object.remove(key);if(object.isEmpty())values.remove(id);}pending.entrySet().removeIf(entry->entry.getValue().objectId().equals(id)&&entry.getValue().parameterKey().equals(key));}
 	public synchronized void clearObject(ArchitecturalObjectId id){values.remove(id);pending.entrySet().removeIf(entry->entry.getValue().objectId().equals(id));}
 	private record PendingPreview(ArchitecturalObjectId objectId,String parameterKey,PreviewState state){}

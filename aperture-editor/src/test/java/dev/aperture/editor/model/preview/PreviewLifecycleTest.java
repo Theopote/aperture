@@ -21,6 +21,8 @@ class PreviewLifecycleTest {
 		assertTrue(previews.value(objectId,"width").isPresent());
 		previews.complete(commandId);
 		assertTrue(previews.value(objectId,"width").isEmpty());
+		assertEquals(PreviewState.ACCEPTED_WAITING_REPLICA, previews.state(commandId).orElseThrow());
+		previews.dismiss(commandId);
 		assertTrue(previews.state(commandId).isEmpty());
 	}
 
