@@ -2,11 +2,7 @@ package dev.aperture.editor.imgui;
 
 import dev.aperture.editor.model.history.EditorHistoryEntry;
 import dev.aperture.editor.model.command.ExpectedRevision;
-import dev.aperture.runtime.model.command.RequestOpenCommand;
-import dev.aperture.runtime.model.command.RequestCloseCommand;
-import dev.aperture.runtime.model.command.SetLockCommand;
-import dev.aperture.runtime.model.event.ObjectRef;
-import dev.aperture.editor.model.inspector.InspectorProperty;
+import dev.aperture.editor.model.inspector.PropertyDescriptor;
 import dev.aperture.editor.model.inspector.InspectorSection;
 import dev.aperture.editor.model.read.EditorDiagnostic;
 import dev.aperture.editor.model.session.EditorSession;
@@ -145,13 +141,13 @@ public final class DearImGuiEditor {
 		if (selection.objectIds().isEmpty()) ImGui.textDisabled("No architectural object selected");
 		else if (selection.objectIds().size() > 1) ImGui.text(selection.objectIds().size() + " objects selected (read-only)");
 		else for (InspectorSection section : session.inspector().sections(selection.primaryObject())) {
-			if (ImGui.collapsingHeader(section.label())) for (InspectorProperty property : section.properties()) renderProperty(selection.primaryObject(), property);
+			if (ImGui.collapsingHeader(section.label())) for (PropertyDescriptor property : section.properties()) renderProperty(selection.primaryObject(), property);
 		}
 		ImGui.end();
 	}
 
-	private void renderProperty(dev.aperture.runtime.model.object.ArchitecturalObjectId objectId, InspectorProperty property) {
-		ImGui.textDisabled(property.label()); ImGui.sameLine(180);
+	private void renderProperty(dev.aperture.runtime.model.object.ArchitecturalObjectId objectId, PropertyDescriptor property) {
+		ImGui.textDisabled(property.displayName()); ImGui.sameLine(180);
 		Object value = property.value();
 		if (value instanceof ParameterValue parameter && propertyEditor.render(objectId, property, parameter)) return;
 		String display = value instanceof ParameterValue parameter ? formatParameter(parameter) : String.valueOf(value);
@@ -182,15 +178,8 @@ public final class DearImGuiEditor {
 	}
 
 	private void submitRuntimeAction(dev.aperture.editor.model.read.ObjectEditorView view, String action) {
-		ObjectRef target = new ObjectRef(view.objectId());
-		var command = switch (action) {
-			case "request_open" -> new RequestOpenCommand(target);
-			case "request_close" -> new RequestCloseCommand(target);
-			case "set_locked" -> new SetLockCommand(target, true);
-			case "set_unlocked" -> new SetLockCommand(target, false);
-			default -> throw new IllegalArgumentException("Unsupported runtime action: " + action);
-		};
-		session.commands().submit(command, new ExpectedRevision(view.objectRevision(), view.stateRevision()));
+		session.commands().submitRuntimeAction(view.objectId(), action,
+			new ExpectedRevision(view.objectRevision(), view.stateRevision()));
 	}
 
 	private void renderHistory() {

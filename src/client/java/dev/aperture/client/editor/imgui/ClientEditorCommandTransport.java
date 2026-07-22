@@ -8,6 +8,7 @@ import dev.aperture.editor.model.command.SetParameterArchitecturalCommand;
 import dev.aperture.editor.model.read.DiagnosticsModel;
 import dev.aperture.editor.model.read.EditorDiagnostic;
 import dev.aperture.editor.model.preview.PreviewCoordinator;
+import dev.aperture.editor.model.preview.PreviewState;
 import dev.aperture.fabric.network.ApertureReplicationPayload;
 import dev.aperture.parameter.ParameterValue;
 import dev.aperture.runtime.model.command.ArchitecturalCommand;
@@ -20,6 +21,8 @@ import dev.aperture.runtime.model.replication.CommandAcceptedMessage;
 import dev.aperture.runtime.model.replication.CommandRejectedMessage;
 import dev.aperture.runtime.model.replication.CommandRequestMessage;
 import dev.aperture.runtime.model.replication.ReplicationMessage;
+import dev.aperture.runtime.model.replication.ObjectResyncRequest;
+import dev.aperture.runtime.model.replication.ObjectSnapshotMessage;
 import dev.aperture.runtime.model.state.StateRevision;
 import dev.aperture.runtime.replication.AuthoritativeCommandGateway;
 import dev.aperture.runtime.replication.JsonReplicationMessageCodec;
@@ -70,22 +73,38 @@ final class ClientEditorCommandTransport implements EditorCommandTransport {
 	}
 
 	private void onMessage(ReplicationMessage message) {
-		if (message instanceof CommandAcceptedMessage accepted) clearPreview(pending.remove(accepted.commandId()));
-		else if (message instanceof CommandRejectedMessage rejected) {
-			PendingCommand command = pending.remove(rejected.commandId());
+		if (message instanceof CommandAcceptedMessage accepted) {
+			PendingCommand command=pending.remove(accepted.commandId());
+			if(command!=null){previews.transition(accepted.commandId(),PreviewState.ACCEPTED_WAITING_REPLICA);previews.complete(accepted.commandId());}
+		} else if (message instanceof CommandRejectedMessage rejected) {
+			PendingCommand command = pending.get(rejected.commandId());
 			if (command == null) return;
-			clearPreview(command);
+			boolean conflict=rejected.errorCode() == CommandRejectedMessage.ErrorCode.REVISION_CONFLICT;
+			if(conflict){
+				previews.transition(rejected.commandId(),PreviewState.CONFLICT);
+				previews.transition(rejected.commandId(),PreviewState.RESYNCING);
+				requestResync(rejected);
+			}else{
+				pending.remove(rejected.commandId());
+				previews.transition(rejected.commandId(),PreviewState.REJECTED);
+				previews.complete(rejected.commandId());
+			}
 			ArchitecturalObjectId id = command.objectId();
 			EditorDiagnostic.Severity severity = EditorDiagnostic.Severity.ERROR;
 			diagnostics.add(new EditorDiagnostic(severity, rejected.errorCode().name().toLowerCase(), rejected.message(),
 				Optional.of(id), Optional.empty(), "server", Instant.now(),
 				rejected.errorCode() == CommandRejectedMessage.ErrorCode.REVISION_CONFLICT ? "Resync object" : "Review command", false));
+		} else if(message instanceof ObjectSnapshotMessage snapshot){
+			var completed=pending.entrySet().stream().filter(entry->entry.getValue().objectId().equals(snapshot.objectId())&&previews.state(entry.getKey()).orElse(null)==PreviewState.RESYNCING).map(Map.Entry::getKey).toList();
+			completed.forEach(commandId->{pending.remove(commandId);previews.complete(commandId);});
 		}
 	}
 
-	private void clearPreview(PendingCommand command) {
-		if (command != null && command.parameterKey() != null) previews.clear(command.objectId(), command.parameterKey());
+	private void requestResync(CommandRejectedMessage rejected){
+		var request=new ObjectResyncRequest(AuthoritativeCommandGateway.PROTOCOL_VERSION,rejected.objectId(),rejected.authoritativeObjectRevision(),rejected.authoritativeStateRevision(),0,"editor revision conflict");
+		ClientPlayNetworking.send(new ApertureReplicationPayload(codec.encode(request)));
 	}
+
 
 	private record PendingCommand(ArchitecturalObjectId objectId, String parameterKey) { }
 	private static Map<String, String> parameterPayload(String key, ParameterValue value) {

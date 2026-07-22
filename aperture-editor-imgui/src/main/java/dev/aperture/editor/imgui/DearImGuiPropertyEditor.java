@@ -1,7 +1,7 @@
 package dev.aperture.editor.imgui;
 
 import dev.aperture.editor.model.command.ExpectedRevision;
-import dev.aperture.editor.model.inspector.InspectorProperty;
+import dev.aperture.editor.model.inspector.PropertyDescriptor;
 import dev.aperture.editor.model.preview.DefaultParameterEditSession;
 import dev.aperture.editor.model.preview.ParameterEditSession;
 import dev.aperture.editor.model.session.EditorSession;
@@ -19,13 +19,13 @@ final class DearImGuiPropertyEditor {
 	private ParameterEditSession active;
 	DearImGuiPropertyEditor(EditorSession session){this.session=Objects.requireNonNull(session);}
 
-	boolean render(ArchitecturalObjectId objectId, InspectorProperty property, ParameterValue value) {
+	boolean render(ArchitecturalObjectId objectId, PropertyDescriptor property, ParameterValue value) {
 		if (property.readOnly()) return false;
 		boolean changed; ParameterValue next; String widgetId="##parameter-"+property.key();
 		if(value instanceof ParameterValue.BoolValue bool){ImBoolean data=new ImBoolean(bool.value());changed=ImGui.checkbox(widgetId,data);next=ParameterValue.bool(data.get());}
 		else if(value.type()==ParameterType.LENGTH||value.type()==ParameterType.ANGLE||value.type()==ParameterType.NUMBER){
-			float[] data={(float)value.asNumber()};changed=ImGui.dragFloat(widgetId,data,value.type()==ParameterType.LENGTH?1f:0.1f);
-			next=switch(value.type()){case LENGTH->ParameterValue.length(Math.max(0,data[0]));case ANGLE->ParameterValue.angle(data[0]);default->ParameterValue.number(data[0]);};
+			float[] data={(float)value.asNumber()};float speed=(float)property.step().orElse(0.1);float min=(float)property.minimum().orElse(0);float max=(float)property.maximum().orElse(0);changed=ImGui.dragFloat(widgetId,data,speed,min,max,"%."+property.precision()+"f");
+			next=switch(value.type()){case LENGTH->ParameterValue.length(data[0]);case ANGLE->ParameterValue.angle(data[0]);default->ParameterValue.number(data[0]);};
 		}else return false;
 		if(ImGui.isItemActivated())begin(objectId,property.key(),value);
 		if(changed&&active!=null&&active.active())active.updatePreview(next);

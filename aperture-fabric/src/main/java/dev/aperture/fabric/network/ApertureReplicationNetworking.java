@@ -26,10 +26,11 @@ public final class ApertureReplicationNetworking {
 			ReplicationMessage message = CODEC.decode(payload.encoded());
 			if (message instanceof CommandRequestMessage request) {
 				var outcome = FabricRuntimeLifecycle.submit(request);
-				send(context.player(), outcome.response());
 				for (ReplicationMessage update : outcome.broadcasts()) {
 					for (var player : context.server().getPlayerList().getPlayers()) send(player, update);
 				}
+				// Authority must reach the initiating replica before Accepted clears its preview overlay.
+				send(context.player(), outcome.response());
 			} else if (message instanceof ObjectResyncRequest request) {
 				send(context.player(), FabricRuntimeLifecycle.resync(request));
 			} else {
