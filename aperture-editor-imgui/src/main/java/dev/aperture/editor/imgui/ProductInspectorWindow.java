@@ -97,6 +97,7 @@ final class ProductInspectorWindow {
 		String editError = editor.error(property.key());
 		for (String validation : property.validation()) error(validation);
 		if (!editError.isBlank()) error(editError);
+		InspectorDiagnosticPresenter.render(view, property);
 		if (property.readOnly()) statusChip("Read-only", ApertureStyle.WARNING);
 		else if (editor.editing(property.key())) statusChip("Preview", ApertureStyle.BLUE);
 		else if (context.session.preview().value(view.objectId(), property.key()).isPresent()) statusChip("Pending", ApertureStyle.BLUE);
