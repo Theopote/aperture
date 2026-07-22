@@ -18,7 +18,7 @@ public final class DearImGuiEditor {
 	public static final int LAYOUT_VERSION = 2;
 	private static final String DOCKSPACE_ID = "ApertureMainDockspace";
 	private final ApertureUiContext context;
-	private final InspectorWindow inspector;
+	private final ProductInspectorWindow inspector;
 	private final ProjectNavigatorWindow navigator;
 	private final RuntimeWindow runtime;
 	private final ActivityConsoleWindow activity;
@@ -33,7 +33,7 @@ public final class DearImGuiEditor {
 
 	public DearImGuiEditor(EditorSession session, boolean defaultLayoutPending) {
 		this.context = new ApertureUiContext(Objects.requireNonNull(session, "session"));
-		this.inspector = new InspectorWindow(context, new DearImGuiPropertyEditor(session));
+		this.inspector = new ProductInspectorWindow(context);
 		this.navigator = new ProjectNavigatorWindow(context);
 		this.runtime = new RuntimeWindow(context);
 		this.activity = new ActivityConsoleWindow(context);

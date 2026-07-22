@@ -2,6 +2,7 @@ package dev.aperture.client.render.editor;
 
 import dev.aperture.client.editor.ClientEditorWorkspace;
 import dev.aperture.client.editor.OpeningWorldGeometry;
+import dev.aperture.editor.imgui.InspectorInteractionState;
 import net.minecraft.gizmos.Gizmos;
 import net.minecraft.gizmos.TextGizmo;
 
@@ -22,7 +23,9 @@ public final class DimensionOverlayRenderer {
 	}
 
 	private static void emit(OpeningWorldGeometry.Presentation geometry) {
-		Gizmos.line(geometry.dimensionStart(), geometry.dimensionEnd(), DIMENSION, 2.0F).setAlwaysOnTop();
+		int widthColor = dimensionColor("width");
+		int heightColor = dimensionColor("height");
+		Gizmos.line(geometry.dimensionStart(), geometry.dimensionEnd(), widthColor, 2.0F).setAlwaysOnTop();
 		Gizmos.line(geometry.dimensionStart().add(0, -.08, 0), geometry.dimensionStart().add(0, .08, 0), DIMENSION, 2.0F).setAlwaysOnTop();
 		Gizmos.line(geometry.dimensionEnd().add(0, -.08, 0), geometry.dimensionEnd().add(0, .08, 0), DIMENSION, 2.0F).setAlwaysOnTop();
 		var anchor = geometry.leftWidthHandle();
@@ -35,14 +38,21 @@ public final class DimensionOverlayRenderer {
 		Gizmos.line(bottom.add(-.06, 0, -.06), bottom.add(.06, 0, .06), FIXED_ANCHOR, 2.0F).setAlwaysOnTop();
 		Gizmos.line(bottom.add(-.06, 0, .06), bottom.add(.06, 0, -.06), FIXED_ANCHOR, 2.0F).setAlwaysOnTop();
 		String label = Math.round(geometry.widthMm()) + " mm";
-		Gizmos.billboardText(label, geometry.dimensionLabel(), TextGizmo.Style.forColorAndCentered(DIMENSION).withScale(.8F))
+		Gizmos.billboardText(label, geometry.dimensionLabel(), TextGizmo.Style.forColorAndCentered(widthColor).withScale(.8F))
 			.setAlwaysOnTop();
 		String heightLabel = Math.round(geometry.heightMm()) + " mm";
 		Gizmos.billboardText(heightLabel, geometry.heightDimensionLabel(),
-			TextGizmo.Style.forColorAndCentered(DIMENSION).withScale(.8F)).setAlwaysOnTop();
+			TextGizmo.Style.forColorAndCentered(heightColor).withScale(.8F)).setAlwaysOnTop();
+	}
+
+	private static int dimensionColor(String parameter) {
+		return InspectorInteractionState.hoveredParameter().filter(parameter::equals).isPresent()
+			? 0xFFFFFFFF : DIMENSION;
 	}
 
 	private static int handleColor(ClientEditorWorkspace.ResizeState state, String id) {
+		String parameter = id.equals("door.width.right") ? "width" : id.equals("door.height.top") ? "height" : "";
+		if (InspectorInteractionState.hoveredParameter().filter(parameter::equals).isPresent()) return 0xFFFFFFFF;
 		if (state.activeManipulatorId().filter(id::equals).isPresent()) return 0xFFFF8800;
 		if (state.pendingManipulatorId().filter(id::equals).isPresent()) return switch (state.interactionState()) {
 			case REJECTED, CONFLICT -> 0xFFFF4D5A;
