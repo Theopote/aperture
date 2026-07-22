@@ -3,6 +3,7 @@ package dev.aperture.client.editor.imgui;
 import dev.aperture.client.editor.ClientEditorWorkspace;
 import dev.aperture.client.editor.GizmoDragController;
 import dev.aperture.client.editor.ResizeTool;
+import dev.aperture.client.editor.OpeningManipulatorDescriptorProvider;
 import dev.aperture.client.placement.ClientPlacementPreview;
 import dev.aperture.editor.interaction.EditorInputFrame;
 import dev.aperture.editor.interaction.ToolManager;
@@ -28,7 +29,7 @@ final class ClientEditorToolController implements ToolController, ClientEditorWo
 
 	void bind(EditorSession editorSession) {
 		this.session = editorSession;
-		this.resizeTool = new ResizeTool(editorSession);
+		this.resizeTool = new ResizeTool(editorSession, new OpeningManipulatorDescriptorProvider(editorSession.inspector()));
 		this.toolManager = new ToolManager(resizeTool);
 	}
 
@@ -56,10 +57,7 @@ final class ClientEditorToolController implements ToolController, ClientEditorWo
 		return switch (tool) {
 			case SELECT, PLACE -> true;
 			case ROTATE -> ClientPlacementPreview.session().isPresent();
-			case RESIZE -> java.util.Optional.ofNullable(session).flatMap(current -> {
-				var primary = current.selection().snapshot().primaryObject();
-				return primary == null ? java.util.Optional.empty() : current.readModel().object(primary);
-			}).flatMap(view -> view.parameters().get("width")).isPresent();
+			case RESIZE -> resizeTool != null && resizeTool.available();
 			case MOVE, ATTACH, MEASURE -> false;
 		};
 	}

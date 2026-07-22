@@ -4,14 +4,12 @@ import dev.aperture.editor.interaction.EditorInputFrame;
 import dev.aperture.editor.interaction.EditorTool;
 import dev.aperture.editor.interaction.ManipulatorDescriptor;
 import dev.aperture.editor.interaction.ManipulatorDescriptorProvider;
+import dev.aperture.editor.interaction.LinearParameterDragSession;
 import dev.aperture.editor.interaction.WorldRay;
-import dev.aperture.editor.model.command.ExpectedRevision;
-import dev.aperture.editor.model.preview.DefaultParameterEditSession;
 import dev.aperture.editor.model.read.ObjectEditorView;
 import dev.aperture.editor.model.session.EditorSession;
 import dev.aperture.editor.model.session.ToolController;
 import dev.aperture.parameter.ParameterType;
-import dev.aperture.parameter.ParameterValue;
 import net.minecraft.world.phys.Vec3;
 
 /** Generic linear-parameter resize tool driven by family-provided descriptors. */
@@ -81,39 +79,26 @@ public final class ResizeTool implements EditorTool {
 
 	private void start(ObjectEditorView view, ManipulatorGeometryEvaluator.EvaluatedManipulator manipulator,
 		Vec3 rayOrigin, Vec3 rayDirection) {
-		var descriptor = manipulator.descriptor();
-		if (!(view.parameters().get(descriptor.parameterKey()).orElse(null) instanceof ParameterValue.LengthValue value)) return;
 		double anchor = GizmoDragMath.axisPositionBlocks(rayOrigin, rayDirection,
 			manipulator.handle(), manipulator.worldAxis());
-		var edit = new DefaultParameterEditSession(view.objectId(), descriptor.parameterKey(), value,
-			new ExpectedRevision(view.objectRevision(), view.stateRevision()), session.preview(), session.commands());
-		drag = new ActiveDrag(edit, descriptor, value.millimeters(), anchor, manipulator.handle(),
-			manipulator.worldAxis(), value.millimeters());
+		LinearParameterDragSession.begin(session, view, manipulator.descriptor()).ifPresent(value ->
+			drag = new ActiveDrag(value, anchor, manipulator.handle(), manipulator.worldAxis()));
 	}
 
 	private void updateDrag(EditorInputFrame input, Vec3 rayOrigin, Vec3 rayDirection) {
 		double position = GizmoDragMath.axisPositionBlocks(rayOrigin, rayDirection, drag.axisOrigin(), drag.axis());
-		double raw = drag.baseValue() + GizmoDragMath.blocksToMillimeters(position - drag.anchorBlocks());
-		double increment = input.shiftDown() ? drag.descriptor().fineSnapIncrement() : drag.descriptor().snapIncrement();
-		double snapped = input.controlDown() ? raw : Math.round(raw / increment) * increment;
-		double minimum = drag.descriptor().minimum().orElse(1.0);
-		double maximum = drag.descriptor().maximum().orElse(Double.MAX_VALUE);
-		double constrained = Math.max(minimum, Math.min(maximum, snapped));
-		if (Math.abs(constrained - drag.previewValue()) >= .001) {
-			drag.edit().updatePreview(ParameterValue.length(constrained));
-			drag = drag.withPreview(constrained);
-		}
+		double delta = GizmoDragMath.blocksToMillimeters(position - drag.anchorBlocks());
+		drag.session().updateDelta(delta, input.shiftDown(), input.controlDown());
 	}
 
 	private void finish() {
-		ActiveDrag completed = drag;
+		LinearParameterDragSession completed = drag.session();
 		drag = null;
-		if (Math.abs(completed.previewValue() - completed.baseValue()) < .001) completed.edit().cancel();
-		else completed.edit().commit();
+		completed.finish();
 	}
 
 	private void cancelDrag() {
-		if (drag != null) drag.edit().cancel();
+		if (drag != null) drag.session().cancel();
 		drag = null;
 	}
 
@@ -132,10 +117,6 @@ public final class ResizeTool implements EditorTool {
 		return origin.add(direction.scale(projection)).distanceTo(point);
 	}
 
-	private record ActiveDrag(DefaultParameterEditSession edit, ManipulatorDescriptor descriptor,
-		double baseValue, double anchorBlocks, Vec3 axisOrigin, Vec3 axis, double previewValue) {
-		ActiveDrag withPreview(double value) {
-			return new ActiveDrag(edit, descriptor, baseValue, anchorBlocks, axisOrigin, axis, value);
-		}
-	}
+	private record ActiveDrag(LinearParameterDragSession session, double anchorBlocks,
+		Vec3 axisOrigin, Vec3 axis) { }
 }
