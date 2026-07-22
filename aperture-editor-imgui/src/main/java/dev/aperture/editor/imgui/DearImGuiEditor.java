@@ -25,6 +25,7 @@ public final class DearImGuiEditor {
 	private final ApertureToolbar toolbar;
 	private final ApertureMainMenuBar menu;
 	private final EditorStatusBar statusBar;
+	private final ViewportOverlay viewportOverlay;
 	private final ShortcutDispatcher shortcuts = new ShortcutDispatcher();
 	private boolean defaultLayoutPending;
 
@@ -39,6 +40,7 @@ public final class DearImGuiEditor {
 		this.toolbar = new ApertureToolbar(context);
 		this.menu = new ApertureMainMenuBar(context, this::resetLayout);
 		this.statusBar = new EditorStatusBar(context);
+		this.viewportOverlay = new ViewportOverlay(context);
 		this.defaultLayoutPending = defaultLayoutPending;
 		configureShortcuts();
 	}
@@ -47,19 +49,20 @@ public final class DearImGuiEditor {
 		ApertureStyle.push();
 		try {
 			handleShortcuts();
-			renderDockspace();
+			int dockspace = renderDockspace();
 			var visibility = context.session.workspace().windowVisibility();
 			if (visibility.getOrDefault("navigator", true)) navigator.render();
 			if (visibility.getOrDefault("inspector", true)) inspector.render();
 			if (visibility.getOrDefault("runtime", true)) runtime.render();
 			if (visibility.getOrDefault("activity", true)) activity.render();
+			viewportOverlay.render(dockspace);
 			statusBar.render();
 		} finally {
 			ApertureStyle.pop();
 		}
 	}
 
-	private void renderDockspace() {
+	private int renderDockspace() {
 		ImGuiViewport viewport = ImGui.getMainViewport();
 		ImGui.setNextWindowPos(viewport.getWorkPosX(), viewport.getWorkPosY());
 		ImGui.setNextWindowSize(viewport.getWorkSizeX(), viewport.getWorkSizeY() - ApertureStyle.STATUS_BAR_HEIGHT);
@@ -83,6 +86,7 @@ public final class DearImGuiEditor {
 		ImGui.end();
 		ImGui.popStyleColor();
 		ImGui.popStyleVar(3);
+		return dockspace;
 	}
 
 	private void resetLayout() {
