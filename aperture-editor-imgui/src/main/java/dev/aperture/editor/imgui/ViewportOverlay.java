@@ -1,6 +1,12 @@
 package dev.aperture.editor.imgui;
 
 import dev.aperture.editor.model.read.ObjectEditorView;
+import dev.aperture.editor.interaction.DimensionValueParser;
+import dev.aperture.editor.model.command.ExpectedRevision;
+import dev.aperture.editor.model.preview.DefaultParameterEditSession;
+import dev.aperture.runtime.model.object.ArchitecturalObjectId;
+import imgui.type.ImString;
+import imgui.flag.ImGuiInputTextFlags;
 import dev.aperture.editor.model.read.SyncStatus;
 import dev.aperture.parameter.ParameterValue;
 import imgui.ImGui;
@@ -12,6 +18,14 @@ final class ViewportOverlay {
 	private static final int HUD_FLAGS = ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoDocking
 		| ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNav;
 	private final ApertureUiContext context;
+	private final DimensionValueParser dimensionParser = new DimensionValueParser();
+	private final ImString dimensionInput = new ImString(32);
+	private ArchitecturalObjectId dimensionObject;
+	private String dimensionParameter;
+	private double dimensionBase;
+	private long dimensionObjectRevision;
+	private long dimensionStateRevision;
+	private String dimensionError = "";
 
 	ViewportOverlay(ApertureUiContext context) { this.context = context; }
 
@@ -67,6 +81,10 @@ final class ViewportOverlay {
 		ImGui.text(view.displayName());
 		String dimensions = dimensions(view);
 		if (!dimensions.isBlank()) ImGui.textDisabled(dimensions);
+		dimensionButton(view, "width", "Width");
+		ImGui.sameLine();
+		dimensionButton(view, "height", "Height");
+		dimensionPopup();
 		var previews = context.session.preview().values(view.objectId());
 		if (!view.diagnostics().isEmpty()) ImGui.textColored(
 			ApertureStyle.ERROR[0], ApertureStyle.ERROR[1], ApertureStyle.ERROR[2], 1,
@@ -79,6 +97,75 @@ final class ViewportOverlay {
 			"Resynchronization required");
 	}
 
+	private void dimensionButton(ObjectEditorView view, String parameter, String label) {
+		view.parameters().get(parameter).filter(ParameterValue.LengthValue.class::isInstance)
+			.map(ParameterValue.LengthValue.class::cast).ifPresent(value -> {
+				String caption = label + " " + Math.round(value.millimeters()) + " mm##dimension." + parameter;
+				if (ImGui.smallButton(caption)) {
+					dimensionObject = view.objectId();
+					dimensionParameter = parameter;
+					dimensionBase = value.millimeters();
+					dimensionObjectRevision = view.objectRevision();
+					dimensionStateRevision = view.stateRevision();
+					dimensionInput.set(Long.toString(Math.round(dimensionBase)));
+					dimensionError = "";
+					ImGui.openPopup("Edit Dimension");
+				}
+			});
+	}
+
+	private void dimensionPopup() {
+		if (dimensionObject == null || !ImGui.beginPopup("Edit Dimension")) return;
+		ImGui.text("Set " + dimensionParameter);
+		ImGui.textDisabled("Examples: 1350, 1.35m, +100, -50");
+		boolean submit = ImGui.inputText("##DimensionValue", dimensionInput, ImGuiInputTextFlags.EnterReturnsTrue);
+		if (ImGui.button("Apply")) submit = true;
+		ImGui.sameLine();
+		if (ImGui.button("Cancel")) {
+			ImGui.closeCurrentPopup();
+			dimensionError = "";
+		}
+		if (submit) submitDimension();
+		if (!dimensionError.isBlank()) ImGui.textColored(
+			ApertureStyle.ERROR[0], ApertureStyle.ERROR[1], ApertureStyle.ERROR[2], 1, dimensionError);
+		ImGui.endPopup();
+	}
+
+	private void submitDimension() {
+		try {
+			double requested = dimensionParser.parse(dimensionInput.get(), dimensionBase).millimeters();
+			double constrained = constrainDimension(requested);
+			if (Math.abs(constrained - dimensionBase) < .001) {
+				ImGui.closeCurrentPopup();
+				return;
+			}
+			var edit = new DefaultParameterEditSession(dimensionObject, dimensionParameter,
+				ParameterValue.length(dimensionBase), new ExpectedRevision(dimensionObjectRevision, dimensionStateRevision),
+				context.session.preview(), context.session.commands());
+			edit.updatePreview(ParameterValue.length(constrained));
+			edit.commit();
+			dimensionError = "";
+			ImGui.closeCurrentPopup();
+		} catch (IllegalArgumentException error) {
+			dimensionError = error.getMessage();
+		}
+	}
+
+	private double constrainDimension(double requested) {
+		double minimum = 0;
+		double maximum = Double.MAX_VALUE;
+		for (var section : context.session.inspector().sections(dimensionObject)) for (var property : section.properties()) {
+			if (property.key().equals(dimensionParameter)) {
+				minimum = property.minimum().orElse(minimum);
+				maximum = property.maximum().orElse(maximum);
+			}
+		}
+		if (requested < minimum || requested > maximum) {
+			throw new IllegalArgumentException("Value must be between " + Math.round(minimum) + " and "
+				+ (Double.isFinite(maximum) && maximum < Double.MAX_VALUE ? Math.round(maximum) : "unlimited") + " mm");
+		}
+		return requested;
+	}
 	private void helpHud(float x, float y) {
 		beginHud("Tool Help##Viewport", x, y, 380, 36, true);
 		String help = context.mode == ApertureUiContext.Mode.RUNTIME
