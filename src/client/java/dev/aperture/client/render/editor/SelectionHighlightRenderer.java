@@ -18,6 +18,7 @@ public final class SelectionHighlightRenderer {
 	private SelectionHighlightRenderer() { }
 
 	public static void emit() {
+		NavigatorHoverRenderer.emit();
 		ClientEditorWorkspace.session().ifPresent(session -> {
 			var selection = session.selection().snapshot();
 			for (var id : selection.objectIds()) session.readModel().object(id).ifPresent(view -> {

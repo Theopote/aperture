@@ -20,6 +20,8 @@ public final class ClientEditorWorkspace {
 	public static Optional<EditorSession> session() { return Optional.ofNullable(session); }
 
 	public static void update(EditorInputFrame input) {
+		EditorSession currentSession = session;
+		if (currentSession != null) NavigatorFocusController.update(currentSession);
 		WorkspaceTools current = tools;
 		if (current != null) current.update(input);
 	}

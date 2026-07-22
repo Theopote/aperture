@@ -19,7 +19,7 @@ public final class DearImGuiEditor {
 	private static final String DOCKSPACE_ID = "ApertureMainDockspace";
 	private final ApertureUiContext context;
 	private final ProductInspectorWindow inspector;
-	private final ProjectNavigatorWindow navigator;
+	private final ProductProjectNavigatorWindow navigator;
 	private final RuntimeWindow runtime;
 	private final ActivityConsoleWindow activity;
 	private final ApertureToolbar toolbar;
@@ -34,7 +34,7 @@ public final class DearImGuiEditor {
 	public DearImGuiEditor(EditorSession session, boolean defaultLayoutPending) {
 		this.context = new ApertureUiContext(Objects.requireNonNull(session, "session"));
 		this.inspector = new ProductInspectorWindow(context);
-		this.navigator = new ProjectNavigatorWindow(context);
+		this.navigator = new ProductProjectNavigatorWindow(context);
 		this.runtime = new RuntimeWindow(context);
 		this.activity = new ActivityConsoleWindow(context);
 		this.toolbar = new ApertureToolbar(context);
