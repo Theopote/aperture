@@ -2,6 +2,9 @@ package dev.aperture.client.editor;
 
 import dev.aperture.editor.interaction.*;
 import dev.aperture.editor.model.read.ObjectEditorView;
+import dev.aperture.editor.imgui.DimensionEditRequests;
+import dev.aperture.client.editor.imgui.ApertureImGuiClient;
+import dev.aperture.parameter.ParameterValue;
 import dev.aperture.editor.model.session.EditorSession;
 import dev.aperture.editor.model.session.ToolController;
 import dev.aperture.parameter.ParameterType;
@@ -65,8 +68,11 @@ public final class ResizeTool implements EditorTool {
 			: hitTester.hit(input.cursor(), handles).map(ScreenSpaceHandle::id);
 		Vec3 origin = origin(input.worldRay());
 		Vec3 direction = direction(input.worldRay());
-		if (input.primaryPressed()) hoveredManipulatorId.map(byId::get)
-			.ifPresent(manipulator -> start(view, manipulator, origin, direction));
+		if (input.primaryPressed()) {
+			var hoveredManipulator = hoveredManipulatorId.map(byId::get);
+			if (hoveredManipulator.isPresent()) start(view, hoveredManipulator.orElseThrow(), origin, direction);
+			else openDimensionLabel(view, evaluated, input.cursor());
+		}
 		if (input.primaryDown() && drag != null) updateDrag(input, origin, direction);
 		if (input.primaryReleased() && drag != null) finish();
 	}
@@ -118,6 +124,24 @@ public final class ResizeTool implements EditorTool {
 			.toList();
 	}
 
+	private void openDimensionLabel(ObjectEditorView view,
+		List<ManipulatorGeometryEvaluator.EvaluatedManipulator> manipulators, ScreenPoint cursor) {
+		if (cursor == null) return;
+		manipulators.stream()
+			.map(manipulator -> projector.project(Minecraft.getInstance(), manipulator.dimensionLabel())
+				.map(point -> new LabelHit(manipulator, point)).orElse(null))
+			.filter(Objects::nonNull)
+			.filter(hit -> Math.abs(hit.point().x() - cursor.x()) <= 52 && Math.abs(hit.point().y() - cursor.y()) <= 14)
+			.min(Comparator.comparingDouble(hit -> hit.point().distanceSquared(cursor)))
+			.ifPresent(hit -> view.parameters().get(hit.manipulator().descriptor().parameterKey())
+				.filter(ParameterValue.LengthValue.class::isInstance).map(ParameterValue.LengthValue.class::cast)
+				.ifPresent(value -> {
+					DimensionEditRequests.publish(new DimensionEditRequests.Request(view.objectId(),
+						hit.manipulator().descriptor().parameterKey(), value.millimeters(),
+						view.objectRevision(), view.stateRevision()));
+					ApertureImGuiClient.openEditor(Minecraft.getInstance());
+				}));
+	}
 	private void start(ObjectEditorView view, ManipulatorGeometryEvaluator.EvaluatedManipulator manipulator,
 		Vec3 rayOrigin, Vec3 rayDirection) {
 		double anchor = GizmoDragMath.axisPositionBlocks(rayOrigin, rayDirection,
@@ -150,6 +174,7 @@ public final class ResizeTool implements EditorTool {
 		return new Vec3(ray.direction().x(), ray.direction().y(), ray.direction().z());
 	}
 
+	private record LabelHit(ManipulatorGeometryEvaluator.EvaluatedManipulator manipulator, ScreenPoint point) { }
 	private record ActiveDrag(String manipulatorId, LinearParameterDragSession session,
 		double anchorBlocks, Vec3 axisOrigin, Vec3 axis) { }
 	private record PendingManipulation(String manipulatorId, LinearParameterDragSession session) { }

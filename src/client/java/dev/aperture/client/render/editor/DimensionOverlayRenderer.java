@@ -37,6 +37,9 @@ public final class DimensionOverlayRenderer {
 		String label = Math.round(geometry.widthMm()) + " mm";
 		Gizmos.billboardText(label, geometry.dimensionLabel(), TextGizmo.Style.forColorAndCentered(DIMENSION).withScale(.8F))
 			.setAlwaysOnTop();
+		String heightLabel = Math.round(geometry.heightMm()) + " mm";
+		Gizmos.billboardText(heightLabel, geometry.heightDimensionLabel(),
+			TextGizmo.Style.forColorAndCentered(DIMENSION).withScale(.8F)).setAlwaysOnTop();
 	}
 
 	private static int handleColor(ClientEditorWorkspace.ResizeState state, String id) {

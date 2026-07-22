@@ -77,6 +77,9 @@ final class ViewportOverlay {
 	}
 
 	private void selectedObject(ObjectEditorView view) {
+		DimensionEditRequests.consume().filter(request -> request.objectId().equals(view.objectId())).ifPresent(request ->
+			beginDimension(request.objectId(), request.parameterKey(), request.baseMillimeters(),
+				request.objectRevision(), request.stateRevision()));
 		ImGui.text("1 object selected");
 		ImGui.text(view.displayName());
 		String dimensions = dimensions(view);
@@ -102,18 +105,23 @@ final class ViewportOverlay {
 			.map(ParameterValue.LengthValue.class::cast).ifPresent(value -> {
 				String caption = label + " " + Math.round(value.millimeters()) + " mm##dimension." + parameter;
 				if (ImGui.smallButton(caption)) {
-					dimensionObject = view.objectId();
-					dimensionParameter = parameter;
-					dimensionBase = value.millimeters();
-					dimensionObjectRevision = view.objectRevision();
-					dimensionStateRevision = view.stateRevision();
-					dimensionInput.set(Long.toString(Math.round(dimensionBase)));
-					dimensionError = "";
-					ImGui.openPopup("Edit Dimension");
+					beginDimension(view.objectId(), parameter, value.millimeters(),
+						view.objectRevision(), view.stateRevision());
 				}
 			});
 	}
 
+	private void beginDimension(ArchitecturalObjectId objectId, String parameter, double base,
+		long objectRevision, long stateRevision) {
+		dimensionObject = objectId;
+		dimensionParameter = parameter;
+		dimensionBase = base;
+		dimensionObjectRevision = objectRevision;
+		dimensionStateRevision = stateRevision;
+		dimensionInput.set(Long.toString(Math.round(base)));
+		dimensionError = "";
+		ImGui.openPopup("Edit Dimension");
+	}
 	private void dimensionPopup() {
 		if (dimensionObject == null || !ImGui.beginPopup("Edit Dimension")) return;
 		ImGui.text("Set " + dimensionParameter);

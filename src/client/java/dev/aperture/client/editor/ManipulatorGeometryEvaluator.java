@@ -39,10 +39,15 @@ public final class ManipulatorGeometryEvaluator {
 		Vec3d transformedAxisPoint = view.transform().transformPoint(localAxis.scale(MILLIMETERS_PER_BLOCK));
 		Vec3d worldAxis = transformedAxisPoint.subtract(transformedOrigin).normalize();
 		if (descriptor.direction() == ManipulatorDescriptor.DirectionPolicy.NEGATIVE) worldAxis = worldAxis.scale(-1);
-		return Optional.of(new EvaluatedManipulator(descriptor, handle, fixed,
+		Vec3 label = switch (descriptor.axis()) {
+			case LOCAL_X -> geometry.dimensionLabel();
+			case LOCAL_Y -> geometry.heightDimensionLabel();
+			case LOCAL_Z -> handle;
+		};
+		return Optional.of(new EvaluatedManipulator(descriptor, handle, fixed, label,
 			new Vec3(worldAxis.x(), worldAxis.y(), worldAxis.z())));
 	}
 
 	public record EvaluatedManipulator(ManipulatorDescriptor descriptor, Vec3 handle,
-		Vec3 fixedAnchor, Vec3 worldAxis) { }
+		Vec3 fixedAnchor, Vec3 dimensionLabel, Vec3 worldAxis) { }
 }

@@ -32,5 +32,9 @@ public final class ApertureImGuiClient implements ClientModInitializer {
 		}
 	}
 
+	public static void openEditor(Minecraft client) {
+		if (!(client.screen instanceof ApertureImGuiScreen)) client.setScreen(new ApertureImGuiScreen(RUNTIME));
+	}
+
 	public static void renderPendingDrawData() { RUNTIME.renderPendingDrawData(); }
 }
