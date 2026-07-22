@@ -94,6 +94,7 @@ final class ClientEditorToolController implements ToolController, ClientEditorWo
 
 	@Override public void update(EditorInputFrame input) {
 		if (toolManager != null) toolManager.update(input);
+		publishViewportState();
 	}
 
 	@Override public void cancelTools() { cancelActiveTool(); }
@@ -101,5 +102,11 @@ final class ClientEditorToolController implements ToolController, ClientEditorWo
 	@Override public ClientEditorWorkspace.ResizeState resizeState() {
 		return resizeTool == null ? new ClientEditorWorkspace.ResizeState(java.util.Optional.empty(), java.util.Optional.empty(), java.util.Optional.empty(), dev.aperture.editor.interaction.ToolInteractionState.IDLE)
 			: new ClientEditorWorkspace.ResizeState(resizeTool.hoveredManipulatorId(), resizeTool.activeManipulatorId(), resizeTool.pendingManipulatorId(), resizeTool.interactionState());
+	}
+
+	private void publishViewportState() {
+		var state = resizeState();
+		dev.aperture.editor.imgui.ViewportToolState.publish(state.interactionState(),
+			state.activeManipulatorId().or(() -> state.pendingManipulatorId()).or(() -> state.hoveredManipulatorId()));
 	}
 }

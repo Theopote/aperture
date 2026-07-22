@@ -18,6 +18,7 @@ final class ViewportOverlay {
 	private static final int HUD_FLAGS = ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoDocking
 		| ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNav;
 	private final ApertureUiContext context;
+	private final ViewportProductLayers productLayers = new ViewportProductLayers();
 	private final DimensionValueParser dimensionParser = new DimensionValueParser();
 	private final ImString dimensionInput = new ImString(32);
 	private ArchitecturalObjectId dimensionObject;
@@ -36,10 +37,18 @@ final class ViewportOverlay {
 		float y = node.getPosY();
 		float width = node.getSizeX();
 		float height = node.getSizeY();
-		modeHud(x + MARGIN, y + MARGIN);
+		ViewportOverlayViewModel model = ViewportOverlayViewModel.from(context);
+		productLayers.render(model, x, y, width, height);
 		viewportToolbar(x + width * .5f - 115, y + MARGIN);
-		selectionHud(x + width - 272, y + MARGIN);
-		helpHud(x + width * .5f - 190, y + height - 48);
+		dimensionInteraction();
+	}
+
+	private void dimensionInteraction() {
+		var primary = context.session.selection().snapshot().primaryObject();
+		if (primary != null) DimensionEditRequests.consume().filter(request -> request.objectId().equals(primary)).ifPresent(request ->
+			beginDimension(request.objectId(), request.parameterKey(), request.baseMillimeters(),
+				request.objectRevision(), request.stateRevision()));
+		dimensionPopup();
 	}
 
 	private void modeHud(float x, float y) {
@@ -193,7 +202,7 @@ final class ViewportOverlay {
 	private static String dimensions(ObjectEditorView view) {
 		String width = length(view, "width");
 		String height = length(view, "height");
-		if (!width.isBlank() && !height.isBlank()) return width + " × " + height;
+		if (!width.isBlank() && !height.isBlank()) return width + " 脳 " + height;
 		return !width.isBlank() ? "Width  " + width : !height.isBlank() ? "Height  " + height : "";
 	}
 
