@@ -18,7 +18,6 @@ import dev.aperture.opening.runtime.DoorStateSchema;
 import dev.aperture.opening.runtime.ManualDoorInteractionBehavior;
 import dev.aperture.opening.runtime.RequestCloseDoorHandler;
 import dev.aperture.opening.runtime.RequestOpenDoorHandler;
-import dev.aperture.opening.runtime.plugin.OpeningArchitecturalFamilyPlugin;
 import dev.aperture.kernel.ApertureKernel;
 import dev.aperture.geometry.profile.ProfileCatalogLoader;
 import dev.aperture.geometry.profile.ProfileCatalogRegistry;
@@ -113,8 +112,7 @@ public final class ApertureBootstrap {
 
 
 	private static ArchitecturalRuntime createArchitecturalRuntime() {
-		ArchitecturalFamilyPluginRegistry families = new ArchitecturalFamilyPluginRegistry(
-			List.of(new OpeningArchitecturalFamilyPlugin()));
+		ArchitecturalFamilyPluginRegistry families = ArchitecturalFamilyPluginRegistry.discover();
 		return new DefaultArchitecturalRuntime(
 			new InMemoryRuntimeObjectRepository(), families,
 			new DefaultCommandBus(java.util.stream.Stream.concat(families.commandHandlers().stream(), java.util.stream.Stream.of(new SetParameterCommandHandler())).toList()),

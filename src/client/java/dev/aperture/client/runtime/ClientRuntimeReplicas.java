@@ -2,9 +2,7 @@ package dev.aperture.client.runtime;
 
 import dev.aperture.fabric.network.ApertureReplicationPayload;
 import dev.aperture.editor.model.read.RuntimeActionDescriptor;
-import dev.aperture.runtime.model.capability.StandardCapabilities;
 import dev.aperture.runtime.model.replication.ReplicaObject;
-import dev.aperture.opening.runtime.plugin.OpeningArchitecturalFamilyPlugin;
 import dev.aperture.runtime.model.replication.ClientReplicaStore;
 import dev.aperture.runtime.model.replication.ReplicationMessage;
 import dev.aperture.runtime.plugin.ArchitecturalFamilyPluginRegistry;
@@ -20,7 +18,7 @@ import java.util.function.Consumer;
 public final class ClientRuntimeReplicas {
 	private static final JsonReplicationMessageCodec CODEC = new JsonReplicationMessageCodec();
 	private static final ArchitecturalFamilyPluginRegistry FAMILIES =
-		new ArchitecturalFamilyPluginRegistry(List.of(new OpeningArchitecturalFamilyPlugin()));
+		ArchitecturalFamilyPluginRegistry.discover();
 	private static final List<Consumer<ReplicationMessage>> LISTENERS = new CopyOnWriteArrayList<>();
 	private static final ClientReplicaStore STORE = new ClientReplicaStore(
 		AuthoritativeCommandGateway.PROTOCOL_VERSION,
@@ -41,19 +39,8 @@ public final class ClientRuntimeReplicas {
 	}
 
 	public static List<RuntimeActionDescriptor> runtimeActions(ReplicaObject replica) {
-		var configuration = FAMILIES.resolve(replica.instance());
-		if (configuration == null) return List.of();
-		var capabilities = configuration.capabilityResolver().resolve(replica.state());
-		var actions = new java.util.ArrayList<RuntimeActionDescriptor>();
-		capabilities.capability(StandardCapabilities.OPENABLE).ifPresent(openable -> {
-			actions.add(new RuntimeActionDescriptor("request_open", "Open", openable.canRequestOpen()));
-			actions.add(new RuntimeActionDescriptor("request_close", "Close", openable.canRequestClose()));
-		});
-		capabilities.capability(StandardCapabilities.LOCKABLE).ifPresent(lockable -> {
-			actions.add(new RuntimeActionDescriptor(lockable.locked() ? "set_unlocked" : "set_locked",
-				lockable.locked() ? "Unlock" : "Lock", lockable.canChangeLock()));
-		});
-		return List.copyOf(actions);
+		return FAMILIES.runtimeActions(replica.instance(),replica.state()).stream()
+			.map(action->new RuntimeActionDescriptor(action.id(),action.label(),action.enabled())).toList();
 	}
 	public static ClientReplicaStore store() { return STORE; }
 	public static void addMessageListener(Consumer<ReplicationMessage> listener) { LISTENERS.add(listener); }

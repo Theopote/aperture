@@ -46,8 +46,7 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 		io.getFonts().build();
 		ImGui.styleColorsDark();
 		if (!glfw.init(window, true)) throw new IllegalStateException("Unable to initialize ImGui GLFW backend");
-		resetPixelStore();
-		gl3.init("#version 150");
+		try(var ignored=RenderStateGuard.capture()){resetPixelStore();gl3.init("#version 150");}
 		editor = new DearImGuiEditor(createSession(), Files.notExists(iniPath));
 		initialized = true;
 		Aperture.LOGGER.info("Dear ImGui initialized for window {} (fontTexture={}, validTexture={})", window, io.getFonts().getTexID(), GL11.glIsTexture(io.getFonts().getTexID()));
@@ -63,25 +62,15 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 	public void renderPendingDrawData() {
 		if (!initialized || !drawDataReady) return;
 		RenderSystem.assertOnRenderThread();
-		int[] viewport = new int[4]; GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport);
-		int previousFramebuffer = GL11.glGetInteger(GL30.GL_FRAMEBUFFER_BINDING);
-		int previousDrawBuffer = GL11.glGetInteger(GL11.GL_DRAW_BUFFER);
-		int previousSampler = GL30.glGetIntegeri(GL33.GL_SAMPLER_BINDING, 0);
-		boolean scissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
-		try {
+		try (var ignored=RenderStateGuard.capture()) {
 			GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
 			GL11.glDrawBuffer(GL11.GL_BACK);
 			GL33.glBindSampler(0, 0);
 			GL11.glDisable(GL11.GL_SCISSOR_TEST);
 			gl3.renderDrawData(ImGui.getDrawData());
-			if (!drawSubmissionLogged) { Aperture.LOGGER.info("Dear ImGui draw data submitted before frame swap (isolatedSampler={})", previousSampler); drawSubmissionLogged = true; }
+			if (!drawSubmissionLogged) { Aperture.LOGGER.info("Dear ImGui draw data submitted before frame swap under RenderStateGuard"); drawSubmissionLogged = true; }
 		} finally {
 			drawDataReady = false;
-			GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, previousFramebuffer);
-			GL11.glDrawBuffer(previousDrawBuffer);
-			GL33.glBindSampler(0, previousSampler);
-			GL11.glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
-			if (scissor) GL11.glEnable(GL11.GL_SCISSOR_TEST); else GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		}
 	}
 
