@@ -15,6 +15,7 @@ import dev.aperture.client.editor.ArchitecturalPickingService;
 import dev.aperture.client.editor.WorldSelectionController;
 import dev.aperture.client.editor.ClientEditorWorkspace;
 import dev.aperture.client.editor.ClientEditorPreviews;
+import dev.aperture.client.editor.EditorUiCaptureState;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.flag.ImGuiConfigFlags;
@@ -66,6 +67,9 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 		if (!initialized) initialize();
 		RenderSystem.assertOnRenderThread();
 		glfw.newFrame(); ImGui.newFrame(); editor.render(); ImGui.render();
+		ImGuiIO input = ImGui.getIO();
+		EditorUiCaptureState.publish(input.getWantCaptureMouse(), input.getWantCaptureKeyboard(),
+			input.getWantTextInput(), !input.getWantCaptureMouse());
 		drawDataReady = true;
 	}
 
@@ -129,5 +133,5 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 		GL11.glPixelStorei(org.lwjgl.opengl.GL12.GL_PACK_SKIP_ROWS, 0);
 	}
 
-	@Override public void close(){if(!initialized)return;gl3.dispose();glfw.dispose();ImGui.destroyContext();initialized=false;drawDataReady=false;editor=null;worldSelection=null;ClientEditorWorkspace.clear();}
+	@Override public void close(){if(!initialized)return;gl3.dispose();glfw.dispose();ImGui.destroyContext();initialized=false;drawDataReady=false;editor=null;worldSelection=null;ClientEditorWorkspace.clear();EditorUiCaptureState.clear();}
 }

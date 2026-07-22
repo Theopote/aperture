@@ -41,7 +41,8 @@ public final class LinearParameterDragSession {
 
 	public double updateDelta(double delta, boolean fineSnap, boolean snapDisabled) {
 		ensureDragging();
-		double raw = initialValue + delta;
+		double signedDelta = descriptor.direction() == ManipulatorDescriptor.DirectionPolicy.POSITIVE ? delta : -delta;
+		double raw = initialValue + signedDelta;
 		double increment = fineSnap ? descriptor.fineSnapIncrement() : descriptor.snapIncrement();
 		double snapped = snapDisabled ? raw : Math.round(raw / increment) * increment;
 		double constrained = Math.max(descriptor.minimum().orElse(defaultMinimum()),

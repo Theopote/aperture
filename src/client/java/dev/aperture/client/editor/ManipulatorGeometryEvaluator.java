@@ -18,11 +18,15 @@ public final class ManipulatorGeometryEvaluator {
 		Vec3 handle = switch (descriptor.anchor()) {
 			case RIGHT_MIDPOINT -> geometry.rightWidthHandle();
 			case LEFT_MIDPOINT -> geometry.leftWidthHandle();
+			case TOP_MIDPOINT -> geometry.topHeightHandle();
+			case BOTTOM_MIDPOINT -> geometry.bottomHeightHandle();
 			default -> null;
 		};
 		Vec3 fixed = switch (descriptor.fixedAnchor()) {
 			case LEFT_MIDPOINT -> geometry.leftWidthHandle();
 			case RIGHT_MIDPOINT -> geometry.rightWidthHandle();
+			case TOP_MIDPOINT -> geometry.topHeightHandle();
+			case BOTTOM_MIDPOINT -> geometry.bottomHeightHandle();
 			default -> null;
 		};
 		if (handle == null || fixed == null) return Optional.empty();

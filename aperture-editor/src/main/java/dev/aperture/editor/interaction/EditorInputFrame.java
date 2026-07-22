@@ -9,12 +9,18 @@ public record EditorInputFrame(
 	boolean shiftDown,
 	boolean controlDown,
 	boolean altDown,
-	boolean worldInputAllowed,
+	boolean uiCapturesMouse,
+	boolean uiCapturesKeyboard,
+	boolean pointerInsideWorldViewport,
 	ScreenPoint cursor,
 	WorldRay worldRay
 ) {
-	public static EditorInputFrame idle() {
-		return new EditorInputFrame(false, false, false, false, false, false, false, false, null, null);
+	public boolean worldInteractionAllowed() {
+		return pointerInsideWorldViewport && !uiCapturesMouse && worldRay != null;
 	}
 
+	public static EditorInputFrame idle() {
+		return new EditorInputFrame(false, false, false, false, false, false, false,
+			false, false, false, null, null);
+	}
 }

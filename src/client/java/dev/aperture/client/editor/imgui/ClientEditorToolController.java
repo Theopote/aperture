@@ -100,7 +100,7 @@ final class ClientEditorToolController implements ToolController, ClientEditorWo
 	@Override public void cancelTools() { cancelActiveTool(); }
 
 	@Override public ClientEditorWorkspace.ResizeState resizeState() {
-		return resizeTool == null ? new ClientEditorWorkspace.ResizeState(false, false)
-			: new ClientEditorWorkspace.ResizeState(resizeTool.hovered(), resizeTool.dragging());
+		return resizeTool == null ? new ClientEditorWorkspace.ResizeState(java.util.Optional.empty(), java.util.Optional.empty())
+			: new ClientEditorWorkspace.ResizeState(resizeTool.hoveredManipulatorId(), resizeTool.activeManipulatorId());
 	}
 }

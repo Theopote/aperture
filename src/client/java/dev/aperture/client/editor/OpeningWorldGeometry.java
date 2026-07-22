@@ -24,11 +24,13 @@ public final class OpeningWorldGeometry {
 		BoundingBox world = view.transform().applyTo(new BoundingBox(Vec3d.ZERO, new Vec3d(width, height, depth)));
 		Vec3 leftHandle = blocks(view.transform().transformPoint(new Vec3d(0, height / 2.0, depth / 2.0)));
 		Vec3 rightHandle = blocks(view.transform().transformPoint(new Vec3d(width, height / 2.0, depth / 2.0)));
+		Vec3 bottomHandle = blocks(view.transform().transformPoint(new Vec3d(width / 2.0, 0, depth / 2.0)));
+		Vec3 topHandle = blocks(view.transform().transformPoint(new Vec3d(width / 2.0, height, depth / 2.0)));
 		double dimensionY = height + 150.0;
 		Vec3 dimensionStart = blocks(view.transform().transformPoint(new Vec3d(0, dimensionY, depth / 2.0)));
 		Vec3 dimensionEnd = blocks(view.transform().transformPoint(new Vec3d(width, dimensionY, depth / 2.0)));
 		return Optional.of(new Presentation(width, height, depth, aabb(world), leftHandle, rightHandle,
-			dimensionStart, dimensionEnd, dimensionStart.add(dimensionEnd).scale(.5)));
+			bottomHandle, topHandle, dimensionStart, dimensionEnd, dimensionStart.add(dimensionEnd).scale(.5)));
 	}
 
 	private static Optional<Double> thickness(ObjectEditorView view) {
@@ -57,6 +59,6 @@ public final class OpeningWorldGeometry {
 	}
 
 	public record Presentation(double widthMm, double heightMm, double depthMm, AABB bounds,
-		Vec3 leftWidthHandle, Vec3 rightWidthHandle, Vec3 dimensionStart, Vec3 dimensionEnd,
+		Vec3 leftWidthHandle, Vec3 rightWidthHandle, Vec3 bottomHeightHandle, Vec3 topHeightHandle, Vec3 dimensionStart, Vec3 dimensionEnd,
 		Vec3 dimensionLabel) { }
 }

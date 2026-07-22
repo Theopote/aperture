@@ -29,7 +29,12 @@ public final class ToolManager {
 	}
 
 	public void update(EditorInputFrame input) {
-		if (active != null && input.worldInputAllowed()) active.update(input);
+		if (active == null) return;
+		if (!input.worldInteractionAllowed()) {
+			active.cancel();
+			return;
+		}
+		active.update(input);
 	}
 
 	public void cancelActive() {

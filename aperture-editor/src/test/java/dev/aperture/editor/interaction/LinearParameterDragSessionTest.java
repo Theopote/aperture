@@ -56,7 +56,17 @@ class LinearParameterDragSessionTest {
 		assertEquals(ToolInteractionState.CANCELLED, cancelled.drag().state());
 	}
 
+	@Test
+	void negativeDirectionReversesTheProjectedDelta() {
+		Fixture fixture = fixture(EditorCommandSubmission.Status.ACCEPTED,
+			ManipulatorDescriptor.DirectionPolicy.NEGATIVE);
+		assertEquals(800, fixture.drag().updateDelta(100, false, true));
+	}
 	private static Fixture fixture(EditorCommandSubmission.Status status) {
+		return fixture(status, ManipulatorDescriptor.DirectionPolicy.POSITIVE);
+	}
+
+	private static Fixture fixture(EditorCommandSubmission.Status status, ManipulatorDescriptor.DirectionPolicy direction) {
 		var id = ArchitecturalObjectId.random();
 		var view = new ObjectEditorView(id, ArchitecturalTypeId.parse("aperture:door"),
 			new ArchitecturalFamilyId("aperture:opening"), "Door", Transform3d.identity(), List.of(),
@@ -79,7 +89,7 @@ class LinearParameterDragSessionTest {
 			new DiagnosticsModel(), new DefaultWorkspaceModel(), tools);
 		var descriptor = new ManipulatorDescriptor("test.size", ManipulatorDescriptor.Kind.LINEAR_PARAMETER,
 			"Size", "size", ManipulatorDescriptor.Axis.LOCAL_X, ManipulatorDescriptor.Anchor.RIGHT_MIDPOINT,
-			ManipulatorDescriptor.Anchor.LEFT_MIDPOINT, ManipulatorDescriptor.DirectionPolicy.POSITIVE,
+			ManipulatorDescriptor.Anchor.LEFT_MIDPOINT, direction,
 			java.util.OptionalDouble.of(800), java.util.OptionalDouble.of(1200), 10, 1, ParameterType.LENGTH);
 		return new Fixture(LinearParameterDragSession.begin(session, view, descriptor).orElseThrow(), submissions);
 	}

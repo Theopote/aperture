@@ -42,7 +42,13 @@ public final class ClientEditorWorkspace {
 		ResizeState resizeState();
 	}
 
-	public record ResizeState(boolean hovered, boolean dragging) {
-		private static final ResizeState IDLE = new ResizeState(false, false);
+	public record ResizeState(Optional<String> hoveredManipulatorId, Optional<String> activeManipulatorId) {
+		public ResizeState {
+			hoveredManipulatorId = hoveredManipulatorId == null ? Optional.empty() : hoveredManipulatorId;
+			activeManipulatorId = activeManipulatorId == null ? Optional.empty() : activeManipulatorId;
+		}
+		public boolean hovered() { return hoveredManipulatorId.isPresent(); }
+		public boolean dragging() { return activeManipulatorId.isPresent(); }
+		private static final ResizeState IDLE = new ResizeState(Optional.empty(), Optional.empty());
 	}
 }

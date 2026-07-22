@@ -29,11 +29,19 @@ public final class DimensionOverlayRenderer {
 		Gizmos.line(anchor.add(0, -.06, -.06), anchor.add(0, .06, .06), FIXED_ANCHOR, 2.0F).setAlwaysOnTop();
 		Gizmos.line(anchor.add(0, -.06, .06), anchor.add(0, .06, -.06), FIXED_ANCHOR, 2.0F).setAlwaysOnTop();
 		var resize = ClientEditorWorkspace.resizeState();
-		int activeHandleColor = resize.dragging() ? 0xFFFF8800
-			: resize.hovered() ? 0xFFFFFFFF : HANDLE;
-		Gizmos.point(geometry.rightWidthHandle(), activeHandleColor, 11.0F).setAlwaysOnTop();
+		Gizmos.point(geometry.rightWidthHandle(), handleColor(resize, "door.width.right"), 11.0F).setAlwaysOnTop();
+		Gizmos.point(geometry.topHeightHandle(), handleColor(resize, "door.height.top"), 11.0F).setAlwaysOnTop();
+		var bottom = geometry.bottomHeightHandle();
+		Gizmos.line(bottom.add(-.06, 0, -.06), bottom.add(.06, 0, .06), FIXED_ANCHOR, 2.0F).setAlwaysOnTop();
+		Gizmos.line(bottom.add(-.06, 0, .06), bottom.add(.06, 0, -.06), FIXED_ANCHOR, 2.0F).setAlwaysOnTop();
 		String label = Math.round(geometry.widthMm()) + " mm";
 		Gizmos.billboardText(label, geometry.dimensionLabel(), TextGizmo.Style.forColorAndCentered(DIMENSION).withScale(.8F))
 			.setAlwaysOnTop();
+	}
+
+	private static int handleColor(ClientEditorWorkspace.ResizeState state, String id) {
+		if (state.activeManipulatorId().filter(id::equals).isPresent()) return 0xFFFF8800;
+		if (state.hoveredManipulatorId().filter(id::equals).isPresent()) return 0xFFFFFFFF;
+		return HANDLE;
 	}
 }

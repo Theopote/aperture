@@ -4,6 +4,7 @@ import dev.aperture.editor.interaction.EditorInputFrame;
 import dev.aperture.editor.interaction.WorldRay;
 import dev.aperture.editor.interaction.ScreenPoint;
 import dev.aperture.math.Vec3d;
+import dev.aperture.client.editor.imgui.ApertureImGuiScreen;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
 
@@ -21,9 +22,12 @@ public final class EditorInputBridge {
 		long window = client.getWindow().handle();
 		boolean primaryDown = GLFW.glfwGetMouseButton(window, GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
 		boolean cancelDown = keyDown(window, GLFW.GLFW_KEY_ESCAPE);
-		boolean worldAllowed = client.screen == null && client.player != null && client.level != null;
+		boolean editorVisible = client.screen instanceof ApertureImGuiScreen;
+		var ui = EditorUiCaptureState.current();
+		boolean hostWorldAvailable = client.player != null && client.level != null;
+		boolean pointerInsideWorld = !editorVisible || ui.pointerInsideWorldViewport();
 		WorldRay ray = null;
-		if (worldAllowed) {
+		if (hostWorldAvailable) {
 			var origin = client.gameRenderer.getMainCamera().position();
 			var direction = client.player.getViewVector(1.0F).normalize();
 			ray = new WorldRay(new Vec3d(origin.x * MILLIMETERS_PER_BLOCK,
@@ -42,7 +46,9 @@ public final class EditorInputBridge {
 			keyDown(window, GLFW.GLFW_KEY_LEFT_SHIFT) || keyDown(window, GLFW.GLFW_KEY_RIGHT_SHIFT),
 			keyDown(window, GLFW.GLFW_KEY_LEFT_CONTROL) || keyDown(window, GLFW.GLFW_KEY_RIGHT_CONTROL),
 			keyDown(window, GLFW.GLFW_KEY_LEFT_ALT) || keyDown(window, GLFW.GLFW_KEY_RIGHT_ALT),
-			worldAllowed,
+			editorVisible && ui.capturesMouse(),
+			editorVisible && ui.capturesKeyboard(),
+			pointerInsideWorld,
 			new ScreenPoint(cursorX, cursorY),
 			ray
 		);

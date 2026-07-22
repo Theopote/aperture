@@ -34,6 +34,17 @@ class ToolManagerTest {
 	}
 
 	@Test
+	void imguiMouseCaptureSuppressesWorldToolEvenWithAWorldRay() {
+		RecordingTool resize = new RecordingTool(ToolController.Tool.RESIZE, new ArrayList<>());
+		ToolManager manager = new ToolManager(resize);
+		manager.activate(ToolController.Tool.RESIZE);
+		var ray = new WorldRay(dev.aperture.math.Vec3d.ZERO, new dev.aperture.math.Vec3d(0, 0, 1));
+		manager.update(new EditorInputFrame(true, true, false, false, false, false, false,
+			true, false, true, new ScreenPoint(100, 100), ray));
+
+		assertEquals(0, resize.updates);
+	}
+	@Test
 	void cancelActiveIsIdempotent() {
 		List<String> events = new ArrayList<>();
 		ToolManager manager = new ToolManager(new RecordingTool(ToolController.Tool.RESIZE, events));
