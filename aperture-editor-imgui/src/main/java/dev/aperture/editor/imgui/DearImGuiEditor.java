@@ -15,6 +15,7 @@ import java.util.Objects;
 
 /** Product workspace orchestrator. Individual windows own their presentation. */
 public final class DearImGuiEditor {
+	public static final int LAYOUT_VERSION = 2;
 	private static final String DOCKSPACE_ID = "ApertureMainDockspace";
 	private final ApertureUiContext context;
 	private final InspectorWindow inspector;
@@ -74,11 +75,11 @@ public final class DearImGuiEditor {
 		menu.render();
 		toolbar.render();
 		int dockspace = ImGui.getID(DOCKSPACE_ID);
-		ImGui.dockSpace(dockspace, 0, 0, ImGuiDockNodeFlags.PassthruCentralNode);
 		if (defaultLayoutPending) {
-			DearImGuiLayout.buildDefault(dockspace);
+			DearImGuiLayout.buildDefault(dockspace, ImGui.getContentRegionAvailX(), ImGui.getContentRegionAvailY());
 			defaultLayoutPending = false;
 		}
+		ImGui.dockSpace(dockspace, 0, 0, ImGuiDockNodeFlags.PassthruCentralNode);
 		ImGui.end();
 		ImGui.popStyleColor();
 		ImGui.popStyleVar(3);

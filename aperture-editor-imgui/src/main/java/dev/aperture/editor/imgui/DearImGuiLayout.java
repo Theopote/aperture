@@ -1,27 +1,37 @@
 package dev.aperture.editor.imgui;
 
-import imgui.ImGui;
 import imgui.type.ImInt;
 import imgui.flag.ImGuiDir;
 import imgui.internal.flag.ImGuiDockNodeFlags;
 
-/** Builds the first-run professional editor layout. */
+/** Builds the versioned five-region product workspace. */
 final class DearImGuiLayout {
+	private static final float NAVIGATOR_RATIO = 0.20f;
+	private static final float CONTEXT_RATIO = 0.26f;
+	private static final float CONSOLE_RATIO = 0.28f;
+	private static final float RUNTIME_RATIO = 0.38f;
+
 	private DearImGuiLayout() {}
-	static void buildDefault(int root) {
+
+	static void buildDefault(int root, float width, float height) {
 		imgui.internal.ImGui.dockBuilderRemoveNode(root);
 		imgui.internal.ImGui.dockBuilderAddNode(root, ImGuiDockNodeFlags.DockSpace);
-		var viewport = ImGui.getMainViewport();
-		imgui.internal.ImGui.dockBuilderSetNodeSize(root, viewport.getWorkSizeX(), viewport.getWorkSizeY());
+		imgui.internal.ImGui.dockBuilderSetNodeSize(root, width, height);
+
 		ImInt center = new ImInt(root);
-		ImInt left = new ImInt(); ImInt right = new ImInt(); ImInt bottom = new ImInt();
-		imgui.internal.ImGui.dockBuilderSplitNode(center.get(), ImGuiDir.Left, 0.20f, left, center);
-		imgui.internal.ImGui.dockBuilderSplitNode(center.get(), ImGuiDir.Right, 0.26f, right, center);
-		imgui.internal.ImGui.dockBuilderSplitNode(center.get(), ImGuiDir.Down, 0.28f, bottom, center);
-		imgui.internal.ImGui.dockBuilderDockWindow("Project Navigator", left.get());
-		imgui.internal.ImGui.dockBuilderDockWindow("Inspector", right.get());
-		imgui.internal.ImGui.dockBuilderDockWindow("Context Runtime", right.get());
-		imgui.internal.ImGui.dockBuilderDockWindow("Activity Console", bottom.get());
+		ImInt navigator = new ImInt();
+		ImInt context = new ImInt();
+		ImInt console = new ImInt();
+		ImInt runtime = new ImInt();
+		imgui.internal.ImGui.dockBuilderSplitNode(center.get(), ImGuiDir.Left, NAVIGATOR_RATIO, navigator, center);
+		imgui.internal.ImGui.dockBuilderSplitNode(center.get(), ImGuiDir.Right, CONTEXT_RATIO, context, center);
+		imgui.internal.ImGui.dockBuilderSplitNode(center.get(), ImGuiDir.Down, CONSOLE_RATIO, console, center);
+		imgui.internal.ImGui.dockBuilderSplitNode(context.get(), ImGuiDir.Down, RUNTIME_RATIO, runtime, context);
+
+		imgui.internal.ImGui.dockBuilderDockWindow("Project Navigator", navigator.get());
+		imgui.internal.ImGui.dockBuilderDockWindow("Inspector", context.get());
+		imgui.internal.ImGui.dockBuilderDockWindow("Context Runtime", runtime.get());
+		imgui.internal.ImGui.dockBuilderDockWindow("Activity Console", console.get());
 		imgui.internal.ImGui.dockBuilderFinish(root);
 	}
 }

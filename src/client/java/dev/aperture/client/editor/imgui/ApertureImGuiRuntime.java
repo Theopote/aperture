@@ -23,6 +23,7 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL33;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.io.IOException;
 
 /** Minecraft-client owner of GLFW/OpenGL and Dear ImGui lifecycle. */
@@ -47,7 +48,10 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 		ImGui.styleColorsDark();
 		if (!glfw.init(window, true)) throw new IllegalStateException("Unable to initialize ImGui GLFW backend");
 		try(var ignored=RenderStateGuard.capture()){resetPixelStore();gl3.init("#version 150");}
-		editor = new DearImGuiEditor(createSession(), Files.notExists(iniPath));
+		var layoutVersionPath = configDirectory.resolve("layout.version");
+		boolean defaultLayoutRequired = Files.notExists(iniPath) || layoutUpgradeRequired(layoutVersionPath);
+		editor = new DearImGuiEditor(createSession(), defaultLayoutRequired);
+		persistLayoutVersion(layoutVersionPath);
 		initialized = true;
 		Aperture.LOGGER.info("Dear ImGui initialized for window {} (fontTexture={}, validTexture={})", window, io.getFonts().getTexID(), GL11.glIsTexture(io.getFonts().getTexID()));
 	}
@@ -84,6 +88,23 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 		var history=new DefaultHistoryProjection(); EditorCommandTransport transport=new ClientEditorCommandTransport(diagnostics,previews);
 		var commands=new DefaultEditorCommandGateway(transport,diagnostics,new StandardRuntimeActionResolver(),read,history);
 		return new DefaultEditorSession(selection,read,commands,new SchemaDrivenInspectorModel(read,typeId->dev.aperture.runtime.ApertureRuntime.get().openingTypes().get(new dev.aperture.core.opening.OpeningId(typeId.namespace(),typeId.path())).map(dev.aperture.core.definition.OpeningTypeDefinition::parametricSchema)),previews,history,diagnostics,new DefaultWorkspaceModel(),()->{var selected=selection.snapshot().primaryObject();if(selected!=null)previews.clearObject(selected);});
+	}
+
+	private static boolean layoutUpgradeRequired(Path versionFile) {
+		try {
+			return !Files.isRegularFile(versionFile)
+				|| Integer.parseInt(Files.readString(versionFile).trim()) != DearImGuiEditor.LAYOUT_VERSION;
+		} catch (IOException | NumberFormatException ignored) {
+			return true;
+		}
+	}
+
+	private static void persistLayoutVersion(Path versionFile) {
+		try {
+			Files.writeString(versionFile, Integer.toString(DearImGuiEditor.LAYOUT_VERSION));
+		} catch (IOException error) {
+			Aperture.LOGGER.warn("Unable to persist Aperture UI layout version", error);
+		}
 	}
 
 	private static void resetPixelStore() {
