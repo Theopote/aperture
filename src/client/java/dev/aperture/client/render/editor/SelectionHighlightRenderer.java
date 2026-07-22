@@ -1,6 +1,7 @@
 package dev.aperture.client.render.editor;
 
 import dev.aperture.client.editor.ClientEditorWorkspace;
+import dev.aperture.client.editor.OpeningWorldGeometry;
 import dev.aperture.editor.model.read.EditorDiagnostic;
 import net.minecraft.gizmos.GizmoStyle;
 import net.minecraft.gizmos.Gizmos;
@@ -24,9 +25,10 @@ public final class SelectionHighlightRenderer {
 				double x = origin.x() / MILLIMETERS_PER_BLOCK;
 				double y = origin.y() / MILLIMETERS_PER_BLOCK;
 				double z = origin.z() / MILLIMETERS_PER_BLOCK;
+				AABB fallback = new AABB(x, y, z, x + 1, y + 1, z + 1);
+				AABB bounds = OpeningWorldGeometry.from(view).map(OpeningWorldGeometry.Presentation::bounds).orElse(fallback);
 				int color = color(view.diagnostics(), id.equals(selection.primaryObject()));
-				Gizmos.cuboid(new AABB(x, y, z, x + 1, y + 1, z + 1), GizmoStyle.stroke(color, 2.5F))
-					.setAlwaysOnTop();
+				Gizmos.cuboid(bounds, GizmoStyle.stroke(color, 2.5F)).setAlwaysOnTop();
 			});
 		});
 	}

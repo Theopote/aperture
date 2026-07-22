@@ -10,6 +10,7 @@ import dev.aperture.client.render.ApertureRenderers;
 import dev.aperture.client.render.ClientMaterialPreview;
 import dev.aperture.client.render.InstanceRenderCache;
 import dev.aperture.client.render.editor.EditorGizmoRenderer;
+import dev.aperture.client.render.editor.DimensionOverlayRenderer;
 import dev.aperture.client.render.editor.SelectionHighlightRenderer;
 import dev.aperture.client.render.placement.GhostPreviewMeshRenderer;
 import dev.aperture.client.render.placement.PlacementPreviewMeshService;
@@ -60,6 +61,7 @@ public class ApertureClient implements ClientModInitializer {
 			PlacementPreviewRenderer.emit();
 			EditorGizmoRenderer.emit();
 			SelectionHighlightRenderer.emit();
+			DimensionOverlayRenderer.emit();
 		});
 		ApertureEditor.init(new ApertureEditor(new EditorService(), new ParametricService()));
 		ApertureRenderers.registerAll();

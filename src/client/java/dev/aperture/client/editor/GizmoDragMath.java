@@ -3,37 +3,23 @@ package dev.aperture.client.editor;
 import dev.aperture.fabric.placement.McUnits;
 import net.minecraft.world.phys.Vec3;
 
-/**
- * Projects cursor ray movement onto a drag axis for resize gizmos.
- */
+/** Projects a view ray onto a world-space drag axis. */
 public final class GizmoDragMath {
-	private GizmoDragMath() {
-	}
+	private GizmoDragMath() { }
 
-	public static double axisPositionBlocks(
-		Vec3 rayOrigin,
-		Vec3 rayDirection,
-		Vec3 axisOriginBlocks,
-		Vec3 axisDirectionBlocks
-	) {
-		Vec3 axisDir = axisDirectionBlocks.normalize();
-		Vec3 planeNormal = rayDirection.cross(axisDir);
-		if (planeNormal.lengthSqr() < 1.0E-8) {
-			planeNormal = axisDir.cross(new Vec3(0.0, 1.0, 0.0));
-			if (planeNormal.lengthSqr() < 1.0E-8) {
-				planeNormal = axisDir.cross(new Vec3(1.0, 0.0, 0.0));
-			}
+	public static double axisPositionBlocks(Vec3 rayOrigin, Vec3 rayDirection,
+		Vec3 axisOriginBlocks, Vec3 axisDirectionBlocks) {
+		Vec3 ray = rayDirection.normalize();
+		Vec3 axis = axisDirectionBlocks.normalize();
+		Vec3 betweenOrigins = rayOrigin.subtract(axisOriginBlocks);
+		double parallel = ray.dot(axis);
+		double denominator = 1.0 - parallel * parallel;
+		if (denominator < 1.0E-8) {
+			return betweenOrigins.dot(axis);
 		}
-		planeNormal = planeNormal.normalize();
-
-		double denominator = planeNormal.dot(rayDirection);
-		if (Math.abs(denominator) < 1.0E-8) {
-			return 0.0;
-		}
-
-		double rayDistance = planeNormal.dot(axisOriginBlocks.subtract(rayOrigin)) / denominator;
-		Vec3 hit = rayOrigin.add(rayDirection.scale(rayDistance));
-		return hit.subtract(axisOriginBlocks).dot(axisDir);
+		double rayOffset = ray.dot(betweenOrigins);
+		double axisOffset = axis.dot(betweenOrigins);
+		return (axisOffset - parallel * rayOffset) / denominator;
 	}
 
 	public static double blocksToMillimeters(double blocks) {
