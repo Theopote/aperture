@@ -12,7 +12,6 @@ import java.util.Optional;
 
 /** Parameter-derived world presentation geometry for an opening editor view. */
 public final class OpeningWorldGeometry {
-	private static final double MILLIMETERS_PER_BLOCK = 1000.0;
 
 	private OpeningWorldGeometry() { }
 
@@ -49,14 +48,14 @@ public final class OpeningWorldGeometry {
 	}
 
 	private static Vec3 blocks(Vec3d value) {
-		return new Vec3(value.x() / MILLIMETERS_PER_BLOCK, value.y() / MILLIMETERS_PER_BLOCK,
-			value.z() / MILLIMETERS_PER_BLOCK);
+		return new Vec3(ClientWorldUnits.toBlocks(value.x()), ClientWorldUnits.toBlocks(value.y()),
+			ClientWorldUnits.toBlocks(value.z()));
 	}
 
 	private static AABB aabb(BoundingBox value) {
-		return new AABB(value.min().x() / MILLIMETERS_PER_BLOCK, value.min().y() / MILLIMETERS_PER_BLOCK,
-			value.min().z() / MILLIMETERS_PER_BLOCK, value.max().x() / MILLIMETERS_PER_BLOCK,
-			value.max().y() / MILLIMETERS_PER_BLOCK, value.max().z() / MILLIMETERS_PER_BLOCK);
+		return new AABB(ClientWorldUnits.toBlocks(value.min().x()), ClientWorldUnits.toBlocks(value.min().y()),
+			ClientWorldUnits.toBlocks(value.min().z()), ClientWorldUnits.toBlocks(value.max().x()),
+			ClientWorldUnits.toBlocks(value.max().y()), ClientWorldUnits.toBlocks(value.max().z()));
 	}
 
 	public record Presentation(double widthMm, double heightMm, double depthMm, AABB bounds,

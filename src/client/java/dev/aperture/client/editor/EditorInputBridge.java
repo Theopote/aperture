@@ -10,7 +10,6 @@ import org.lwjgl.glfw.GLFW;
 
 /** Samples host input once per client tick and translates it into editor semantics. */
 public final class EditorInputBridge {
-	private static final double MILLIMETERS_PER_BLOCK = 1000.0;
 	private final int[] windowWidth = new int[1];
 	private final int[] windowHeight = new int[1];
 	private final int[] framebufferWidth = new int[1];
@@ -30,8 +29,8 @@ public final class EditorInputBridge {
 		if (hostWorldAvailable) {
 			var origin = client.gameRenderer.getMainCamera().position();
 			var direction = client.player.getViewVector(1.0F).normalize();
-			ray = new WorldRay(new Vec3d(origin.x * MILLIMETERS_PER_BLOCK,
-				origin.y * MILLIMETERS_PER_BLOCK, origin.z * MILLIMETERS_PER_BLOCK),
+			ray = new WorldRay(new Vec3d(ClientWorldUnits.toMillimeters(origin.x),
+				ClientWorldUnits.toMillimeters(origin.y), ClientWorldUnits.toMillimeters(origin.z)),
 				new Vec3d(direction.x, direction.y, direction.z));
 		}
 		GLFW.glfwGetWindowSize(window, windowWidth, windowHeight);

@@ -9,7 +9,6 @@ import java.util.Optional;
 
 /** Evaluates declarative local manipulator geometry into Minecraft world space. */
 public final class ManipulatorGeometryEvaluator {
-	private static final double MILLIMETERS_PER_BLOCK = 1000.0;
 
 	public Optional<EvaluatedManipulator> evaluate(ObjectEditorView view, ManipulatorDescriptor descriptor) {
 		var opening = OpeningWorldGeometry.from(view);
@@ -36,9 +35,8 @@ public final class ManipulatorGeometryEvaluator {
 			case LOCAL_Z -> new Vec3d(0, 0, 1);
 		};
 		Vec3d transformedOrigin = view.transform().transformPoint(Vec3d.ZERO);
-		Vec3d transformedAxisPoint = view.transform().transformPoint(localAxis.scale(MILLIMETERS_PER_BLOCK));
+		Vec3d transformedAxisPoint = view.transform().transformPoint(localAxis.scale(dev.aperture.editor.interaction.WorldUnitConverter.MILLIMETERS_PER_BLOCK));
 		Vec3d worldAxis = transformedAxisPoint.subtract(transformedOrigin).normalize();
-		if (descriptor.direction() == ManipulatorDescriptor.DirectionPolicy.NEGATIVE) worldAxis = worldAxis.scale(-1);
 		Vec3 label = switch (descriptor.axis()) {
 			case LOCAL_X -> geometry.dimensionLabel();
 			case LOCAL_Y -> geometry.heightDimensionLabel();

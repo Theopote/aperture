@@ -108,6 +108,7 @@ public final class LinearParameterDragSession {
 	public double initialValue() { return initialValue; }
 	public double previewValue() { return previewValue; }
 	public ToolInteractionState state() { return state; }
+	public dev.aperture.runtime.model.object.ArchitecturalObjectId objectId() { return edit.objectId(); }
 
 	private double defaultMinimum() {
 		return descriptor.unit() == ParameterType.LENGTH || descriptor.unit() == ParameterType.COUNT ? 0.0 : -Double.MAX_VALUE;

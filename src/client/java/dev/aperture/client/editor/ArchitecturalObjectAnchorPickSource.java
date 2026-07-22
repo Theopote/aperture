@@ -11,7 +11,6 @@ import java.util.Optional;
 
 /** Current anchor-backed source; other object hosts can be added without changing arbitration. */
 public final class ArchitecturalObjectAnchorPickSource implements PickSource {
-	private static final double MILLIMETERS_PER_BLOCK = 1000.0;
 	private final Minecraft client;
 
 	public ArchitecturalObjectAnchorPickSource(Minecraft client) { this.client = client; }
@@ -22,8 +21,8 @@ public final class ArchitecturalObjectAnchorPickSource implements PickSource {
 		if (client.level == null || !(client.hitResult instanceof BlockHitResult hit)) return List.of();
 		if (!(client.level.getBlockEntity(hit.getBlockPos()) instanceof OpeningBlockEntity opening)) return List.of();
 		return opening.resolveRuntimeSnapshot().map(snapshot -> {
-			Vec3d position = new Vec3d(hit.getLocation().x * MILLIMETERS_PER_BLOCK,
-				hit.getLocation().y * MILLIMETERS_PER_BLOCK, hit.getLocation().z * MILLIMETERS_PER_BLOCK);
+			Vec3d position = new Vec3d(ClientWorldUnits.toMillimeters(hit.getLocation().x),
+				ClientWorldUnits.toMillimeters(hit.getLocation().y), ClientWorldUnits.toMillimeters(hit.getLocation().z));
 			var normal = hit.getDirection().getUnitVec3();
 			double distance = Math.sqrt(position.subtract(ray.origin()).lengthSquared());
 			return List.of(new PickCandidate(snapshot.instance().objectId(), Optional.empty(), Optional.empty(),

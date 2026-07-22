@@ -11,14 +11,13 @@ import java.util.Optional;
 
 /** Minecraft composition root for the frontend-neutral architectural picking pipeline. */
 public final class ArchitecturalPickingService {
-	private static final double MILLIMETERS_PER_BLOCK = 1000.0;
 
 	public Optional<PickResult> pick(Minecraft client, PickContext context) {
 		if (client.player == null || client.level == null) return Optional.empty();
 		var origin = client.gameRenderer.getMainCamera().position();
 		var direction = client.player.getViewVector(1.0F);
-		WorldRay ray = new WorldRay(new Vec3d(origin.x * MILLIMETERS_PER_BLOCK,
-			origin.y * MILLIMETERS_PER_BLOCK, origin.z * MILLIMETERS_PER_BLOCK),
+		WorldRay ray = new WorldRay(new Vec3d(ClientWorldUnits.toMillimeters(origin.x),
+			ClientWorldUnits.toMillimeters(origin.y), ClientWorldUnits.toMillimeters(origin.z)),
 			new Vec3d(direction.x, direction.y, direction.z));
 		var pipeline = new dev.aperture.editor.interaction.ArchitecturalPickingService(
 			List.of(new ArchitecturalObjectAnchorPickSource(client)));

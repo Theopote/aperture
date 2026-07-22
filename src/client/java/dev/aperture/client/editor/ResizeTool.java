@@ -15,7 +15,6 @@ import java.util.*;
 
 /** Generic multi-manipulator linear-parameter resize tool. */
 public final class ResizeTool implements EditorTool {
-	private static final double MILLIMETERS_PER_BLOCK = 1000.0;
 	private final EditorSession session;
 	private final ManipulatorDescriptorProvider descriptors;
 	private final ManipulatorGeometryEvaluator geometry = new ManipulatorGeometryEvaluator();
@@ -39,10 +38,14 @@ public final class ResizeTool implements EditorTool {
 			return;
 		}
 		ObjectEditorView view = selectedView();
-		if (view != null && pending != null) {
+		if (view != null && pending != null && pending.objectId().equals(view.objectId())) {
 			pending.session().refresh(view);
 			if (pending.session().state() == ToolInteractionState.IDLE) pending = null;
 			else { hoveredManipulatorId = Optional.empty(); return; }
+		}
+		if (pending != null && (view == null || !pending.objectId().equals(view.objectId()))) {
+			hoveredManipulatorId = Optional.empty();
+			return;
 		}
 		if (view == null || input.worldRay() == null) {
 			cancel();
@@ -162,13 +165,12 @@ public final class ResizeTool implements EditorTool {
 		drag = null;
 		completed.session().finish();
 		if (completed.session().state() != ToolInteractionState.CANCELLED) {
-			pending = new PendingManipulation(completed.manipulatorId(), completed.session());
+			pending = new PendingManipulation(completed.session().objectId(), completed.manipulatorId(), completed.session());
 		}
 	}
 
 	private static Vec3 origin(WorldRay ray) {
-		return new Vec3(ray.origin().x() / MILLIMETERS_PER_BLOCK,
-			ray.origin().y() / MILLIMETERS_PER_BLOCK, ray.origin().z() / MILLIMETERS_PER_BLOCK);
+		return ClientWorldUnits.toBlocks(ray.origin());
 	}
 	private static Vec3 direction(WorldRay ray) {
 		return new Vec3(ray.direction().x(), ray.direction().y(), ray.direction().z());
@@ -177,5 +179,6 @@ public final class ResizeTool implements EditorTool {
 	private record LabelHit(ManipulatorGeometryEvaluator.EvaluatedManipulator manipulator, ScreenPoint point) { }
 	private record ActiveDrag(String manipulatorId, LinearParameterDragSession session,
 		double anchorBlocks, Vec3 axisOrigin, Vec3 axis) { }
-	private record PendingManipulation(String manipulatorId, LinearParameterDragSession session) { }
+	private record PendingManipulation(dev.aperture.runtime.model.object.ArchitecturalObjectId objectId,
+		String manipulatorId, LinearParameterDragSession session) { }
 }
