@@ -2,27 +2,31 @@ package dev.aperture.client.editor;
 
 import dev.aperture.editor.interaction.EditorInputFrame;
 import dev.aperture.editor.interaction.EditorTool;
+import dev.aperture.editor.interaction.ManipulatorDescriptor;
+import dev.aperture.editor.interaction.ManipulatorDescriptorProvider;
 import dev.aperture.editor.interaction.WorldRay;
 import dev.aperture.editor.model.command.ExpectedRevision;
 import dev.aperture.editor.model.preview.DefaultParameterEditSession;
 import dev.aperture.editor.model.read.ObjectEditorView;
 import dev.aperture.editor.model.session.EditorSession;
 import dev.aperture.editor.model.session.ToolController;
+import dev.aperture.parameter.ParameterType;
 import dev.aperture.parameter.ParameterValue;
-import dev.aperture.runtime.model.object.ArchitecturalObjectId;
 import net.minecraft.world.phys.Vec3;
 
-/** Instance-owned width manipulator migrated from the original static controller. */
+/** Generic linear-parameter resize tool driven by family-provided descriptors. */
 public final class ResizeTool implements EditorTool {
 	private static final double MILLIMETERS_PER_BLOCK = 1000.0;
 	private static final double PICK_RADIUS_BLOCKS = .14;
-	private static final double DEFAULT_SNAP_MM = 10.0;
 	private final EditorSession session;
+	private final ManipulatorDescriptorProvider descriptors;
+	private final ManipulatorGeometryEvaluator geometry = new ManipulatorGeometryEvaluator();
 	private boolean hovered;
 	private ActiveDrag drag;
 
-	public ResizeTool(EditorSession session) {
+	public ResizeTool(EditorSession session, ManipulatorDescriptorProvider descriptors) {
 		this.session = session;
+		this.descriptors = descriptors;
 	}
 
 	@Override public ToolController.Tool id() { return ToolController.Tool.RESIZE; }
@@ -34,28 +38,29 @@ public final class ResizeTool implements EditorTool {
 			return;
 		}
 		ObjectEditorView view = selectedView();
-		if (view == null || input.worldRay() == null) {
+		var evaluated = view == null ? java.util.Optional.<ManipulatorGeometryEvaluator.EvaluatedManipulator>empty()
+			: activeManipulator(view);
+		if (evaluated.isEmpty() || input.worldRay() == null) {
 			cancelDrag();
 			hovered = false;
 			return;
 		}
-		var geometryOptional = OpeningWorldGeometry.from(view);
-		if (geometryOptional.isEmpty()) {
-			cancelDrag();
-			hovered = false;
-			return;
-		}
-		var geometry = geometryOptional.get();
+		var manipulator = evaluated.get();
 		Vec3 origin = origin(input.worldRay());
 		Vec3 direction = direction(input.worldRay());
-		hovered = rayDistanceToPoint(origin, direction, geometry.rightWidthHandle()) <= PICK_RADIUS_BLOCKS;
-		if (input.primaryPressed() && hovered) start(view, geometry, origin, direction);
+		hovered = rayDistanceToPoint(origin, direction, manipulator.handle()) <= PICK_RADIUS_BLOCKS;
+		if (input.primaryPressed() && hovered) start(view, manipulator, origin, direction);
 		if (input.primaryDown() && drag != null) updateDrag(input, origin, direction);
 		if (input.primaryReleased() && drag != null) finish();
 	}
 
 	@Override public void cancel() { cancelDrag(); hovered = false; }
 	@Override public void deactivate() { hovered = false; }
+
+	public boolean available() {
+		ObjectEditorView view = selectedView();
+		return view != null && activeManipulator(view).isPresent();
+	}
 
 	public boolean hovered() { return hovered; }
 	public boolean dragging() { return drag != null; }
@@ -65,24 +70,36 @@ public final class ResizeTool implements EditorTool {
 		return primary == null ? null : session.readModel().object(primary).orElse(null);
 	}
 
-	private void start(ObjectEditorView view, OpeningWorldGeometry.Presentation geometry,
+	private java.util.Optional<ManipulatorGeometryEvaluator.EvaluatedManipulator> activeManipulator(ObjectEditorView view) {
+		return descriptors.descriptors(view).stream()
+			.filter(value -> value.kind() == ManipulatorDescriptor.Kind.LINEAR_PARAMETER)
+			.filter(value -> value.unit() == ParameterType.LENGTH)
+			.map(value -> geometry.evaluate(view, value))
+			.flatMap(java.util.Optional::stream)
+			.findFirst();
+	}
+
+	private void start(ObjectEditorView view, ManipulatorGeometryEvaluator.EvaluatedManipulator manipulator,
 		Vec3 rayOrigin, Vec3 rayDirection) {
-		if (!(view.parameters().get("width").orElse(null) instanceof ParameterValue.LengthValue width)) return;
-		Vec3 axis = geometry.dimensionEnd().subtract(geometry.dimensionStart()).normalize();
-		double anchor = GizmoDragMath.axisPositionBlocks(rayOrigin, rayDirection, geometry.rightWidthHandle(), axis);
-		var edit = new DefaultParameterEditSession(view.objectId(), "width", width,
+		var descriptor = manipulator.descriptor();
+		if (!(view.parameters().get(descriptor.parameterKey()).orElse(null) instanceof ParameterValue.LengthValue value)) return;
+		double anchor = GizmoDragMath.axisPositionBlocks(rayOrigin, rayDirection,
+			manipulator.handle(), manipulator.worldAxis());
+		var edit = new DefaultParameterEditSession(view.objectId(), descriptor.parameterKey(), value,
 			new ExpectedRevision(view.objectRevision(), view.stateRevision()), session.preview(), session.commands());
-		drag = new ActiveDrag(edit, width.millimeters(), anchor, geometry.rightWidthHandle(), axis,
-			limits(view.objectId()), width.millimeters());
+		drag = new ActiveDrag(edit, descriptor, value.millimeters(), anchor, manipulator.handle(),
+			manipulator.worldAxis(), value.millimeters());
 	}
 
 	private void updateDrag(EditorInputFrame input, Vec3 rayOrigin, Vec3 rayDirection) {
 		double position = GizmoDragMath.axisPositionBlocks(rayOrigin, rayDirection, drag.axisOrigin(), drag.axis());
-		double raw = drag.baseWidthMm() + GizmoDragMath.blocksToMillimeters(position - drag.anchorBlocks());
-		double increment = input.shiftDown() ? 1.0 : DEFAULT_SNAP_MM;
+		double raw = drag.baseValue() + GizmoDragMath.blocksToMillimeters(position - drag.anchorBlocks());
+		double increment = input.shiftDown() ? drag.descriptor().fineSnapIncrement() : drag.descriptor().snapIncrement();
 		double snapped = input.controlDown() ? raw : Math.round(raw / increment) * increment;
-		double constrained = Math.max(drag.limits().minimum(), Math.min(drag.limits().maximum(), snapped));
-		if (Math.abs(constrained - drag.previewWidthMm()) >= .001) {
+		double minimum = drag.descriptor().minimum().orElse(1.0);
+		double maximum = drag.descriptor().maximum().orElse(Double.MAX_VALUE);
+		double constrained = Math.max(minimum, Math.min(maximum, snapped));
+		if (Math.abs(constrained - drag.previewValue()) >= .001) {
 			drag.edit().updatePreview(ParameterValue.length(constrained));
 			drag = drag.withPreview(constrained);
 		}
@@ -91,17 +108,8 @@ public final class ResizeTool implements EditorTool {
 	private void finish() {
 		ActiveDrag completed = drag;
 		drag = null;
-		if (Math.abs(completed.previewWidthMm() - completed.baseWidthMm()) < .001) completed.edit().cancel();
+		if (Math.abs(completed.previewValue() - completed.baseValue()) < .001) completed.edit().cancel();
 		else completed.edit().commit();
-	}
-
-	private Limits limits(ArchitecturalObjectId id) {
-		for (var section : session.inspector().sections(id)) for (var property : section.properties()) {
-			if (property.key().equals("width")) {
-				return new Limits(property.minimum().orElse(1.0), property.maximum().orElse(Double.MAX_VALUE));
-			}
-		}
-		return new Limits(1.0, Double.MAX_VALUE);
 	}
 
 	private void cancelDrag() {
@@ -124,11 +132,10 @@ public final class ResizeTool implements EditorTool {
 		return origin.add(direction.scale(projection)).distanceTo(point);
 	}
 
-	private record Limits(double minimum, double maximum) { }
-	private record ActiveDrag(DefaultParameterEditSession edit, double baseWidthMm, double anchorBlocks,
-		Vec3 axisOrigin, Vec3 axis, Limits limits, double previewWidthMm) {
+	private record ActiveDrag(DefaultParameterEditSession edit, ManipulatorDescriptor descriptor,
+		double baseValue, double anchorBlocks, Vec3 axisOrigin, Vec3 axis, double previewValue) {
 		ActiveDrag withPreview(double value) {
-			return new ActiveDrag(edit, baseWidthMm, anchorBlocks, axisOrigin, axis, limits, value);
+			return new ActiveDrag(edit, descriptor, baseValue, anchorBlocks, axisOrigin, axis, value);
 		}
 	}
 }
