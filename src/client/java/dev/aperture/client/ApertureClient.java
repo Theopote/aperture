@@ -5,7 +5,8 @@ import dev.aperture.editor.ApertureEditor;
 import dev.aperture.editor.service.EditorService;
 import dev.aperture.editor.service.ParametricService;
 import dev.aperture.client.editor.GizmoDragController;
-import dev.aperture.client.editor.AuthoritativeResizeController;
+import dev.aperture.client.editor.ClientEditorWorkspace;
+import dev.aperture.client.editor.EditorInputBridge;
 import dev.aperture.client.placement.ClientPlacementPreview;
 import dev.aperture.client.render.ApertureRenderers;
 import dev.aperture.client.render.ClientMaterialPreview;
@@ -30,6 +31,7 @@ import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 public class ApertureClient implements ClientModInitializer {
+	private final EditorInputBridge editorInput = new EditorInputBridge();
 	public static final KeyMapping.Category KEY_CATEGORY = KeyMapping.Category.register(
 		Identifier.fromNamespaceAndPath(Aperture.MOD_ID, "placement")
 	);
@@ -79,7 +81,7 @@ public class ApertureClient implements ClientModInitializer {
 	private void onClientTick(Minecraft client) {
 		ClientPlacementPreview.tick(client);
 		GizmoDragController.tick(client);
-		AuthoritativeResizeController.tick(client);
+		ClientEditorWorkspace.update(editorInput.capture(client));
 
 		while (commitPlacementKey.consumeClick()) {
 			if (ClientPlacementPreview.commitPreview()) {
