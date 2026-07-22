@@ -5,6 +5,7 @@ import dev.aperture.editor.ApertureEditor;
 import dev.aperture.editor.service.EditorService;
 import dev.aperture.editor.service.ParametricService;
 import dev.aperture.client.editor.GizmoDragController;
+import dev.aperture.client.editor.AuthoritativeResizeController;
 import dev.aperture.client.placement.ClientPlacementPreview;
 import dev.aperture.client.render.ApertureRenderers;
 import dev.aperture.client.render.ClientMaterialPreview;
@@ -78,6 +79,7 @@ public class ApertureClient implements ClientModInitializer {
 	private void onClientTick(Minecraft client) {
 		ClientPlacementPreview.tick(client);
 		GizmoDragController.tick(client);
+		AuthoritativeResizeController.tick(client);
 
 		while (commitPlacementKey.consumeClick()) {
 			if (ClientPlacementPreview.commitPreview()) {

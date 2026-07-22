@@ -1,6 +1,8 @@
 package dev.aperture.client.editor.imgui;
 
 import dev.aperture.client.editor.GizmoDragController;
+import dev.aperture.client.editor.AuthoritativeResizeController;
+import dev.aperture.client.editor.ClientEditorWorkspace;
 import dev.aperture.client.placement.ClientPlacementPreview;
 import dev.aperture.editor.model.preview.PreviewCoordinator;
 import dev.aperture.editor.model.selection.SelectionModel;
@@ -40,7 +42,11 @@ final class ClientEditorToolController implements ToolController {
 	public boolean available(Tool tool) {
 		return switch (tool) {
 			case SELECT, PLACE -> true;
-			case ROTATE, RESIZE -> ClientPlacementPreview.session().isPresent();
+			case ROTATE -> ClientPlacementPreview.session().isPresent();
+			case RESIZE -> ClientEditorWorkspace.session().flatMap(session -> {
+				var primary = session.selection().snapshot().primaryObject();
+				return primary == null ? java.util.Optional.empty() : session.readModel().object(primary);
+			}).flatMap(view -> view.parameters().get("width")).isPresent();
 			case MOVE, ATTACH, MEASURE -> false;
 		};
 	}
@@ -48,7 +54,8 @@ final class ClientEditorToolController implements ToolController {
 	@Override
 	public String disabledReason(Tool tool) {
 		return switch (tool) {
-			case ROTATE, RESIZE -> "Aim at a valid host to create a placement preview first";
+			case ROTATE -> "Aim at a valid host to create a placement preview first";
+			case RESIZE -> "Select one object with a Width parameter first";
 			case MOVE -> "World translation is not connected yet";
 			case ATTACH -> "Host reassignment is not connected yet";
 			case MEASURE -> "Measurement overlays are not connected yet";
@@ -72,5 +79,6 @@ final class ClientEditorToolController implements ToolController {
 		var selected = selection.snapshot().primaryObject();
 		if (selected != null) previews.clearObject(selected);
 		GizmoDragController.reset();
+		AuthoritativeResizeController.reset();
 	}
 }

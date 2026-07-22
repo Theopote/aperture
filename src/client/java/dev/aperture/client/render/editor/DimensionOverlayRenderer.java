@@ -1,6 +1,7 @@
 package dev.aperture.client.render.editor;
 
 import dev.aperture.client.editor.ClientEditorWorkspace;
+import dev.aperture.client.editor.AuthoritativeResizeController;
 import dev.aperture.client.editor.OpeningWorldGeometry;
 import net.minecraft.gizmos.Gizmos;
 import net.minecraft.gizmos.TextGizmo;
@@ -25,7 +26,9 @@ public final class DimensionOverlayRenderer {
 		Gizmos.line(geometry.dimensionStart().add(0, -.08, 0), geometry.dimensionStart().add(0, .08, 0), DIMENSION, 2.0F).setAlwaysOnTop();
 		Gizmos.line(geometry.dimensionEnd().add(0, -.08, 0), geometry.dimensionEnd().add(0, .08, 0), DIMENSION, 2.0F).setAlwaysOnTop();
 		Gizmos.point(geometry.leftWidthHandle(), HANDLE, 9.0F).setAlwaysOnTop();
-		Gizmos.point(geometry.rightWidthHandle(), HANDLE, 9.0F).setAlwaysOnTop();
+		int activeHandleColor = AuthoritativeResizeController.dragging() ? 0xFFFF8800
+			: AuthoritativeResizeController.hovered() ? 0xFFFFFFFF : HANDLE;
+		Gizmos.point(geometry.rightWidthHandle(), activeHandleColor, 11.0F).setAlwaysOnTop();
 		String label = Math.round(geometry.widthMm()) + " mm";
 		Gizmos.billboardText(label, geometry.dimensionLabel(), TextGizmo.Style.forColorAndCentered(DIMENSION).withScale(.8F))
 			.setAlwaysOnTop();
