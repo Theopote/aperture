@@ -16,7 +16,4 @@ public record EditorInputFrame(
 		return new EditorInputFrame(false, false, false, false, false, false, false, false, null);
 	}
 
-	/** Ray coordinates are expressed in host-world units; direction is normalized by the adapter. */
-	public record WorldRay(double originX, double originY, double originZ,
-		double directionX, double directionY, double directionZ) { }
 }

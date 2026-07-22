@@ -1,17 +1,27 @@
 package dev.aperture.client.editor;
 
-import dev.aperture.block.entity.OpeningBlockEntity;
-import dev.aperture.runtime.model.object.ArchitecturalObjectId;
+import dev.aperture.editor.interaction.PickContext;
+import dev.aperture.editor.interaction.PickResult;
+import dev.aperture.editor.interaction.WorldRay;
+import dev.aperture.math.Vec3d;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.phys.BlockHitResult;
 
+import java.util.List;
 import java.util.Optional;
 
-/** Resolves the architectural identity anchored at the current Minecraft hit. */
+/** Minecraft composition root for the frontend-neutral architectural picking pipeline. */
 public final class ArchitecturalPickingService {
-	public Optional<ArchitecturalObjectId> pick(Minecraft client) {
-		if (client.level == null || !(client.hitResult instanceof BlockHitResult hit)) return Optional.empty();
-		if (!(client.level.getBlockEntity(hit.getBlockPos()) instanceof OpeningBlockEntity opening)) return Optional.empty();
-		return opening.resolveRuntimeSnapshot().map(snapshot -> snapshot.instance().objectId());
+	private static final double MILLIMETERS_PER_BLOCK = 1000.0;
+
+	public Optional<PickResult> pick(Minecraft client, PickContext context) {
+		if (client.player == null || client.level == null) return Optional.empty();
+		var origin = client.gameRenderer.getMainCamera().position();
+		var direction = client.player.getViewVector(1.0F);
+		WorldRay ray = new WorldRay(new Vec3d(origin.x * MILLIMETERS_PER_BLOCK,
+			origin.y * MILLIMETERS_PER_BLOCK, origin.z * MILLIMETERS_PER_BLOCK),
+			new Vec3d(direction.x, direction.y, direction.z));
+		var pipeline = new dev.aperture.editor.interaction.ArchitecturalPickingService(
+			List.of(new ArchitecturalObjectAnchorPickSource(client)));
+		return pipeline.pick(ray, context);
 	}
 }

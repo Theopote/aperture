@@ -2,6 +2,7 @@ package dev.aperture.client.editor;
 
 import dev.aperture.editor.interaction.EditorInputFrame;
 import dev.aperture.editor.interaction.EditorTool;
+import dev.aperture.editor.interaction.WorldRay;
 import dev.aperture.editor.model.command.ExpectedRevision;
 import dev.aperture.editor.model.preview.DefaultParameterEditSession;
 import dev.aperture.editor.model.read.ObjectEditorView;
@@ -13,6 +14,7 @@ import net.minecraft.world.phys.Vec3;
 
 /** Instance-owned width manipulator migrated from the original static controller. */
 public final class ResizeTool implements EditorTool {
+	private static final double MILLIMETERS_PER_BLOCK = 1000.0;
 	private static final double PICK_RADIUS_BLOCKS = .14;
 	private static final double DEFAULT_SNAP_MM = 10.0;
 	private final EditorSession session;
@@ -107,12 +109,13 @@ public final class ResizeTool implements EditorTool {
 		drag = null;
 	}
 
-	private static Vec3 origin(EditorInputFrame.WorldRay ray) {
-		return new Vec3(ray.originX(), ray.originY(), ray.originZ());
+	private static Vec3 origin(WorldRay ray) {
+		return new Vec3(ray.origin().x() / MILLIMETERS_PER_BLOCK,
+			ray.origin().y() / MILLIMETERS_PER_BLOCK, ray.origin().z() / MILLIMETERS_PER_BLOCK);
 	}
 
-	private static Vec3 direction(EditorInputFrame.WorldRay ray) {
-		return new Vec3(ray.directionX(), ray.directionY(), ray.directionZ());
+	private static Vec3 direction(WorldRay ray) {
+		return new Vec3(ray.direction().x(), ray.direction().y(), ray.direction().z());
 	}
 
 	private static double rayDistanceToPoint(Vec3 origin, Vec3 direction, Vec3 point) {
