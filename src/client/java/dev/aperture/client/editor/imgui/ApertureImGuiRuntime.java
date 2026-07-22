@@ -11,6 +11,9 @@ import dev.aperture.editor.model.read.*;
 import dev.aperture.editor.model.selection.DefaultSelectionModel;
 import dev.aperture.editor.model.session.*;
 import dev.aperture.client.runtime.ClientRuntimeReplicas;
+import dev.aperture.client.editor.ArchitecturalPickingService;
+import dev.aperture.client.editor.WorldSelectionController;
+import dev.aperture.client.editor.ClientEditorWorkspace;
 import dev.aperture.client.editor.ClientEditorPreviews;
 import imgui.ImGui;
 import imgui.ImGuiIO;
@@ -31,6 +34,7 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 	private final ImGuiImplGlfw glfw = new ImGuiImplGlfw();
 	private final ImGuiImplGl3 gl3 = new ImGuiImplGl3();
 	private DearImGuiEditor editor;
+	private WorldSelectionController worldSelection;
 	private boolean initialized;
 	private boolean drawDataReady;
 	private boolean drawSubmissionLogged;
@@ -50,7 +54,9 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 		try(var ignored=RenderStateGuard.capture()){resetPixelStore();gl3.init("#version 150");}
 		var layoutVersionPath = configDirectory.resolve("layout.version");
 		boolean defaultLayoutRequired = Files.notExists(iniPath) || layoutUpgradeRequired(layoutVersionPath);
-		editor = new DearImGuiEditor(createSession(), defaultLayoutRequired);
+		EditorSession session = createSession();
+		editor = new DearImGuiEditor(session, defaultLayoutRequired);
+		worldSelection = new WorldSelectionController(session.selection(), session.readModel(), new ArchitecturalPickingService());
 		persistLayoutVersion(layoutVersionPath);
 		initialized = true;
 		Aperture.LOGGER.info("Dear ImGui initialized for window {} (fontTexture={}, validTexture={})", window, io.getFonts().getTexID(), GL11.glIsTexture(io.getFonts().getTexID()));
@@ -80,6 +86,7 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 
 	public boolean wantsMouse(){return initialized && ImGui.getIO().getWantCaptureMouse();}
 	public boolean wantsKeyboard(){return initialized && ImGui.getIO().getWantCaptureKeyboard();}
+	public boolean selectAtCrosshair(boolean additive){return initialized && worldSelection.selectAtCrosshair(Minecraft.getInstance(),additive);}
 	public boolean initialized(){return initialized;}
 
 	private static EditorSession createSession() {
@@ -87,7 +94,9 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 		var read=new ReplicaEditorReadModel(ClientRuntimeReplicas.store(),previews,diagnostics,ClientRuntimeReplicas::runtimeActions);
 		var history=new DefaultHistoryProjection(); EditorCommandTransport transport=new ClientEditorCommandTransport(diagnostics,previews);
 		var commands=new DefaultEditorCommandGateway(transport,diagnostics,new StandardRuntimeActionResolver(),read,history);
-		return new DefaultEditorSession(selection,read,commands,new SchemaDrivenInspectorModel(read,typeId->dev.aperture.runtime.ApertureRuntime.get().openingTypes().get(new dev.aperture.core.opening.OpeningId(typeId.namespace(),typeId.path())).map(dev.aperture.core.definition.OpeningTypeDefinition::parametricSchema)),previews,history,diagnostics,new DefaultWorkspaceModel(),new ClientEditorToolController(selection,previews));
+		EditorSession session = new DefaultEditorSession(selection,read,commands,new SchemaDrivenInspectorModel(read,typeId->dev.aperture.runtime.ApertureRuntime.get().openingTypes().get(new dev.aperture.core.opening.OpeningId(typeId.namespace(),typeId.path())).map(dev.aperture.core.definition.OpeningTypeDefinition::parametricSchema)),previews,history,diagnostics,new DefaultWorkspaceModel(),new ClientEditorToolController(selection,previews));
+		ClientEditorWorkspace.bind(session);
+		return session;
 	}
 
 	private static boolean layoutUpgradeRequired(Path versionFile) {
@@ -118,5 +127,5 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 		GL11.glPixelStorei(org.lwjgl.opengl.GL12.GL_PACK_SKIP_ROWS, 0);
 	}
 
-	@Override public void close(){if(!initialized)return;gl3.dispose();glfw.dispose();ImGui.destroyContext();initialized=false;drawDataReady=false;editor=null;}
+	@Override public void close(){if(!initialized)return;gl3.dispose();glfw.dispose();ImGui.destroyContext();initialized=false;drawDataReady=false;editor=null;worldSelection=null;ClientEditorWorkspace.clear();}
 }
