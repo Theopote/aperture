@@ -29,10 +29,11 @@ final class ViewportOverlay {
 	}
 
 	private void modeHud(float x, float y) {
-		beginHud("Viewport Mode##Viewport", x, y, 190, 82, true);
+		beginHud("Viewport Mode##Viewport", x, y, 190, 100, true);
 		float[] color = context.mode == ApertureUiContext.Mode.RUNTIME ? ApertureStyle.RUNTIME : ApertureStyle.BLUE;
 		ImGui.textColored(color[0], color[1], color[2], 1, context.mode + " MODE");
 		ImGui.textDisabled("Minecraft World");
+		ImGui.text("Tool  " + context.session.tools().activeTool());
 		ImGui.text("Snap  " + (context.snap ? "On" : "Off") + "   |   Coordinates  World");
 		ImGui.end();
 	}
@@ -80,7 +81,7 @@ final class ViewportOverlay {
 		beginHud("Tool Help##Viewport", x, y, 380, 36, true);
 		String help = context.mode == ApertureUiContext.Mode.RUNTIME
 			? "Click an object to inspect state   |   Esc to cancel"
-			: "Click to select   |   Edit dimensions in Inspector   |   Esc to cancel";
+			: context.session.tools().hint();
 		ImGui.textDisabled(help);
 		ImGui.end();
 	}

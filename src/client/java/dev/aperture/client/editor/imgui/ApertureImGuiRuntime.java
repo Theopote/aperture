@@ -87,7 +87,7 @@ public final class ApertureImGuiRuntime implements AutoCloseable {
 		var read=new ReplicaEditorReadModel(ClientRuntimeReplicas.store(),previews,diagnostics,ClientRuntimeReplicas::runtimeActions);
 		var history=new DefaultHistoryProjection(); EditorCommandTransport transport=new ClientEditorCommandTransport(diagnostics,previews);
 		var commands=new DefaultEditorCommandGateway(transport,diagnostics,new StandardRuntimeActionResolver(),read,history);
-		return new DefaultEditorSession(selection,read,commands,new SchemaDrivenInspectorModel(read,typeId->dev.aperture.runtime.ApertureRuntime.get().openingTypes().get(new dev.aperture.core.opening.OpeningId(typeId.namespace(),typeId.path())).map(dev.aperture.core.definition.OpeningTypeDefinition::parametricSchema)),previews,history,diagnostics,new DefaultWorkspaceModel(),()->{var selected=selection.snapshot().primaryObject();if(selected!=null)previews.clearObject(selected);});
+		return new DefaultEditorSession(selection,read,commands,new SchemaDrivenInspectorModel(read,typeId->dev.aperture.runtime.ApertureRuntime.get().openingTypes().get(new dev.aperture.core.opening.OpeningId(typeId.namespace(),typeId.path())).map(dev.aperture.core.definition.OpeningTypeDefinition::parametricSchema)),previews,history,diagnostics,new DefaultWorkspaceModel(),new ClientEditorToolController(selection,previews));
 	}
 
 	private static boolean layoutUpgradeRequired(Path versionFile) {
