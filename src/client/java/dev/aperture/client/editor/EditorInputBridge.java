@@ -2,6 +2,7 @@ package dev.aperture.client.editor;
 
 import dev.aperture.editor.interaction.EditorInputFrame;
 import dev.aperture.editor.interaction.WorldRay;
+import dev.aperture.editor.interaction.ScreenPoint;
 import dev.aperture.math.Vec3d;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
@@ -34,6 +35,7 @@ public final class EditorInputBridge {
 			keyDown(window, GLFW.GLFW_KEY_LEFT_CONTROL) || keyDown(window, GLFW.GLFW_KEY_RIGHT_CONTROL),
 			keyDown(window, GLFW.GLFW_KEY_LEFT_ALT) || keyDown(window, GLFW.GLFW_KEY_RIGHT_ALT),
 			worldAllowed,
+			new ScreenPoint(client.mouseHandler.xpos(), client.mouseHandler.ypos()),
 			ray
 		);
 		previousPrimaryDown = primaryDown;

@@ -10,10 +10,11 @@ public record EditorInputFrame(
 	boolean controlDown,
 	boolean altDown,
 	boolean worldInputAllowed,
+	ScreenPoint cursor,
 	WorldRay worldRay
 ) {
 	public static EditorInputFrame idle() {
-		return new EditorInputFrame(false, false, false, false, false, false, false, false, null);
+		return new EditorInputFrame(false, false, false, false, false, false, false, false, null, null);
 	}
 
 }

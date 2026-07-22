@@ -5,20 +5,24 @@ import dev.aperture.editor.interaction.EditorTool;
 import dev.aperture.editor.interaction.ManipulatorDescriptor;
 import dev.aperture.editor.interaction.ManipulatorDescriptorProvider;
 import dev.aperture.editor.interaction.LinearParameterDragSession;
+import dev.aperture.editor.interaction.GizmoHitTester;
+import dev.aperture.editor.interaction.ScreenSpaceHandle;
 import dev.aperture.editor.interaction.WorldRay;
 import dev.aperture.editor.model.read.ObjectEditorView;
 import dev.aperture.editor.model.session.EditorSession;
 import dev.aperture.editor.model.session.ToolController;
 import dev.aperture.parameter.ParameterType;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.client.Minecraft;
 
 /** Generic linear-parameter resize tool driven by family-provided descriptors. */
 public final class ResizeTool implements EditorTool {
 	private static final double MILLIMETERS_PER_BLOCK = 1000.0;
-	private static final double PICK_RADIUS_BLOCKS = .14;
 	private final EditorSession session;
 	private final ManipulatorDescriptorProvider descriptors;
 	private final ManipulatorGeometryEvaluator geometry = new ManipulatorGeometryEvaluator();
+	private final WorldToScreenProjector projector = new WorldToScreenProjector();
+	private final GizmoHitTester hitTester = new GizmoHitTester();
 	private boolean hovered;
 	private ActiveDrag drag;
 
@@ -46,7 +50,12 @@ public final class ResizeTool implements EditorTool {
 		var manipulator = evaluated.get();
 		Vec3 origin = origin(input.worldRay());
 		Vec3 direction = direction(input.worldRay());
-		hovered = rayDistanceToPoint(origin, direction, manipulator.handle()) <= PICK_RADIUS_BLOCKS;
+		hovered = input.cursor() != null && projector.project(Minecraft.getInstance(), manipulator.handle())
+			.map(center -> new ScreenSpaceHandle(manipulator.descriptor().id(), center, 9, 12, 14, true,
+				ScreenSpaceHandle.OcclusionPolicy.IGNORE_SCENE_DEPTH,
+				ScreenSpaceHandle.DisplayPolicy.ALWAYS_ON_TOP))
+			.flatMap(handle -> hitTester.hit(input.cursor(), java.util.List.of(handle)))
+			.isPresent();
 		if (input.primaryPressed() && hovered) start(view, manipulator, origin, direction);
 		if (input.primaryDown() && drag != null) updateDrag(input, origin, direction);
 		if (input.primaryReleased() && drag != null) finish();
@@ -111,11 +120,6 @@ public final class ResizeTool implements EditorTool {
 		return new Vec3(ray.direction().x(), ray.direction().y(), ray.direction().z());
 	}
 
-	private static double rayDistanceToPoint(Vec3 origin, Vec3 direction, Vec3 point) {
-		double projection = point.subtract(origin).dot(direction);
-		if (projection < 0) return Double.MAX_VALUE;
-		return origin.add(direction.scale(projection)).distanceTo(point);
-	}
 
 	private record ActiveDrag(LinearParameterDragSession session, double anchorBlocks,
 		Vec3 axisOrigin, Vec3 axis) { }
