@@ -3,6 +3,7 @@ package dev.aperture.client.editor.imgui;
 import dev.aperture.client.runtime.ClientRuntimeReplicas;
 import dev.aperture.editor.model.command.EditorCommandSubmission;
 import dev.aperture.editor.model.command.EditorCommandTransport;
+import dev.aperture.editor.model.command.EditorCommandResultListener;
 import dev.aperture.editor.model.command.ExpectedRevision;
 import dev.aperture.editor.model.command.SetParameterArchitecturalCommand;
 import dev.aperture.editor.model.read.DiagnosticsModel;
@@ -41,12 +42,15 @@ final class ClientEditorCommandTransport implements EditorCommandTransport {
 	private final DiagnosticsModel diagnostics;
 	private final PreviewCoordinator previews;
 	private final Map<UUID, PendingCommand> pending = new ConcurrentHashMap<>();
+	private final java.util.List<EditorCommandResultListener> resultListeners=new java.util.concurrent.CopyOnWriteArrayList<>();
 
 	ClientEditorCommandTransport(DiagnosticsModel diagnostics, PreviewCoordinator previews) {
 		this.diagnostics = diagnostics;
 		this.previews = previews;
 		ClientRuntimeReplicas.addMessageListener(this::onMessage);
 	}
+
+	@Override public void addResultListener(EditorCommandResultListener listener){resultListeners.add(listener);}
 
 	@Override
 	public EditorCommandSubmission submit(UUID commandId, ArchitecturalCommand command, ExpectedRevision revision) {
@@ -75,7 +79,7 @@ final class ClientEditorCommandTransport implements EditorCommandTransport {
 	private void onMessage(ReplicationMessage message) {
 		if (message instanceof CommandAcceptedMessage accepted) {
 			PendingCommand command=pending.remove(accepted.commandId());
-			if(command!=null){previews.transition(accepted.commandId(),PreviewState.ACCEPTED_WAITING_REPLICA);previews.complete(accepted.commandId());}
+			if(command!=null){previews.transition(accepted.commandId(),PreviewState.ACCEPTED_WAITING_REPLICA);previews.complete(accepted.commandId());notifyResult(new EditorCommandSubmission(accepted.commandId(),EditorCommandSubmission.Status.ACCEPTED,"Accepted",accepted.resultingObjectRevision(),accepted.resultingStateRevision().value()));}
 		} else if (message instanceof CommandRejectedMessage rejected) {
 			PendingCommand command = pending.get(rejected.commandId());
 			if (command == null) return;
@@ -89,6 +93,7 @@ final class ClientEditorCommandTransport implements EditorCommandTransport {
 				previews.transition(rejected.commandId(),PreviewState.REJECTED);
 				previews.complete(rejected.commandId());
 			}
+			notifyResult(new EditorCommandSubmission(rejected.commandId(),conflict?EditorCommandSubmission.Status.REVISION_CONFLICT:EditorCommandSubmission.Status.REJECTED,rejected.message(),rejected.authoritativeObjectRevision(),rejected.authoritativeStateRevision().value()));
 			ArchitecturalObjectId id = command.objectId();
 			EditorDiagnostic.Severity severity = EditorDiagnostic.Severity.ERROR;
 			diagnostics.add(new EditorDiagnostic(severity, rejected.errorCode().name().toLowerCase(), rejected.message(),
@@ -99,6 +104,8 @@ final class ClientEditorCommandTransport implements EditorCommandTransport {
 			completed.forEach(commandId->{pending.remove(commandId);previews.complete(commandId);});
 		}
 	}
+
+	private void notifyResult(EditorCommandSubmission result){resultListeners.forEach(listener->listener.completed(result));}
 
 	private void requestResync(CommandRejectedMessage rejected){
 		var request=new ObjectResyncRequest(AuthoritativeCommandGateway.PROTOCOL_VERSION,rejected.objectId(),rejected.authoritativeObjectRevision(),rejected.authoritativeStateRevision(),0,"editor revision conflict");

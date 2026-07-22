@@ -104,11 +104,8 @@ public final class DearImGuiEditor {
 			session.selection().clear();
 			session.readModel().visibleObjects().forEach(object -> session.selection().addObject(object.objectId()));
 		});
-		shortcuts.bind("CTRL+Z", () -> session.history().designCommands().stream()
-			.filter(entry -> entry.undoable() && entry.result() == EditorHistoryEntry.Result.ACCEPTED)
-			.reduce((first, second) -> second).ifPresent(session.commands()::undo));
-		shortcuts.bind("CTRL+SHIFT+Z", () -> session.history().designCommands().stream()
-			.reduce((first, second) -> second).ifPresent(session.commands()::redo));
+		shortcuts.bind("CTRL+Z", () -> session.commands().undo(session.history()));
+		shortcuts.bind("CTRL+SHIFT+Z", () -> session.commands().redo(session.history()));
 		shortcuts.bind("CTRL+Y", () -> shortcuts.dispatch("CTRL+SHIFT+Z", new EditorInputPolicy(false, false, false)));
 	}
 
@@ -164,12 +161,15 @@ public final class DearImGuiEditor {
 			});
 			if (!view.runtimeActions().isEmpty()) {
 				ImGui.separator(); ImGui.textDisabled("Actions");
+				String group=null;
 				for (var action : view.runtimeActions()) {
-					if (!action.enabled()) ImGui.beginDisabled();
-					boolean pressed = ImGui.button(action.label()+"##"+action.id());
-					if (!action.enabled()) ImGui.endDisabled();
-					if (pressed) submitRuntimeAction(view, action.id());
-					ImGui.sameLine();
+					if(!action.group().equals(group)){if(group!=null)ImGui.newLine();group=action.group();ImGui.textDisabled(group);}
+					boolean disabled=!action.enabled()||action.pending();if(disabled)ImGui.beginDisabled();
+					String prefix=action.icon().isBlank()?"":action.icon()+" ";boolean pressed=ImGui.button(prefix+action.label()+"##"+action.id());
+					if(disabled)ImGui.endDisabled();
+					if(ImGui.isItemHovered()){String tip=action.pending()?"Command pending":!action.enabled()&&!action.disabledReason().isBlank()?action.disabledReason():action.tooltip();if(!tip.isBlank())ImGui.setTooltip(tip);}
+					if(pressed)submitRuntimeAction(view,action.id());
+					if(ImGui.getContentRegionAvailX()>120)ImGui.sameLine();else ImGui.newLine();
 				}
 				ImGui.newLine();
 			}

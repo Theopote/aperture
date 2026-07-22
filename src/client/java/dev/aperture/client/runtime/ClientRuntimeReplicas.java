@@ -40,7 +40,7 @@ public final class ClientRuntimeReplicas {
 
 	public static List<RuntimeActionDescriptor> runtimeActions(ReplicaObject replica) {
 		return FAMILIES.runtimeActions(replica.instance(),replica.state()).stream()
-			.map(action->new RuntimeActionDescriptor(action.id(),action.label(),action.enabled())).toList();
+			.map(action->new RuntimeActionDescriptor(action.id(),action.label(),action.enabled(),action.group(),action.icon(),RuntimeActionDescriptor.Severity.valueOf(action.severity().name()),action.tooltip(),action.confirmation(),action.pending(),action.disabledReason())).toList();
 	}
 	public static ClientReplicaStore store() { return STORE; }
 	public static void addMessageListener(Consumer<ReplicationMessage> listener) { LISTENERS.add(listener); }
